@@ -1,0 +1,108 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+    --admin-bg: #f7f9fa;
+    --admin-card: #ffffff;
+    --admin-border: #e5e9eb;
+    --admin-text: #1f272b;
+    --admin-secondary: #606e6e;
+    --admin-muted: #8a9599;
+    --admin-hover: #f8f9fb;
+
+    --admin-primary: #2d15fd;
+    --admin-primary-bg: #eef0ff;
+
+    --admin-success: #38c79a;
+    --admin-success-bg: #ecfbf5;
+
+    --admin-chart-grid: #e5e9eb;
+    --admin-chart-text: #778387;
+    --admin-chart-hover: #f1f3f4;
+
+    --admin-sidebar: #ffffff;
+}
+
+/* DARK THEME */
+html.dark {
+    --admin-bg: #12181b;
+    --admin-card: #1c2529;
+    --admin-border: #303a3f;
+    --admin-text: #f4f6f7;
+    --admin-secondary: #aeb7ba;
+    --admin-muted: #778387;
+    --admin-hover: #222d31;
+
+    --admin-primary: #6c63ff;
+    --admin-primary-bg: rgba(108, 99, 255, 0.15);
+
+    --admin-success: #38c79a;
+    --admin-success-bg: rgba(56, 199, 154, 0.15);
+
+    --admin-chart-grid: #303a3f;
+    --admin-chart-text: #778387;
+    --admin-chart-hover: #222d31;
+
+    --admin-sidebar: #171f23;
+}
+
+/* ADMIN THEME CLASSES */
+
+.admin-bg {
+    background-color: var(--admin-bg);
+}
+
+.admin-card {
+    background-color: var(--admin-card);
+}
+
+.admin-sidebar {
+    background-color: var(--admin-sidebar);
+}
+
+.admin-border {
+    border-color: var(--admin-border);
+}
+
+.admin-text {
+    color: var(--admin-text);
+}
+
+.admin-secondary {
+    color: var(--admin-secondary);
+}
+
+.admin-muted {
+    color: var(--admin-muted);
+}
+
+.admin-hover:hover {
+    background-color: var(--admin-hover);
+}
+
+.admin-primary {
+    color: var(--admin-primary);
+}
+
+.admin-primary-bg {
+    background-color: var(--admin-primary-bg);
+}
+
+.admin-success {
+    color: var(--admin-success);
+}
+
+.admin-success-bg {
+    background-color: var(--admin-success-bg);
+}
+
+.admin-progress-bg {
+    background-color: var(--admin-hover);
+}
