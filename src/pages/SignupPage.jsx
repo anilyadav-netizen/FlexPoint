@@ -52,11 +52,11 @@ const SignupPage = () => {
     };
 
     return (
-        <main className=" w-full bg-[#0d0d0d] text-white">
+        <main className=" w-full bg-[#0d0d0d] text-white min-h-screen">
 
-            <div className="mx-auto flex w-full max-w-[1400px] items-center justify-center px-5 py-12 sm:px-8 lg:px-12">
+            <div className="mx-auto flex w-full max-w-[1400px] items-center justify-center px-5 py-125 sm:px-8 lg:px-12">
 
-                <div className="grid w-full max-w-[1100px] overflow-hidden border border-white/10 bg-[#111111] lg:grid-cols-[0.9fr_1.1fr]">
+                <div className="grid w-full max-w-[1100px] overflow-hidden border border-white/10 bg-[#111111] lg:grid-cols-[0.9fr_1.1fr] mt-24">
 
                     {/* =================================================
                         LEFT SIDE

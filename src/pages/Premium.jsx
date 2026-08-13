@@ -49,13 +49,13 @@ const Premium = () => {
     return (
         <section
             id="membership"
-            className="w-full overflow-hidden border-t border-white/10 bg-[#0d0d0d] py-9 text-white sm:py-11 md:py-13 lg:py-15"
+            className="w-full overflow-hidden border-t border-white/10 bg-[#0d0d0d] py-3 text-white sm:py-11 md:py-6 lg:py-8"
         >
             <div className="mx-auto w-full max-w-[110rem] px-6 sm:px-10 lg:px-16 xl:px-[7%]">
 
                 {/* ================= HEADING ================= */}
 
-                <div className="mb-5 flex items-center sm:mb-6">
+                <div className="mb-9 flex items-center ">
 
                     <h2 className="whitespace-nowrap font-['Bebas_Neue'] text-[27px] leading-none tracking-[0.02em] text-white sm:text-[31px] md:text-[35px] lg:text-[39px]">
 
@@ -71,7 +71,7 @@ const Premium = () => {
 
                 {/* ================= MAIN LAYOUT ================= */}
 
-                <div className="grid grid-cols-1 gap-4 lg:grid-cols-[1fr_0.43fr] lg:gap-5">
+                <div className="grid grid-cols-1 gap-4 lg:grid-cols-[1fr_0.43fr] lg:gap-5 mt-3">
 
                     {/* ================= PLANS ================= */}
 

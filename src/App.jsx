@@ -20,7 +20,6 @@ import AdminLayout from "./Admin/adminLayout/AdminLayout";
 import Dashboard from "./Admin/adPages/Dashboard";
 import Members from "./Admin/adPages/Members";
 import AddMember from "./Admin/adPages/AddMember";
-import Trainer from "./pages/Trainer";
 import AdTrainer from "./Admin/adPages/AdTrainer";
 import AddTrainers from "./Admin/adPages/AddTrainers";
 import AdProgram from "./Admin/adPages/AdProgram";
@@ -37,39 +36,39 @@ import Attandance from "./Admin/adPages/Attandance";
 import Progress from "./Admin/adPages/Progress";
 import MyProfile from "./Admin/adPages/MyProfile";
 
+const WebsiteLayout = () => {
+  return (
+    <>
+      <Navbar />
+      <main className="flex-1">
+        <Routes>
+          <Route path="/" element={<Home />} />
+          <Route path="/about" element={<AboutPage />} />
+          <Route path="/programs" element={<ProgramPage />} />
+          <Route path="/trainers" element={<TrainerPage />} />
+          <Route path="/blog" element={<BlogPage />} />
+          <Route path="/contact" element={<ContactPage />} />
+          <Route path="/privacy" element={<Privacy />} />
+          <Route path="/terms" element={<Terms />} />
+        </Routes>
+      </main>
+      <Footer />
+    </>
+  );
+};
+
 function App() {
   return (
     <>
       <ScrollToTop />
 
       <Routes>
+        {/* Website Routes - Navbar + Footer */}
+        <Route path="/*" element={<WebsiteLayout />} />
 
-        {/* Website Routes */}
-        <Route
-          path="/*"
-          element={
-            <>
-              <Navbar />
-
-              <main className="flex-1">
-                <Routes>
-                  <Route path="/" element={<Home />} />
-                  <Route path="/about" element={<AboutPage />} />
-                  <Route path="/programs" element={<ProgramPage />} />
-                  <Route path="/trainers" element={<TrainerPage />} />
-                  <Route path="/blog" element={<BlogPage />} />
-                  <Route path="/contact" element={<ContactPage />} />
-                  <Route path="/login" element={<LoginPage />} />
-                  <Route path="/signup" element={<SignupPage />} />
-                  <Route path="/privacy" element={<Privacy />} />
-                  <Route path="/terms" element={<Terms />} />
-                </Routes>
-              </main>
-
-              <Footer />
-            </>
-          }
-        />
+        {/* Authentication Routes - No Navbar + Footer */}
+        <Route path="/login" element={<LoginPage />} />
+        <Route path="/signup" element={<SignupPage />} />
 
         {/* Admin Routes */}
         <Route path="/admin" element={<AdminLayout />}>
@@ -93,7 +92,6 @@ function App() {
           <Route path="adblogs" element={<AdBlog />} />
           <Route path="addblogs" element={<AddBlogPage />} />
         </Route>
-
       </Routes>
     </>
   );

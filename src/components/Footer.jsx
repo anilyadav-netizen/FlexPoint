@@ -54,7 +54,7 @@ const Footer = () => {
 
                 {/* ================= MAIN FOOTER ================= */}
 
-                <div className="grid grid-cols-1 gap-4 py-10 sm:grid-cols-2 md:grid-cols-4 md:gap-8 lg:py-12">
+                <div className="grid grid-cols-1 gap-4 py-4 sm:grid-cols-2 md:grid-cols-4 md:gap-8 lg:py-8">
 
                     {/* ================= BRAND ================= */}
 

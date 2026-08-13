@@ -41,11 +41,11 @@ const LoginPage = () => {
     };
 
     return (
-        <main className=" w-full bg-[#0d0d0d] text-white">
+        <main className=" w-full bg-[#0d0d0d] text-white min-h-screen">
 
             <div className="mx-auto flex w-full max-w-[1400px] items-center justify-center px-5 py-10 sm:px-8 lg:px-12">
 
-                <div className="grid w-full max-w-[1050px] overflow-hidden border border-white/10 bg-[#111111] lg:grid-cols-2">
+                <div className="grid w-full max-w-[1050px] overflow-hidden border border-white/10 bg-[#111111] lg:grid-cols-2 mt-24">
 
                     {/* =================================================
                         LEFT SIDE
