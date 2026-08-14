@@ -46,7 +46,7 @@ const SignupPage = () => {
             })
         );
         if (registerUser.fulfilled.match(result)) {
-            navigate("/");
+            navigate("/login");
         }
     };
     return (
