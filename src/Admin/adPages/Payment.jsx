@@ -34,8 +34,7 @@ const Payment = () => {
     };
 
     return (
-        <div className="min-h-full bg-[#F5F7F9] dark:bg-[#12181B] git status
-        ">
+        <div className="min-h-full bg-[#F5F7F9] dark:bg-[#12181B] git status p-5 sm:p-8 lg:p-10">
             <div className="">
                 <div className="mb-6">
                     <h1 className="text-xl sm:text-2xl font-bold text-[#1F272B] dark:text-[#F4F6F7]">Payments</h1>

@@ -8,21 +8,22 @@ import Facility from './Facility'
 import Premium from './Premium'
 import Banner from './Banner'
 import BlogSection from './BlogSection'
+import Faq from './Faq'
 
 const Home = () => {
     return (
         <>
             <div>
                 <Hero />
-                <Program/>
-                <About/>
-                <Trainer/>
-                <WhyUs/>
-                <BlogSection/>
-                <Facility/>
-                <Premium/>
-                <Banner/>
-
+                <Program />
+                <About />
+                <Trainer />
+                <WhyUs />
+                <BlogSection />
+                <Facility />
+                <Premium />
+                <Banner />
+                <Faq />
             </div>
         </>
     )
