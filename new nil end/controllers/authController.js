@@ -124,7 +124,8 @@ const login = async (req, res) => {
       });
     }
 
-    const isMatch = await user.comparePassword(password);
+    // Compare plain password with hashed password
+    const isMatch = await bcrypt.compare(password, user.password);
 
     if (!isMatch) {
       return res.status(401).json({
