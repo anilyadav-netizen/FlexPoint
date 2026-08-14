@@ -1,5 +1,6 @@
 const User = require("../models/User");
 const jwt = require("jsonwebtoken");
+const bcrypt = require("bcryptjs"); 
 
 // Generate JWT
 const generateToken = (user) => {
@@ -24,11 +25,11 @@ const cookieOptions = {
 };
 
 // ==========================
-// Register
+// Register (with bcrypt in controller)
 // ==========================
 const register = async (req, res) => {
   try {
-    const { name, email, password,  } = req.body;
+    const { name, email, password } = req.body;
 
     if (!name || !email || !password) {
       return res.status(400).json({
@@ -55,14 +56,15 @@ const register = async (req, res) => {
       });
     }
 
-    // Public registration should normally create only user
-    const userRole =  "user";
+    // ✅ Hash password manually in controller
+    const salt = await bcrypt.genSalt(10);
+    const hashedPassword = await bcrypt.hash(password, salt);
 
     const user = await User.create({
       name,
       email: email.toLowerCase(),
-      password,
-      role: userRole,
+      password: hashedPassword, // 👈 store hashed password
+      role: "user",
     });
 
     const token = generateToken(user);
@@ -91,7 +93,7 @@ const register = async (req, res) => {
 };
 
 // ==========================
-// Login
+// Login (no change needed)
 // ==========================
 const login = async (req, res) => {
   try {
