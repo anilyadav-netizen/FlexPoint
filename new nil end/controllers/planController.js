@@ -52,6 +52,7 @@ const createPlan = async (req, res) => {
 // ============================
 // GET ALL PLANS
 // ============================
+
 const getPlans = async (req, res) => {
   try {
     const { active } = req.query;
@@ -86,6 +87,7 @@ const getPlans = async (req, res) => {
 // ============================
 // GET SINGLE PLAN
 // ============================
+
 const getPlanById = async (req, res) => {
   try {
     const { id } = req.params;
@@ -185,6 +187,7 @@ const updatePlan = async (req, res) => {
 // ============================
 // DELETE PLAN
 // ============================
+
 const deletePlan = async (req, res) => {
   try {
     const { id } = req.params;
