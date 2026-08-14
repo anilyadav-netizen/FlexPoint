@@ -8,6 +8,7 @@ const dns = require("dns");
 dns.setServers(['1.1.1.1','8.8.8.8'])
 
 const authRoutes = require("./routes/authRoutes");
+const planRoutes = require("./routes/planRoutes");
 
 const app = express();
 
@@ -31,6 +32,7 @@ app.use(cookieParser());
 // ==========================
 
 app.use("/api/auth", authRoutes);
+app.use("/api/plans", planRoutes);
 
 // Test route
 app.get("/", (req, res) => {
