@@ -1,299 +1,459 @@
-import React, { useState } from "react";
-import { ArrowLeft, Upload } from "lucide-react";
-import { useNavigate } from "react-router-dom";
+import React, { useEffect, useState } from "react";
+import {
+  ArrowLeft,
+  Upload,
+  X,
+  Save,
+} from "lucide-react";
+import { useDispatch, useSelector } from "react-redux";
+import { useLocation, useNavigate } from "react-router-dom";
+import {
+  createTrainer,
+  updateTrainer,
+} from "../../redux/Slicer/trainerSlice";
 
-const AddTrainers = () => {
+const AddTrainer = () => {
   const navigate = useNavigate();
+  const location = useLocation();
+  const dispatch = useDispatch();
+
+  const { loading } = useSelector((state) => state.trainer);
+
+  const editingTrainer = location.state?.trainer;
+  const isEdit = location.state?.isEdit === true;
 
   const [formData, setFormData] = useState({
+    number: "",
     name: "",
-    email: "",
-    phone: "",
+    role: "",
     specialty: "",
     experience: "",
-    members: "",
-    rating: "",
-    status: "Active",
-    bio: "",
-    image: null,
+    icon: "Users",
+    isActive: true,
   });
 
+  const [image, setImage] = useState(null);
+  const [preview, setPreview] = useState("");
+
+  // ============================
+  // LOAD EDIT DATA
+  // ============================
+  useEffect(() => {
+    if (isEdit && editingTrainer) {
+      setFormData({
+        number: editingTrainer.number || "",
+        name: editingTrainer.name || "",
+        role: editingTrainer.role || "",
+        specialty: editingTrainer.specialty || "",
+        experience: editingTrainer.experience || "",
+        icon: editingTrainer.icon || "Users",
+        isActive: editingTrainer.isActive ?? true,
+      });
+
+      setPreview(editingTrainer.image || "");
+    }
+  }, [isEdit, editingTrainer]);
+
+  // ============================
+  // INPUT CHANGE
+  // ============================
   const handleChange = (e) => {
-    const { name, value, files } = e.target;
-    setFormData({ ...formData, [name]: files ? files[0] : value });
+    const { name, value } = e.target;
+
+    setFormData((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
   };
 
-  const handleSubmit = (e) => {
+  // ============================
+  // STATUS CHANGE
+  // ============================
+  const handleStatusChange = (e) => {
+    setFormData((prev) => ({
+      ...prev,
+      isActive: e.target.value === "true",
+    }));
+  };
+
+  // ============================
+  // IMAGE CHANGE
+  // ============================
+  const handleImageChange = (e) => {
+    const file = e.target.files?.[0];
+
+    if (!file) return;
+
+    if (!file.type.startsWith("image/")) {
+      alert("Please select an image file.");
+      return;
+    }
+
+    if (file.size > 5 * 1024 * 1024) {
+      alert("Image size must be less than 5MB.");
+      return;
+    }
+
+    setImage(file);
+    setPreview(URL.createObjectURL(file));
+  };
+
+  // ============================
+  // REMOVE IMAGE
+  // ============================
+  const removeImage = () => {
+    setImage(null);
+
+    if (isEdit && editingTrainer?.image) {
+      setPreview(editingTrainer.image);
+    } else {
+      setPreview("");
+    }
+  };
+
+  // ============================
+  // SUBMIT
+  // ============================
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log("Trainer Data:", formData);
+
+    // Required fields
+    if (
+      !formData.number ||
+      !formData.name ||
+      !formData.role ||
+      !formData.specialty ||
+      !formData.experience
+    ) {
+      alert(
+        "Number, name, role, specialty and experience are required."
+      );
+      return;
+    }
+
+    // Image required only while creating
+    if (!isEdit && !image) {
+      alert("Trainer image is required.");
+      return;
+    }
+
+    try {
+      if (isEdit && editingTrainer?._id) {
+        await dispatch(
+          updateTrainer({
+            id: editingTrainer._id,
+            trainerData: {
+              ...formData,
+              image,
+            },
+          })
+        ).unwrap();
+
+        alert("Trainer updated successfully.");
+      } else {
+        await dispatch(
+          createTrainer({
+            ...formData,
+            image,
+          })
+        ).unwrap();
+
+        alert("Trainer created successfully.");
+      }
+
+      navigate("/admin/adtrainers");
+    } catch (error) {
+      alert(error || "Something went wrong.");
+    }
   };
 
   return (
-    <div className="min-h-full bg-[#F5F7F9] dark:bg-[#12181B] p-3 sm:p-5 lg:p-6">
-      <div className="max-w-7xl mx-auto">
-        <div className="flex items-center gap-3 mb-6">
-          <button
-            onClick={() => navigate(-1)}
-            className="w-9 h-9 rounded-lg bg-white dark:bg-[#1C2529] border border-[#E2E6E8] dark:border-[#303A3F] flex items-center justify-center text-[#606E6E] dark:text-[#AEB7BA] hover:text-[#3420FF]"
-          >
-            <ArrowLeft size={18} />
-          </button>
+    <div className="min-h-full bg-[#F5F7F9] dark:bg-[#12181B] p-5 sm:p-8 lg:p-10 transition-colors duration-300">
+      {/* ============================
+          HEADER
+      ============================ */}
+      <div className="flex items-center gap-3 mb-6">
+        <button
+          onClick={() => navigate("/admin/adtrainers")}
+          className="w-9 h-9 rounded-lg border border-[#303A3F] bg-[#1C2529] text-[#AEB7BA] flex items-center justify-center hover:bg-[#263136] transition"
+        >
+          <ArrowLeft size={18} />
+        </button>
 
-          <div>
-            <h1 className="text-xl sm:text-2xl font-bold text-[#1F272B] dark:text-[#F4F6F7]">
-              Add Trainer
-            </h1>
+        <div>
+          <h1 className="text-xl sm:text-2xl font-bold text-[#F4F6F7]">
+            {isEdit ? "Edit Trainer" : "Add Trainer"}
+          </h1>
 
-            <p className="text-xs sm:text-sm text-[#606E6E] dark:text-[#AEB7BA] mt-1">
-              Add a new fitness trainer
-            </p>
-          </div>
+          <p className="text-xs sm:text-sm text-[#AEB7BA] mt-1">
+            {isEdit
+              ? "Update trainer information"
+              : "Add a new fitness trainer"}
+          </p>
+        </div>
+      </div>
+
+      {/* ============================
+          FORM CARD
+      ============================ */}
+
+      <form
+        onSubmit={handleSubmit}
+        className="bg-[#1C2529] rounded-xl border border-[#303A3F] overflow-hidden"
+      >
+        {/* Card Header */}
+        <div className="px-6 py-6 border-b border-[#303A3F]">
+          <h2 className="text-base sm:text-lg font-semibold text-[#F4F6F7]">
+            Trainer Information
+          </h2>
+
+          <p className="text-xs sm:text-sm text-[#AEB7BA] mt-1">
+            Enter trainer details below
+          </p>
         </div>
 
-        <form onSubmit={handleSubmit}>
-          <div className="bg-white dark:bg-[#1C2529] rounded-xl border border-[#E2E6E8] dark:border-[#303A3F] shadow-sm">
-            <div className="p-4 sm:p-6 border-b border-[#E7EAED] dark:border-[#303A3F]">
-              <h2 className="text-base sm:text-lg font-semibold text-[#1F272B] dark:text-[#F4F6F7]">
-                Trainer Information
-              </h2>
+        {/* Form Content */}
+        <div className="p-6 space-y-6">
+          {/* ============================
+              IMAGE
+          ============================ */}
+          <div>
+            <label className="block text-sm font-semibold text-[#F4F6F7] mb-2">
+              Trainer Image
+            </label>
 
-              <p className="text-xs sm:text-sm text-[#778387] dark:text-[#AEB7BA] mt-1">
-                Enter trainer details below
-              </p>
-            </div>
+            <div className="relative w-32 h-32">
+              {preview ? (
+                <div className="relative w-32 h-32">
+                  <img
+                    src={preview}
+                    alt="Trainer preview"
+                    className="w-full h-full rounded-xl object-cover border border-[#303A3F]"
+                  />
 
-            <div className="p-4 sm:p-6 space-y-5">
-              <div>
-                <label className="form-label">Trainer Image</label>
+                  <button
+                    type="button"
+                    onClick={removeImage}
+                    className="absolute -top-2 -right-2 w-7 h-7 rounded-full bg-red-500 text-white flex items-center justify-center"
+                  >
+                    <X size={14} />
+                  </button>
+                </div>
+              ) : (
+                <label className="w-32 h-32 rounded-xl border-2 border-dashed border-[#3A474C] bg-[#12181B] flex flex-col items-center justify-center cursor-pointer hover:border-[#3420FF] transition">
+                  <Upload
+                    size={22}
+                    className="text-[#89959A]"
+                  />
 
-                <label className="w-32 h-32 rounded-xl border-2 border-dashed border-[#D7DCDF] dark:border-[#3A454A] bg-[#F8F9FB] dark:bg-[#12181B] flex flex-col items-center justify-center cursor-pointer hover:border-[#3420FF]">
-                  <Upload size={22} className="text-[#778387] mb-2" />
-
-                  <span className="text-xs text-[#778387]">
+                  <span className="text-xs text-[#7E8B90] mt-2">
                     Upload Image
                   </span>
 
                   <input
                     type="file"
-                    name="image"
                     accept="image/*"
-                    onChange={handleChange}
+                    onChange={handleImageChange}
                     className="hidden"
                   />
                 </label>
-
-                {formData.image && (
-                  <p className="text-xs text-[#606E6E] mt-2">
-                    {formData.image.name}
-                  </p>
-                )}
-              </div>
-
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                  <label className="form-label">Full Name</label>
-
-                  <input
-                    type="text"
-                    name="name"
-                    value={formData.name}
-                    onChange={handleChange}
-                    placeholder="Enter trainer name"
-                    className="form-input"
-                    required
-                  />
-                </div>
-
-                <div>
-                  <label className="form-label">Email Address</label>
-
-                  <input
-                    type="email"
-                    name="email"
-                    value={formData.email}
-                    onChange={handleChange}
-                    placeholder="trainer@example.com"
-                    className="form-input"
-                    required
-                  />
-                </div>
-              </div>
-
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                  <label className="form-label">Phone Number</label>
-
-                  <input
-                    type="tel"
-                    name="phone"
-                    value={formData.phone}
-                    onChange={handleChange}
-                    placeholder="+91 98765 43210"
-                    className="form-input"
-                    required
-                  />
-                </div>
-
-                <div>
-                  <label className="form-label">Specialization</label>
-
-                  <select
-                    name="specialty"
-                    value={formData.specialty}
-                    onChange={handleChange}
-                    className="form-input"
-                    required
-                  >
-                    <option value="">Select specialization</option>
-                    <option value="Strength Training">
-                      Strength Training
-                    </option>
-                    <option value="Cardio & HIIT">Cardio & HIIT</option>
-                    <option value="CrossFit">CrossFit</option>
-                    <option value="Yoga & Flexibility">
-                      Yoga & Flexibility
-                    </option>
-                    <option value="Personal Training">
-                      Personal Training
-                    </option>
-                    <option value="Zumba">Zumba</option>
-                    <option value="Nutrition">Nutrition</option>
-                  </select>
-                </div>
-              </div>
-
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-                <div>
-                  <label className="form-label">Experience</label>
-
-                  <input
-                    type="text"
-                    name="experience"
-                    value={formData.experience}
-                    onChange={handleChange}
-                    placeholder="5 Years"
-                    className="form-input"
-                  />
-                </div>
-
-                <div>
-                  <label className="form-label">Members</label>
-
-                  <input
-                    type="number"
-                    name="members"
-                    value={formData.members}
-                    onChange={handleChange}
-                    placeholder="0"
-                    className="form-input"
-                  />
-                </div>
-
-                <div>
-                  <label className="form-label">Rating</label>
-
-                  <input
-                    type="number"
-                    name="rating"
-                    value={formData.rating}
-                    onChange={handleChange}
-                    placeholder="4.8"
-                    min="0"
-                    max="5"
-                    step="0.1"
-                    className="form-input"
-                  />
-                </div>
-
-                <div>
-                  <label className="form-label">Status</label>
-
-                  <select
-                    name="status"
-                    value={formData.status}
-                    onChange={handleChange}
-                    className="form-input"
-                  >
-                    <option value="Active">Active</option>
-                    <option value="Inactive">Inactive</option>
-                  </select>
-                </div>
-              </div>
-
-              <div>
-                <label className="form-label">Trainer Bio</label>
-
-                <textarea
-                  name="bio"
-                  value={formData.bio}
-                  onChange={handleChange}
-                  rows="5"
-                  placeholder="Write a short description..."
-                  className="form-input resize-none"
-                />
-              </div>
+              )}
             </div>
 
-            <div className="flex flex-col sm:flex-row justify-end gap-3 p-4 sm:p-6 border-t border-[#E7EAED] dark:border-[#303A3F]">
-              <button
-                type="button"
-                onClick={() => navigate(-1)}
-                className="px-5 py-2.5 rounded-lg border border-[#E2E6E8] dark:border-[#303A3F] text-sm font-medium text-[#606E6E] dark:text-[#AEB7BA] hover:bg-[#F8F9FB]"
-              >
-                Cancel
-              </button>
+            <p className="text-xs text-[#778387] mt-2">
+              JPG, PNG or WEBP. Maximum 5MB.
+            </p>
+          </div>
 
-              <button
-                type="submit"
-                className="px-5 py-2.5 rounded-lg bg-[#3420FF] text-white text-sm font-medium hover:bg-[#2818D9]"
-              >
-                Add Trainer
-              </button>
+          {/* ============================
+              ROW 1
+          ============================ */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
+            {/* Name */}
+            <div>
+              <label className="block text-sm font-semibold text-[#F4F6F7] mb-2">
+                Full Name
+              </label>
+
+              <input
+                type="text"
+                name="name"
+                value={formData.name}
+                onChange={handleChange}
+                placeholder="Enter trainer name"
+                className="w-full px-4 py-3 rounded-lg border border-[#303A3F] bg-[#12181B] text-sm text-[#F4F6F7] placeholder:text-[#6F7C81] outline-none focus:border-[#3420FF] transition"
+              />
+            </div>
+
+            {/* Role */}
+            <div>
+              <label className="block text-sm font-semibold text-[#F4F6F7] mb-2">
+                Role
+              </label>
+
+              <input
+                type="text"
+                name="role"
+                value={formData.role}
+                onChange={handleChange}
+                placeholder="e.g. Fitness Trainer"
+                className="w-full px-4 py-3 rounded-lg border border-[#303A3F] bg-[#12181B] text-sm text-[#F4F6F7] placeholder:text-[#6F7C81] outline-none focus:border-[#3420FF] transition"
+              />
             </div>
           </div>
-        </form>
-      </div>
 
-      <style>{`
-        .form-label {
-          display: block;
-          font-size: .875rem;
-          font-weight: 500;
-          color: #1F272B;
-          margin-bottom: .5rem;
-        }
+          {/* ============================
+              ROW 2
+          ============================ */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
+            {/* Number */}
+            <div>
+              <label className="block text-sm font-semibold text-[#F4F6F7] mb-2">
+                Phone / Trainer Number
+              </label>
 
-        .form-input {
-          width: 100%;
-          padding: .625rem .875rem;
-          border-radius: .5rem;
-          border: 1px solid #E2E6E8;
-          background: white;
-          color: #1F272B;
-          font-size: .875rem;
-          outline: none;
-        }
+              <input
+                type="text"
+                name="number"
+                value={formData.number}
+                onChange={handleChange}
+                placeholder="+91 98765 43210"
+                className="w-full px-4 py-3 rounded-lg border border-[#303A3F] bg-[#12181B] text-sm text-[#F4F6F7] placeholder:text-[#6F7C81] outline-none focus:border-[#3420FF] transition"
+              />
+            </div>
 
-        .form-input:focus {
-          border-color: #3420FF;
-        }
+            {/* Specialty */}
+            <div>
+              <label className="block text-sm font-semibold text-[#F4F6F7] mb-2">
+                Specialization
+              </label>
 
-        .dark .form-label {
-          color: #F4F6F7;
-        }
+              <select
+                name="specialty"
+                value={formData.specialty}
+                onChange={handleChange}
+                className="w-full px-4 py-3 rounded-lg border border-[#303A3F] bg-[#12181B] text-sm text-[#F4F6F7] outline-none focus:border-[#3420FF] transition"
+              >
+                <option value="">
+                  Select specialization
+                </option>
+                <option value="Strength Training">
+                  Strength Training
+                </option>
+                <option value="Cardio & HIIT">
+                  Cardio & HIIT
+                </option>
+                <option value="CrossFit">
+                  CrossFit
+                </option>
+                <option value="Yoga & Flexibility">
+                  Yoga & Flexibility
+                </option>
+                <option value="Pilates">
+                  Pilates
+                </option>
+                <option value="Personal Training">
+                  Personal Training
+                </option>
+                <option value="Functional Training">
+                  Functional Training
+                </option>
+              </select>
+            </div>
+          </div>
 
-        .dark .form-input {
-          background: #12181B;
-          border-color: #303A3F;
-          color: #F4F6F7;
-        }
+          {/* ============================
+              ROW 3
+          ============================ */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+            {/* Experience */}
+            <div>
+              <label className="block text-sm font-semibold text-[#F4F6F7] mb-2">
+                Experience
+              </label>
 
-        .dark .form-input::placeholder {
-          color: #778387;
-        }
-      `}</style>
+              <input
+                type="text"
+                name="experience"
+                value={formData.experience}
+                onChange={handleChange}
+                placeholder="5 Years"
+                className="w-full px-4 py-3 rounded-lg border border-[#303A3F] bg-[#12181B] text-sm text-[#F4F6F7] placeholder:text-[#6F7C81] outline-none focus:border-[#3420FF] transition"
+              />
+            </div>
+
+            {/* Status */}
+            <div>
+              <label className="block text-sm font-semibold text-[#F4F6F7] mb-2">
+                Status
+              </label>
+
+              <select
+                value={String(formData.isActive)}
+                onChange={handleStatusChange}
+                className="w-full px-4 py-3 rounded-lg border border-[#303A3F] bg-[#12181B] text-sm text-[#F4F6F7] outline-none focus:border-[#3420FF] transition"
+              >
+                <option value="true">Active</option>
+                <option value="false">Inactive</option>
+              </select>
+            </div>
+          </div>
+
+          {/* ============================
+              ICON
+          ============================ */}
+          <div>
+            <label className="block text-sm font-semibold text-[#F4F6F7] mb-2">
+              Icon
+            </label>
+
+            <input
+              type="text"
+              name="icon"
+              value={formData.icon}
+              onChange={handleChange}
+              placeholder="Users"
+              className="w-full px-4 py-3 rounded-lg border border-[#303A3F] bg-[#12181B] text-sm text-[#F4F6F7] placeholder:text-[#6F7C81] outline-none focus:border-[#3420FF] transition"
+            />
+
+            <p className="text-xs text-[#778387] mt-1">
+              Enter a Lucide icon name, e.g. Users, Dumbbell,
+              HeartPulse.
+            </p>
+          </div>
+        </div>
+
+        {/* ============================
+            FOOTER BUTTONS
+        ============================ */}
+        <div className="px-6 py-5 border-t border-[#303A3F] flex justify-end gap-3">
+          <button
+            type="button"
+            onClick={() => navigate("/admin/trainers")}
+            className="px-5 py-2.5 rounded-lg border border-[#303A3F] bg-[#12181B] text-[#AEB7BA] text-sm hover:bg-[#263136] transition"
+          >
+            Cancel
+          </button>
+
+          <button
+            type="submit"
+            disabled={loading}
+            className="flex items-center gap-2 px-5 py-2.5 rounded-lg bg-[#3420FF] text-white text-sm hover:bg-[#2818D9] transition disabled:opacity-60 disabled:cursor-not-allowed"
+          >
+            <Save size={16} />
+
+            {loading
+              ? isEdit
+                ? "Updating..."
+                : "Creating..."
+              : isEdit
+                ? "Update Trainer"
+                : "Create Trainer"}
+          </button>
+        </div>
+      </form>
     </div>
   );
 };
 
-export default AddTrainers;
+export default AddTrainer;

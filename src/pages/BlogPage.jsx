@@ -1,154 +1,238 @@
-import React from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import { FaArrowRight, FaClock } from "react-icons/fa";
+import { useDispatch, useSelector } from "react-redux";
+import axios from "axios";
+import { getPrograms } from "../redux/Slicer/programSlice";
 
-const blogs = [
-    {
-        id: 1,
-        category: "TRAINING",
-        date: "AUG 02, 2026",
-        readTime: "5 MIN READ",
-        title: "How To Build A Stronger Training Routine",
-        description:
-            "Learn how to create a structured workout routine that keeps you consistent, focused and progressing.",
-        image:
-            "https://images.unsplash.com/photo-1534438327276-14e5300c3a48?auto=format&fit=crop&w=1200&q=85",
-    },
-    {
-        id: 2,
-        category: "NUTRITION",
-        date: "JUL 28, 2026",
-        readTime: "6 MIN READ",
-        title: "Simple Nutrition Habits For Better Results",
-        description:
-            "Small changes in your daily nutrition can make a big difference in your energy, recovery and performance.",
-        image:
-            "https://images.unsplash.com/photo-1490645935967-10de6ba17061?auto=format&fit=crop&w=1200&q=85",
-    },
-    {
-        id: 3,
-        category: "FITNESS",
-        date: "JUL 21, 2026",
-        readTime: "4 MIN READ",
-        title: "Why Consistency Beats Motivation",
-        description:
-            "Motivation comes and goes. Discover why building consistent habits is the real key to long-term fitness.",
-        image:
-            "https://images.unsplash.com/photo-1517836357463-d25dfeac3438?auto=format&fit=crop&w=1200&q=85",
-    },
-    {
-        id: 4,
-        category: "RECOVERY",
-        date: "JUL 15, 2026",
-        readTime: "5 MIN READ",
-        title: "The Importance Of Rest And Recovery",
-        description:
-            "Training hard is only one part of the process. Learn how proper recovery helps your body perform better.",
-        image:
-            "https://images.unsplash.com/photo-1518611012118-696072aa579a?auto=format&fit=crop&w=1200&q=85",
-    },
-    {
-        id: 5,
-        category: "STRENGTH",
-        date: "JUL 10, 2026",
-        readTime: "7 MIN READ",
-        title: "How To Start Strength Training The Right Way",
-        description:
-            "A practical guide to building strength with proper technique, progressive training and smart exercise selection.",
-        image:
-            "https://images.unsplash.com/photo-1581009146145-b5ef050c2e1e?auto=format&fit=crop&w=1200&q=85",
-    },
-    {
-        id: 6,
-        category: "CARDIO",
-        date: "JUL 05, 2026",
-        readTime: "5 MIN READ",
-        title: "Cardio Training Without Losing Strength",
-        description:
-            "Discover how to combine cardiovascular training with strength work without compromising your progress.",
-        image:
-            "https://images.unsplash.com/photo-1538805060514-97d9cc17730c?auto=format&fit=crop&w=1200&q=85",
-    },
-    {
-        id: 7,
-        category: "MINDSET",
-        date: "JUN 29, 2026",
-        readTime: "4 MIN READ",
-        title: "Build A Fitness Mindset That Lasts",
-        description:
-            "Long-term fitness starts with the right mindset. Learn how to stay disciplined when motivation gets low.",
-        image:
-            "https://images.unsplash.com/photo-1526401485004-2aa7e3d6c0c7?auto=format&fit=crop&w=1200&q=85",
-    },
-    {
-        id: 8,
-        category: "MOBILITY",
-        date: "JUN 22, 2026",
-        readTime: "5 MIN READ",
-        title: "Why Mobility Should Be Part Of Your Training",
-        description:
-            "Better mobility can improve movement quality, training performance and everyday physical comfort.",
-        image:
-            "https://images.unsplash.com/photo-1518611012118-696072aa579a?auto=format&fit=crop&w=1200&q=85",
-    },
-    {
-        id: 9,
-        category: "WELLNESS",
-        date: "JUN 16, 2026",
-        readTime: "6 MIN READ",
-        title: "Small Daily Habits That Improve Your Fitness",
-        description:
-            "Fitness is not only about workouts. These simple daily habits can help you become healthier and more consistent.",
-        image:
-            "https://images.unsplash.com/photo-1476480862126-209bfaa8edc8?auto=format&fit=crop&w=1200&q=85",
-    },
-    {
-        id: 10,
-        category: "TRAINING",
-        date: "JUN 10, 2026",
-        readTime: "6 MIN READ",
-        title: "Train Smarter And Make Every Session Count",
-        description:
-            "Learn how to structure your workouts so every session has a clear purpose and contributes to your goals.",
-        image:
-            "https://images.unsplash.com/photo-1534438327276-14e5300c3a48?auto=format&fit=crop&w=1200&q=85",
-    },
-    {
-        id: 11,
-        category: "NUTRITION",
-        date: "JUN 04, 2026",
-        readTime: "5 MIN READ",
-        title: "What To Eat Before And After Training",
-        description:
-            "Understand the basics of pre-workout and post-workout nutrition to support energy and recovery.",
-        image:
-            "https://images.unsplash.com/photo-1547592180-85f173990554?auto=format&fit=crop&w=1200&q=85",
-    },
-    {
-        id: 12,
-        category: "RECOVERY",
-        date: "MAY 28, 2026",
-        readTime: "4 MIN READ",
-        title: "Recovery Mistakes That Could Slow Your Progress",
-        description:
-            "Training harder is not always better. Avoid these common recovery mistakes and give your body time to adapt.",
-        image:
-            "https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?auto=format&fit=crop&w=1200&q=85",
-    },
-];
-
-const categories = [
-    "ALL",
-    "TRAINING",
-    "NUTRITION",
-    "FITNESS",
-    "RECOVERY",
-    "MINDSET",
-];
+const DEFAULT_IMAGE =
+    "https://images.unsplash.com/photo-1534438327276-14e5300c3a48?auto=format&fit=crop&w=1200&q=85";
 
 const BlogPage = () => {
-    const featuredBlog = blogs[0];
-    const remainingBlogs = blogs.slice(1);
+    const dispatch = useDispatch();
+
+    /* ================= BLOG STATE ================= */
+    const [blogs, setBlogs] = useState([]);
+    const [activeProgram, setActiveProgram] = useState("ALL");
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState("");
+
+    /* ================= PROGRAM REDUX ================= */
+    const {
+        program,
+        loading: programLoading,
+        error: programError,
+    } = useSelector((state) => state.program);
+
+    const programs = Array.isArray(program) ? program : [];
+
+    /* ================= FETCH BLOGS ================= */
+    useEffect(() => {
+        const fetchBlogs = async () => {
+            try {
+                setLoading(true);
+                setError("");
+
+                const response = await axios.get("/api/blogs");
+
+                const data =
+                    response.data?.blogs ||
+                    response.data?.data ||
+                    [];
+
+                setBlogs(Array.isArray(data) ? data : []);
+            } catch (err) {
+                console.error("Failed to fetch blogs:", err);
+                setError("Unable to load blogs. Please try again later.");
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchBlogs();
+    }, []);
+
+    /* ================= FETCH PROGRAMS ================= */
+    useEffect(() => {
+        dispatch(getPrograms(true));
+    }, [dispatch]);
+
+    /* ================= HELPERS ================= */
+
+    const getBlogId = (blog) => {
+        return blog?._id || blog?.id;
+    };
+
+    const getImage = (blog) => {
+        return (
+            blog?.image ||
+            blog?.imageUrl ||
+            blog?.coverImage ||
+            DEFAULT_IMAGE
+        );
+    };
+
+    const formatDate = (date) => {
+        if (!date) return "";
+
+        const parsedDate = new Date(date);
+
+        if (Number.isNaN(parsedDate.getTime())) {
+            return "";
+        }
+
+        return parsedDate
+            .toLocaleDateString("en-US", {
+                month: "short",
+                day: "2-digit",
+                year: "numeric",
+            })
+            .toUpperCase();
+    };
+
+    const formatReadTime = (readTime) => {
+        if (!readTime) return "5 MIN READ";
+
+        if (typeof readTime === "number") {
+            return `${readTime} MIN READ`;
+        }
+
+        const value = String(readTime).toUpperCase();
+
+        return value.includes("READ")
+            ? value
+            : `${value} MIN READ`;
+    };
+
+    /*
+     * Blog ke program ko safely get karega.
+     *
+     * Preferred:
+     * blog.program
+     *
+     * Backward compatibility:
+     * blog.category
+     */
+    const getBlogProgram = (blog) => {
+        return (
+            blog?.program ||
+            blog?.programName ||
+            blog?.category ||
+            ""
+        );
+    };
+
+    /*
+     * Program ka display name.
+     *
+     * Backend program object agar blog.program me aa raha ho
+     * to title/name bhi handle karega.
+     */
+    const getProgramName = (program) => {
+        if (!program) return "";
+
+        if (typeof program === "string") {
+            return program;
+        }
+
+        return (
+            program.title ||
+            program.name ||
+            program.programName ||
+            ""
+        );
+    };
+
+    /*
+     * Blog ke program ko compare karne ke liye
+     * normalized value.
+     */
+    const normalizeProgram = (value) => {
+        if (!value) return "";
+
+        if (typeof value === "object") {
+            value = getProgramName(value);
+        }
+
+        return String(value)
+            .trim()
+            .toLowerCase();
+    };
+
+    /* ================= DYNAMIC PROGRAMS ================= */
+
+    const programCategories = useMemo(() => {
+        const uniquePrograms = [];
+
+        programs.forEach((item) => {
+            if (!item?.isActive) return;
+
+            const name = getProgramName(item);
+
+            if (!name) return;
+
+            const alreadyExists = uniquePrograms.some(
+                (programName) =>
+                    normalizeProgram(programName) ===
+                    normalizeProgram(name)
+            );
+
+            if (!alreadyExists) {
+                uniquePrograms.push(name);
+            }
+        });
+
+        return ["ALL", ...uniquePrograms];
+    }, [programs]);
+
+    /*
+     * Agar backend se program list late aaye aur
+     * currently selected program available na ho,
+     * to ALL select kar denge.
+     */
+    useEffect(() => {
+        if (
+            activeProgram !== "ALL" &&
+            !programCategories.some(
+                (item) =>
+                    normalizeProgram(item) ===
+                    normalizeProgram(activeProgram)
+            )
+        ) {
+            setActiveProgram("ALL");
+        }
+    }, [programCategories, activeProgram]);
+
+    /* ================= FILTER BLOGS ================= */
+
+    const filteredBlogs = useMemo(() => {
+        if (activeProgram === "ALL") {
+            return blogs;
+        }
+
+        return blogs.filter((blog) => {
+            const blogProgram = getBlogProgram(blog);
+
+            /*
+             * Agar blog.program object hai:
+             * { _id, title }
+             *
+             * Agar string hai:
+             * "Strength Training"
+             *
+             * Dono handle honge.
+             */
+            return (
+                normalizeProgram(blogProgram) ===
+                normalizeProgram(activeProgram)
+            );
+        });
+    }, [blogs, activeProgram]);
+
+    /* ================= FEATURED ================= */
+
+    const featuredBlog = filteredBlogs[0];
+    const remainingBlogs = filteredBlogs.slice(1);
 
     return (
         <main className="mt-[0px] w-full overflow-hidden bg-[#0d0d0d] text-white">
@@ -163,8 +247,6 @@ const BlogPage = () => {
 
                     <div className="grid items-end gap-5 lg:grid-cols-[1fr_0.7fr] lg:gap-16">
 
-                        {/* LEFT */}
-
                         <div>
 
                             <div className="mb-3 flex items-center gap-2">
@@ -178,32 +260,28 @@ const BlogPage = () => {
                             </div>
 
                             <h1 className="max-w-[850px] font-['Bebas_Neue'] text-[32px] leading-[0.82] tracking-[0.01em] sm:text-[42px] md:text-[52px]">
-
                                 TRAIN SMARTER.
-
                                 <span className="text-[#e85d3a]">
                                     {" "}LIVE STRONGER.
                                 </span>
-
                             </h1>
 
                         </div>
 
-                        {/* RIGHT */}
-
                         <div className="max-w-[500px] lg:justify-self-end">
 
                             <p className="font-['Barlow'] text-[13px] leading-6 text-white/50 sm:text-[14px] sm:leading-7">
-                                Training tips, nutrition advice, recovery strategies
-                                and practical fitness insights to help you make
-                                better decisions inside and outside the gym.
+                                Training tips, nutrition advice, recovery
+                                strategies and practical fitness insights to
+                                help you make better decisions inside and
+                                outside the gym.
                             </p>
 
                             <div className="mt-3 flex flex-wrap gap-2">
 
                                 <div className="border border-white/10 bg-[#151515] px-3.5 py-2">
                                     <span className="font-['Barlow'] text-[10px] font-semibold uppercase tracking-[0.08em] text-white/65 sm:text-[11px]">
-                                        12+ Articles
+                                        {blogs.length} Articles
                                     </span>
                                 </div>
 
@@ -223,9 +301,8 @@ const BlogPage = () => {
 
             </section>
 
-
             {/* =====================================================
-                CATEGORY BAR
+                PROGRAM FILTER BAR
             ====================================================== */}
 
             <section className="border-b border-white/10 bg-[#111111]">
@@ -233,290 +310,387 @@ const BlogPage = () => {
                 <div className="mx-auto flex w-full max-w-[110rem] items-center gap-2 overflow-x-auto px-6 py-3 sm:px-10 lg:px-16 xl:px-[7%]">
 
                     <span className="mr-2 shrink-0 font-['Barlow'] text-[10px] font-bold uppercase tracking-[0.12em] text-white/35">
-                        Explore:
+                        Explore Programs:
                     </span>
 
-                    {categories.map((category, index) => (
+                    {programCategories.map((programName) => (
+
                         <button
-                            key={category}
+                            key={programName}
                             type="button"
-                            className={`shrink-0 border px-4 py-2 font-['Barlow'] text-[10px] font-semibold uppercase tracking-[0.08em] transition-all duration-300 ${index === 0
+                            onClick={() =>
+                                setActiveProgram(programName)
+                            }
+                            className={`shrink-0 border px-4 py-2 font-['Barlow'] text-[10px] font-semibold uppercase tracking-[0.08em] transition-all duration-300 ${
+                                normalizeProgram(activeProgram) ===
+                                normalizeProgram(programName)
                                     ? "border-[#e85d3a] bg-[#e85d3a] text-white"
                                     : "border-white/10 bg-[#151515] text-white/55 hover:border-[#e85d3a]/60 hover:text-white"
-                                }`}
+                            }`}
                         >
-                            {category}
+                            {programName}
                         </button>
+
                     ))}
 
-                </div>
-
-            </section>
-
-
-            {/* =====================================================
-                FEATURED ARTICLE
-            ====================================================== */}
-
-            <section>
-
-                <div className="mx-auto w-full max-w-[110rem] px-6 py-5 sm:px-10 md:py-8 lg:px-16 xl:px-[7%]">
-
-                    <div className="mb-5 flex items-center gap-2">
-
-                        <span className="h-[2px] w-7 bg-[#e85d3a]" />
-
-                        <span className="font-['Barlow'] text-[11px] font-semibold uppercase tracking-[0.15em] text-[#e85d3a]">
-                            Featured Article
+                    {programLoading && (
+                        <span className="ml-2 shrink-0 font-['Barlow'] text-[10px] uppercase tracking-wider text-white/30">
+                            Loading...
                         </span>
-
-                    </div>
-
-                    <Link
-                        to={`/blogs/${featuredBlog.id}`}
-                        className="group block"
-                    >
-
-                        <article className="grid overflow-hidden border border-white/10 bg-[#151515] lg:grid-cols-[1.15fr_0.85fr]">
-
-                            {/* IMAGE */}
-
-                            <div className="relative h-[230px] overflow-hidden sm:h-[300px] lg:h-[350px]">
-
-                                <img
-                                    src={featuredBlog.image}
-                                    alt={featuredBlog.title}
-                                    loading="lazy"
-                                    className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-105"
-                                />
-
-                                <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/15 to-transparent" />
-
-                                <div className="absolute left-4 top-4 bg-[#e85d3a] px-3 py-1.5">
-
-                                    <span className="font-['Barlow'] text-[10px] font-bold uppercase tracking-[0.1em]">
-                                        {featuredBlog.category}
-                                    </span>
-
-                                </div>
-
-                            </div>
-
-
-                            {/* CONTENT */}
-
-                            <div className="flex flex-col justify-center p-6 sm:p-8 lg:p-10">
-
-                                <div className="flex items-center gap-4">
-
-                                    <span className="font-['Barlow'] text-[10px] font-medium uppercase tracking-[0.08em] text-white/35">
-                                        {featuredBlog.date}
-                                    </span>
-
-                                    <span className="h-1 w-1 rounded-full bg-[#e85d3a]" />
-
-                                    <span className="flex items-center gap-1.5 font-['Barlow'] text-[10px] uppercase tracking-[0.08em] text-white/35">
-                                        <FaClock size={9} />
-                                        {featuredBlog.readTime}
-                                    </span>
-
-                                </div>
-
-                                <h2 className="mt-4 font-['Bebas_Neue'] text-[32px] leading-[0.88] tracking-wide sm:text-[42px] lg:text-[48px]">
-
-                                    {featuredBlog.title}
-
-                                </h2>
-
-                                <p className="mt-4 max-w-[560px] font-['Barlow'] text-[13px] leading-6 text-white/45 sm:text-[14px] sm:leading-7">
-                                    {featuredBlog.description}
-                                </p>
-
-                                <div className="mt-6 flex items-center gap-2 font-['Barlow'] text-[11px] font-bold uppercase tracking-[0.1em] text-[#e85d3a]">
-
-                                    Read Featured Article
-
-                                    <FaArrowRight
-                                        size={9}
-                                        className="transition-transform duration-300 group-hover:translate-x-1"
-                                    />
-
-                                </div>
-
-                            </div>
-
-                        </article>
-
-                    </Link>
+                    )}
 
                 </div>
 
             </section>
 
-
             {/* =====================================================
-                ALL ARTICLES
+                LOADING
             ====================================================== */}
 
-            <section className="border-t border-white/10">
+            {loading && (
 
-                <div className="mx-auto w-full max-w-[110rem] px-6 py-5 sm:px-10 md:py-8 lg:px-16 xl:px-[7%]">
+                <section className="flex min-h-[400px] items-center justify-center">
 
-                    {/* HEADER */}
+                    <div className="text-center">
 
-                    <div className="mb-5 flex flex-col gap-3 md:flex-row md:items-end md:justify-between">
+                        <div className="mx-auto h-8 w-8 animate-spin rounded-full border-2 border-white/10 border-t-[#e85d3a]" />
 
-                        <div>
-
-                            <div className="mb-2 flex items-center gap-2">
-
-                                <span className="h-[2px] w-7 bg-[#e85d3a]" />
-
-                                <span className="font-['Barlow'] text-[11px] font-semibold uppercase tracking-[0.15em] text-[#e85d3a]">
-                                    Latest From The Gym
-                                </span>
-
-                            </div>
-
-                            <h2 className="font-['Bebas_Neue'] text-[26px] leading-[0.85] tracking-wide sm:text-[34px] md:text-[40px]">
-
-                                ALL
-
-                                <span className="text-[#e85d3a]">
-                                    {" "}ARTICLES
-                                </span>
-
-                            </h2>
-
-                        </div>
-
-                        <p className="max-w-[430px] font-['Barlow'] text-[12px] leading-5 text-white/40 sm:text-[13px] sm:leading-6">
-                            Practical information to help you train consistently,
-                            recover properly and make smarter fitness choices.
+                        <p className="mt-3 font-['Barlow'] text-[12px] uppercase tracking-[0.1em] text-white/40">
+                            Loading Articles...
                         </p>
 
                     </div>
 
+                </section>
 
-                    {/* BLOG GRID */}
+            )}
 
-                    <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3 lg:gap-4">
+            {/* =====================================================
+                ERROR
+            ====================================================== */}
 
-                        {remainingBlogs.map((blog) => (
+            {!loading && error && (
 
-                            <Link
-                                key={blog.id}
-                                to={""}
-                                className="group block"
-                            >
+                <section className="px-6 py-20 text-center">
 
-                                <article className="h-full overflow-hidden border border-white/10 bg-[#151515] transition-all duration-300 hover:-translate-y-1 hover:border-[#e85d3a]/60 hover:shadow-[0_15px_35px_rgba(0,0,0,0.35)]">
+                    <p className="font-['Barlow'] text-[14px] text-red-400">
+                        {error}
+                    </p>
 
-                                    {/* IMAGE */}
+                </section>
 
-                                    <div className="relative h-[205px] overflow-hidden sm:h-[220px] lg:h-[210px] xl:h-[225px]">
+            )}
 
-                                        <img
-                                            src={blog.image}
-                                            alt={blog.title}
-                                            loading="lazy"
-                                            className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-105"
-                                        />
+            {/* =====================================================
+                PROGRAM ERROR
+            ====================================================== */}
 
-                                        <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/10 to-transparent" />
+            {!loading && !error && programError && (
 
-                                        {/* CATEGORY */}
+                <div className="px-6 pt-5 text-center">
 
-                                        <div className="absolute left-3 top-3 bg-[#e85d3a] px-2.5 py-1">
+                    <p className="font-['Barlow'] text-[12px] text-yellow-500/80">
+                        Programs could not be loaded.
+                    </p>
 
-                                            <span className="font-['Barlow'] text-[9px] font-bold uppercase tracking-[0.1em]">
-                                                {blog.category}
-                                            </span>
+                </div>
 
-                                        </div>
+            )}
 
-                                        {/* NUMBER */}
+            {/* =====================================================
+                NO BLOGS
+            ====================================================== */}
 
-                                        <span className="absolute right-3 top-3 font-['Bebas_Neue'] text-[20px] text-white/40">
-                                            {String(blog.id).padStart(2, "0")}
-                                        </span>
+            {!loading &&
+                !error &&
+                filteredBlogs.length === 0 && (
 
-                                    </div>
+                    <section className="px-6 py-20 text-center">
 
+                        <p className="font-['Barlow'] text-[14px] text-white/40">
+                            No articles found for this program.
+                        </p>
 
-                                    {/* CONTENT */}
+                    </section>
+                )}
 
-                                    <div className="p-4 sm:p-5">
+            {!loading &&
+                !error &&
+                featuredBlog && (
+                    <>
 
-                                        <div className="mb-2.5 flex items-center justify-between">
+                        {/* =====================================================
+                            FEATURED ARTICLE
+                        ====================================================== */}
 
-                                            <div className="flex items-center gap-2">
+                        <section>
 
-                                                <span className="font-['Barlow'] text-[10px] font-medium uppercase tracking-[0.08em] text-white/35">
-                                                    {blog.date}
-                                                </span>
+                            <div className="mx-auto w-full max-w-[110rem] px-6 py-5 sm:px-10 md:py-8 lg:px-16 xl:px-[7%]">
 
-                                                <span className="h-1 w-1 rounded-full bg-white/20" />
+                                <div className="mb-5 flex items-center gap-2">
 
-                                                <span className="font-['Barlow'] text-[9px] uppercase tracking-[0.05em] text-white/30">
-                                                    {blog.readTime}
+                                    <span className="h-[2px] w-7 bg-[#e85d3a]" />
+
+                                    <span className="font-['Barlow'] text-[11px] font-semibold uppercase tracking-[0.15em] text-[#e85d3a]">
+                                        Featured Article
+                                    </span>
+
+                                </div>
+
+                                <Link
+                                    to={`/blogs/${getBlogId(featuredBlog)}`}
+                                    className="group block"
+                                >
+
+                                    <article className="grid overflow-hidden border border-white/10 bg-[#151515] lg:grid-cols-[1.15fr_0.85fr]">
+
+                                        {/* IMAGE */}
+
+                                        <div className="relative h-[230px] overflow-hidden sm:h-[300px] lg:h-[350px]">
+
+                                            <img
+                                                src={getImage(featuredBlog)}
+                                                alt={featuredBlog.title}
+                                                loading="lazy"
+                                                className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-105"
+                                                onError={(e) => {
+                                                    e.currentTarget.src =
+                                                        DEFAULT_IMAGE;
+                                                }}
+                                            />
+
+                                            <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/15 to-transparent" />
+
+                                            <div className="absolute left-4 top-4 bg-[#e85d3a] px-3 py-1.5">
+
+                                                <span className="font-['Barlow'] text-[10px] font-bold uppercase tracking-[0.1em]">
+                                                    {getProgramName(
+                                                        getBlogProgram(
+                                                            featuredBlog
+                                                        )
+                                                    )}
                                                 </span>
 
                                             </div>
 
-                                            <span className="flex h-6 w-6 items-center justify-center border border-white/10 text-white/40 transition-all duration-300 group-hover:border-[#e85d3a] group-hover:bg-[#e85d3a] group-hover:text-white">
+                                        </div>
 
-                                                <FaArrowRight size={8} />
+                                        {/* CONTENT */}
 
+                                        <div className="flex flex-col justify-center p-6 sm:p-8 lg:p-10">
+
+                                            <div className="flex items-center gap-4">
+
+                                                <span className="font-['Barlow'] text-[10px] font-medium uppercase tracking-[0.08em] text-white/35">
+                                                    {formatDate(
+                                                        featuredBlog.createdAt ||
+                                                            featuredBlog.date
+                                                    )}
+                                                </span>
+
+                                                <span className="h-1 w-1 rounded-full bg-[#e85d3a]" />
+
+                                                <span className="flex items-center gap-1.5 font-['Barlow'] text-[10px] uppercase tracking-[0.08em] text-white/35">
+                                                    <FaClock size={9} />
+                                                    {formatReadTime(
+                                                        featuredBlog.readTime
+                                                    )}
+                                                </span>
+
+                                            </div>
+
+                                            <h2 className="mt-4 font-['Bebas_Neue'] text-[32px] leading-[0.88] tracking-wide sm:text-[42px] lg:text-[48px]">
+                                                {featuredBlog.title}
+                                            </h2>
+
+                                            <p className="mt-4 max-w-[560px] font-['Barlow'] text-[13px] leading-6 text-white/45 sm:text-[14px] sm:leading-7">
+                                                {featuredBlog.description}
+                                            </p>
+
+                                            <div className="mt-6 flex items-center gap-2 font-['Barlow'] text-[11px] font-bold uppercase tracking-[0.1em] text-[#e85d3a]">
+
+                                                Read Featured Article
+
+                                                <FaArrowRight
+                                                    size={9}
+                                                    className="transition-transform duration-300 group-hover:translate-x-1"
+                                                />
+
+                                            </div>
+
+                                        </div>
+
+                                    </article>
+
+                                </Link>
+
+                            </div>
+
+                        </section>
+
+                        {/* =====================================================
+                            ALL ARTICLES
+                        ====================================================== */}
+
+                        <section className="border-t border-white/10">
+
+                            <div className="mx-auto w-full max-w-[110rem] px-6 py-5 sm:px-10 md:py-8 lg:px-16 xl:px-[7%]">
+
+                                <div className="mb-5 flex flex-col gap-3 md:flex-row md:items-end md:justify-between">
+
+                                    <div>
+
+                                        <div className="mb-2 flex items-center gap-2">
+
+                                            <span className="h-[2px] w-7 bg-[#e85d3a]" />
+
+                                            <span className="font-['Barlow'] text-[11px] font-semibold uppercase tracking-[0.15em] text-[#e85d3a]">
+                                                Latest From The Gym
                                             </span>
 
                                         </div>
 
-
-                                        <h3 className="font-['Bebas_Neue'] text-[22px] leading-[0.92] tracking-wide transition-colors duration-300 group-hover:text-[#e85d3a] sm:text-[24px]">
-
-                                            {blog.title}
-
-                                        </h3>
-
-
-                                        <p className="mt-2.5 font-['Barlow'] text-[12px] leading-5 text-white/40 sm:text-[13px] sm:leading-[1.55]">
-
-                                            {blog.description}
-
-                                        </p>
-
-
-                                        <div className="mt-4 flex items-center gap-2 font-['Barlow'] text-[10px] font-bold uppercase tracking-[0.1em] text-[#e85d3a]">
-
-                                            Read Article
-
-                                            <FaArrowRight
-                                                size={8}
-                                                className="transition-transform duration-300 group-hover:translate-x-1"
-                                            />
-
-                                        </div>
+                                        <h2 className="font-['Bebas_Neue'] text-[26px] leading-[0.85] tracking-wide sm:text-[34px] md:text-[40px]">
+                                            ALL
+                                            <span className="text-[#e85d3a]">
+                                                {" "}ARTICLES
+                                            </span>
+                                        </h2>
 
                                     </div>
 
+                                    <p className="max-w-[430px] font-['Barlow'] text-[12px] leading-5 text-white/40 sm:text-[13px] sm:leading-6">
+                                        Practical information to help you train
+                                        consistently, recover properly and make
+                                        smarter fitness choices.
+                                    </p>
 
-                                    {/* BOTTOM ACCENT */}
+                                </div>
 
-                                    <div className="h-[2px] w-0 bg-[#e85d3a] transition-all duration-300 group-hover:w-full" />
+                                <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3 lg:gap-4">
 
-                                </article>
+                                    {remainingBlogs.map((blog, index) => (
 
-                            </Link>
+                                        <Link
+                                            key={getBlogId(blog)}
+                                            to={`/blogs/${getBlogId(blog)}`}
+                                            className="group block"
+                                        >
 
-                        ))}
+                                            <article className="h-full overflow-hidden border border-white/10 bg-[#151515] transition-all duration-300 hover:-translate-y-1 hover:border-[#e85d3a]/60 hover:shadow-[0_15px_35px_rgba(0,0,0,0.35)]">
 
-                    </div>
+                                                {/* IMAGE */}
 
-                </div>
+                                                <div className="relative h-[205px] overflow-hidden sm:h-[220px] lg:h-[210px] xl:h-[225px]">
 
-            </section>
+                                                    <img
+                                                        src={getImage(blog)}
+                                                        alt={blog.title}
+                                                        loading="lazy"
+                                                        className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-105"
+                                                        onError={(e) => {
+                                                            e.currentTarget.src =
+                                                                DEFAULT_IMAGE;
+                                                        }}
+                                                    />
 
+                                                    <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/10 to-transparent" />
+
+                                                    {/* PROGRAM */}
+
+                                                    <div className="absolute left-3 top-3 bg-[#e85d3a] px-2.5 py-1">
+
+                                                        <span className="font-['Barlow'] text-[9px] font-bold uppercase tracking-[0.1em]">
+                                                            {getProgramName(
+                                                                getBlogProgram(
+                                                                    blog
+                                                                )
+                                                            )}
+                                                        </span>
+
+                                                    </div>
+
+                                                    {/* NUMBER */}
+
+                                                    <span className="absolute right-3 top-3 font-['Bebas_Neue'] text-[20px] text-white/40">
+                                                        {String(index + 2).padStart(
+                                                            2,
+                                                            "0"
+                                                        )}
+                                                    </span>
+
+                                                </div>
+
+                                                {/* CONTENT */}
+
+                                                <div className="p-4 sm:p-5">
+
+                                                    <div className="mb-2.5 flex items-center justify-between">
+
+                                                        <div className="flex items-center gap-2">
+
+                                                            <span className="font-['Barlow'] text-[10px] font-medium uppercase tracking-[0.08em] text-white/35">
+                                                                {formatDate(
+                                                                    blog.createdAt ||
+                                                                        blog.date
+                                                                )}
+                                                            </span>
+
+                                                            <span className="h-1 w-1 rounded-full bg-white/20" />
+
+                                                            <span className="font-['Barlow'] text-[9px] uppercase tracking-[0.05em] text-white/30">
+                                                                {formatReadTime(
+                                                                    blog.readTime
+                                                                )}
+                                                            </span>
+
+                                                        </div>
+
+                                                        <span className="flex h-6 w-6 items-center justify-center border border-white/10 text-white/40 transition-all duration-300 group-hover:border-[#e85d3a] group-hover:bg-[#e85d3a] group-hover:text-white">
+
+                                                            <FaArrowRight size={8} />
+
+                                                        </span>
+
+                                                    </div>
+
+                                                    <h3 className="font-['Bebas_Neue'] text-[22px] leading-[0.92] tracking-wide transition-colors duration-300 group-hover:text-[#e85d3a] sm:text-[24px]">
+                                                        {blog.title}
+                                                    </h3>
+
+                                                    <p className="mt-2.5 font-['Barlow'] text-[12px] leading-5 text-white/40 sm:text-[13px] sm:leading-[1.55]">
+                                                        {blog.description}
+                                                    </p>
+
+                                                    <div className="mt-4 flex items-center gap-2 font-['Barlow'] text-[10px] font-bold uppercase tracking-[0.1em] text-[#e85d3a]">
+
+                                                        Read Article
+
+                                                        <FaArrowRight
+                                                            size={8}
+                                                            className="transition-transform duration-300 group-hover:translate-x-1"
+                                                        />
+
+                                                    </div>
+
+                                                </div>
+
+                                                <div className="h-[2px] w-0 bg-[#e85d3a] transition-all duration-300 group-hover:w-full" />
+
+                                            </article>
+
+                                        </Link>
+
+                                    ))}
+
+                                </div>
+
+                            </div>
+
+                        </section>
+
+                    </>
+                )}
 
             {/* =====================================================
                 FITNESS PHILOSOPHY
@@ -527,8 +701,6 @@ const BlogPage = () => {
                 <div className="mx-auto w-full max-w-[110rem] px-6 py-5 sm:px-10 md:py-8 lg:px-16 xl:px-[7%]">
 
                     <div className="grid gap-6 lg:grid-cols-[0.8fr_1.2fr] lg:items-center lg:gap-16">
-
-                        {/* LEFT */}
 
                         <div>
 
@@ -543,25 +715,20 @@ const BlogPage = () => {
                             </div>
 
                             <h2 className="font-['Bebas_Neue'] text-[27px] leading-[0.84] tracking-wide sm:text-[36px] md:text-[45px]">
-
                                 KNOWLEDGE
-
                                 <span className="block text-[#e85d3a]">
                                     BUILDS RESULTS.
                                 </span>
-
                             </h2>
 
                             <p className="mt-3 max-w-[480px] font-['Barlow'] text-[13px] leading-6 text-white/40 sm:text-[14px] sm:leading-7">
-                                The better you understand your training, nutrition
-                                and recovery, the better decisions you can make
-                                for your body and your long-term fitness journey.
+                                The better you understand your training,
+                                nutrition and recovery, the better decisions
+                                you can make for your body and your long-term
+                                fitness journey.
                             </p>
 
                         </div>
-
-
-                        {/* RIGHT */}
 
                         <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
 
@@ -612,7 +779,6 @@ const BlogPage = () => {
 
             </section>
 
-
             {/* =====================================================
                 CTA
             ====================================================== */}
@@ -622,8 +788,6 @@ const BlogPage = () => {
                 <div className="mx-auto w-full max-w-[110rem] px-6 py-5 sm:px-10 md:py-8 lg:px-16 xl:px-[7%]">
 
                     <div className="relative overflow-hidden border border-white/10 bg-[#151515] px-6 py-8 sm:px-10 md:py-10 lg:px-14">
-
-                        {/* Accent */}
 
                         <div className="absolute -right-20 -top-24 h-60 w-60 rounded-full bg-[#e85d3a]/10 blur-3xl" />
 
@@ -636,13 +800,10 @@ const BlogPage = () => {
                                 </p>
 
                                 <h2 className="font-['Bebas_Neue'] text-[28px] leading-[0.85] tracking-wide sm:text-[38px] md:text-[48px]">
-
                                     YOUR FITNESS.
-
                                     <span className="text-[#e85d3a]">
                                         {" "}YOUR JOURNEY.
                                     </span>
-
                                 </h2>
 
                                 <p className="mt-3 max-w-[560px] font-['Barlow'] text-[12px] leading-5 text-white/40 sm:text-[13px] sm:leading-6">
@@ -652,7 +813,6 @@ const BlogPage = () => {
                                 </p>
 
                             </div>
-
 
                             <Link
                                 to="/programs"

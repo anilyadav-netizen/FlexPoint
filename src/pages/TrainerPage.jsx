@@ -1,149 +1,140 @@
-import React, { useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import {
     ArrowRight,
+    Award,
     Dumbbell,
     HeartPulse,
-    Award,
     Users,
     Flame,
     Target,
     ShieldCheck,
 } from "lucide-react";
+import { useDispatch, useSelector } from "react-redux";
+import { getTrainers } from "../redux/Slicer/trainerSlice";
 
 const TrainerPage = () => {
+    const dispatch = useDispatch();
     const [activePage, setActivePage] = useState(0);
 
-    const trainers = [
-        {
-            number: "01",
-            name: "RAHUL SHARMA",
-            role: "Strength Coach",
-            specialty: "Strength & Muscle Building",
-            experience: "8+ Years",
-            image:
-                "https://images.unsplash.com/photo-1534438327276-14e5300c3a48?auto=format&fit=crop&w=900&q=85",
-            icon: Dumbbell,
-        },
-        {
-            number: "02",
-            name: "ANANYA GUPTA",
-            role: "Yoga Instructor",
-            specialty: "Yoga & Flexibility",
-            experience: "7+ Years",
-            image:
-                "https://images.unsplash.com/photo-1594381898411-846e7d193883?auto=format&fit=crop&w=900&q=85",
-            icon: HeartPulse,
-        },
-        {
-            number: "03",
-            name: "VIKRAM SINGH",
-            role: "HIIT Specialist",
-            specialty: "HIIT & Conditioning",
-            experience: "6+ Years",
-            image:
-                "https://images.unsplash.com/photo-1581009146145-b5ef050c2e1e?auto=format&fit=crop&w=900&q=85",
-            icon: Flame,
-        },
-        {
-            number: "04",
-            name: "NEHA VERMA",
-            role: "Fitness Coach",
-            specialty: "Weight Loss & Fitness",
-            experience: "6+ Years",
-            image:
-                "https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?auto=format&fit=crop&w=900&q=85",
-            icon: Target,
-        },
-        {
-            number: "05",
-            name: "ARJUN MEHTA",
-            role: "Functional Coach",
-            specialty: "Functional Training",
-            experience: "9+ Years",
-            image:
-                "https://images.unsplash.com/photo-1599058917212-d750089bc07e?auto=format&fit=crop&w=900&q=85",
-            icon: Dumbbell,
-        },
-        {
-            number: "06",
-            name: "POOJA PATEL",
-            role: "Pilates Coach",
-            specialty: "Pilates & Core",
-            experience: "5+ Years",
-            image:
-                "https://images.unsplash.com/photo-1548690312-e3b507d8c110?auto=format&fit=crop&w=900&q=85",
-            icon: Award,
-        },
-        {
-            number: "07",
-            name: "ROHAN KAPOOR",
-            role: "Cross Training Coach",
-            specialty: "Cross Training",
-            experience: "7+ Years",
-            image:
-                "https://images.unsplash.com/photo-1538805060514-97d9cc17730c?auto=format&fit=crop&w=900&q=85",
-            icon: ShieldCheck,
-        },
-        {
-            number: "08",
-            name: "MEERA SHAH",
-            role: "Mobility Coach",
-            specialty: "Mobility & Recovery",
-            experience: "5+ Years",
-            image:
-                "https://images.unsplash.com/photo-1518611012118-696072aa579a?auto=format&fit=crop&w=900&q=85",
-            icon: HeartPulse,
-        },
-        {
-            number: "09",
-            name: "KARAN MALHOTRA",
-            role: "Boxing Coach",
-            specialty: "Boxing & Conditioning",
-            experience: "8+ Years",
-            image:
-                "https://images.unsplash.com/photo-1549719386-74dfcbf7dbed?auto=format&fit=crop&w=900&q=85",
-            icon: Flame,
-        },
-        {
-            number: "10",
-            name: "SIMRAN KAUR",
-            role: "Personal Trainer",
-            specialty: "Personal Training",
-            experience: "6+ Years",
-            image:
-                "https://images.unsplash.com/photo-1558611848-73f7eb4001a1?auto=format&fit=crop&w=900&q=85",
-            icon: Users,
-        },
-        {
-            number: "11",
-            name: "ADITYA VERMA",
-            role: "Performance Coach",
-            specialty: "Athletic Performance",
-            experience: "10+ Years",
-            image:
-                "https://images.unsplash.com/photo-1583454110551-21f2fa2afe61?auto=format&fit=crop&w=900&q=85",
-            icon: Award,
-        },
-        {
-            number: "12",
-            name: "RIYA SINGH",
-            role: "Group Fitness Coach",
-            specialty: "Group Training",
-            experience: "5+ Years",
-            image:
-                "https://images.unsplash.com/photo-1517836357463-d25dfeac3438?auto=format&fit=crop&w=900&q=85",
-            icon: Users,
-        },
-    ];
+    const { trainers = [], loading, error } = useSelector(
+        (state) => state.trainer
+    );
 
+    // =========================================================
+    // GET TRAINERS
+    // =========================================================
+    useEffect(() => {
+        dispatch(getTrainers());
+    }, [dispatch]);
+
+    // =========================================================
+    // ICON BASED ON SPECIALTY / ROLE
+    // =========================================================
+    const getTrainerIcon = (trainer) => {
+        const text = `${trainer.specialty || ""} ${trainer.role || ""}`.toLowerCase();
+
+        if (
+            text.includes("yoga") ||
+            text.includes("mobility") ||
+            text.includes("flexibility")
+        ) {
+            return HeartPulse;
+        }
+
+        if (
+            text.includes("hiit") ||
+            text.includes("cardio") ||
+            text.includes("conditioning")
+        ) {
+            return Flame;
+        }
+
+        if (
+            text.includes("nutrition") ||
+            text.includes("fitness")
+        ) {
+            return Target;
+        }
+
+        if (
+            text.includes("personal") ||
+            text.includes("group")
+        ) {
+            return Users;
+        }
+
+        if (
+            text.includes("performance") ||
+            text.includes("pilates")
+        ) {
+            return Award;
+        }
+
+        if (
+            text.includes("cross") ||
+            text.includes("functional")
+        ) {
+            return ShieldCheck;
+        }
+
+        return Dumbbell;
+    };
+
+    // =========================================================
+    // ACTIVE TRAINERS ONLY
+    // =========================================================
+    const activeTrainers = useMemo(() => {
+        return trainers.filter((trainer) => trainer.isActive !== false);
+    }, [trainers]);
+
+    // =========================================================
+    // PAGINATION
+    // =========================================================
     const trainersPerPage = 6;
-    const totalPages = Math.ceil(trainers.length / trainersPerPage);
 
-    const currentTrainers = trainers.slice(
+    const totalPages = Math.ceil(
+        activeTrainers.length / trainersPerPage
+    );
+
+    const currentTrainers = activeTrainers.slice(
         activePage * trainersPerPage,
         activePage * trainersPerPage + trainersPerPage
     );
+
+    // =========================================================
+    // RESET PAGE WHEN DATA CHANGES
+    // =========================================================
+    useEffect(() => {
+        if (totalPages > 0 && activePage >= totalPages) {
+            setActivePage(0);
+        }
+    }, [totalPages, activePage]);
+
+    // =========================================================
+    // DYNAMIC STATS
+    // =========================================================
+    const totalTrainerCount = activeTrainers.length;
+
+    const combinedExperience = useMemo(() => {
+        const years = activeTrainers.reduce((total, trainer) => {
+            const value = parseFloat(
+                String(trainer.experience || "").replace(/[^\d.]/g, "")
+            );
+
+            return total + (Number.isNaN(value) ? 0 : value);
+        }, 0);
+
+        return years > 0 ? `${Math.round(years)}+` : "—";
+    }, [activeTrainers]);
+
+    const trainingStyles = useMemo(() => {
+        const specialties = activeTrainers
+            .map((trainer) => trainer.specialty)
+            .filter(Boolean);
+
+        return new Set(specialties).size;
+    }, [activeTrainers]);
 
     return (
         <main className="mt-[0px] w-full overflow-hidden bg-[#0d0d0d] text-white">
@@ -151,7 +142,6 @@ const TrainerPage = () => {
             {/* =====================================================
                 HERO
             ====================================================== */}
-
             <section className="border-b border-white/10">
 
                 <div className="mx-auto w-full max-w-[110rem] px-6 py-4 sm:px-10 md:py-7 lg:px-16 xl:px-[7%]">
@@ -207,15 +197,19 @@ const TrainerPage = () => {
                             <div className="mt-4 flex flex-nowrap gap-2 sm:gap-2.5">
 
                                 <div className="border border-white/10 bg-[#151515] px-3 py-2 sm:px-4 sm:py-2.5 whitespace-nowrap">
+
                                     <span className="font-['Barlow'] text-[11px] sm:text-[12px] font-semibold uppercase tracking-[0.08em] text-white/70">
-                                        12+ Trainers
+                                        {totalTrainerCount}+ Trainers
                                     </span>
+
                                 </div>
 
                                 <div className="border border-white/10 bg-[#151515] px-3 py-2 sm:px-4 sm:py-2.5 whitespace-nowrap">
+
                                     <span className="font-['Barlow'] text-[11px] sm:text-[12px] font-semibold uppercase tracking-[0.08em] text-white/70">
                                         Multiple Specialties
                                     </span>
+
                                 </div>
 
                             </div>
@@ -240,7 +234,7 @@ const TrainerPage = () => {
                     <div className="border-r border-white/10 px-5 py-7 text-center sm:py-9">
 
                         <p className="font-['Bebas_Neue'] text-[38px] leading-none text-[#e85d3a] sm:text-[46px]">
-                            12+
+                            {totalTrainerCount}+
                         </p>
 
                         <p className="mt-2 font-['Barlow'] text-[11px] font-semibold uppercase tracking-[0.1em] text-white/40 sm:text-[12px]">
@@ -252,7 +246,7 @@ const TrainerPage = () => {
                     <div className="border-r border-white/10 px-5 py-7 text-center sm:py-9">
 
                         <p className="font-['Bebas_Neue'] text-[38px] leading-none text-[#e85d3a] sm:text-[46px]">
-                            80+
+                            {combinedExperience}
                         </p>
 
                         <p className="mt-2 font-['Barlow'] text-[11px] font-semibold uppercase tracking-[0.1em] text-white/40 sm:text-[12px]">
@@ -264,7 +258,7 @@ const TrainerPage = () => {
                     <div className="border-r border-white/10 px-5 py-7 text-center sm:py-9">
 
                         <p className="font-['Bebas_Neue'] text-[38px] leading-none text-[#e85d3a] sm:text-[46px]">
-                            10+
+                            {trainingStyles}+
                         </p>
 
                         <p className="mt-2 font-['Barlow'] text-[11px] font-semibold uppercase tracking-[0.1em] text-white/40 sm:text-[12px]">
@@ -335,128 +329,219 @@ const TrainerPage = () => {
                     </div>
 
 
+                    {/* LOADING */}
+
+                    {loading && (
+                        <div className="flex min-h-[300px] items-center justify-center">
+
+                            <div className="text-center">
+
+                                <div className="mx-auto h-8 w-8 animate-spin rounded-full border-2 border-white/10 border-t-[#e85d3a]" />
+
+                                <p className="mt-4 font-['Barlow'] text-sm text-white/40">
+                                    Loading trainers...
+                                </p>
+
+                            </div>
+
+                        </div>
+                    )}
+
+
+                    {/* ERROR */}
+
+                    {!loading && error && (
+                        <div className="border border-red-500/20 bg-red-500/5 px-5 py-12 text-center">
+
+                            <p className="font-['Barlow'] text-sm text-red-400">
+                                {error}
+                            </p>
+
+                            <button
+                                type="button"
+                                onClick={() => dispatch(getTrainers())}
+                                className="mt-4 bg-[#e85d3a] px-5 py-2.5 font-['Barlow'] text-sm font-semibold uppercase tracking-wide text-white transition hover:bg-[#f16a49]"
+                            >
+                                Try Again
+                            </button>
+
+                        </div>
+                    )}
+
+
+                    {/* EMPTY */}
+
+                    {!loading && !error && activeTrainers.length === 0 && (
+                        <div className="border border-white/10 bg-[#151515] px-5 py-16 text-center">
+
+                            <Dumbbell
+                                size={32}
+                                className="mx-auto text-[#e85d3a]"
+                            />
+
+                            <p className="mt-4 font-['Barlow'] text-sm text-white/40">
+                                No trainers available at the moment.
+                            </p>
+
+                        </div>
+                    )}
+
+
                     {/* TRAINERS */}
 
-                    <div className="grid grid-cols-2 gap-2.5 sm:grid-cols-2 sm:gap-3 md:grid-cols-3 lg:grid-cols-6 lg:gap-4">
+                    {!loading && !error && activeTrainers.length > 0 && (
 
-                        {currentTrainers.map((trainer) => {
+                        <div className="grid grid-cols-2 gap-2.5 sm:grid-cols-2 sm:gap-3 md:grid-cols-3 lg:grid-cols-6 lg:gap-4">
 
-                            const Icon = trainer.icon;
+                            {currentTrainers.map((trainer, index) => {
 
-                            return (
-                                <article
-                                    key={trainer.number}
-                                    className="group relative overflow-hidden border border-white/10 bg-[#151515] transition-all duration-300 hover:-translate-y-1 hover:border-[#e85d3a]/60 hover:shadow-[0_18px_40px_rgba(0,0,0,0.4)]"
-                                >
+                                const Icon = getTrainerIcon(trainer);
 
-                                    {/* IMAGE */}
+                                const trainerNumber = String(
+                                    activePage * trainersPerPage + index + 1
+                                ).padStart(2, "0");
 
-                                    <div className="relative h-[225px] overflow-hidden sm:h-[245px] md:h-[255px] lg:h-[215px] xl:h-[235px]">
+                                return (
+                                    <article
+                                        key={trainer._id || trainer.id}
+                                        className="group relative overflow-hidden border border-white/10 bg-[#151515] transition-all duration-300 hover:-translate-y-1 hover:border-[#e85d3a]/60 hover:shadow-[0_18px_40px_rgba(0,0,0,0.4)]"
+                                    >
 
-                                        <img
-                                            src={trainer.image}
-                                            alt={`${trainer.name} - ${trainer.role}`}
-                                            loading="lazy"
-                                            className="h-full w-full object-cover object-top grayscale-[10%] transition-all duration-700 group-hover:scale-105 group-hover:grayscale-0"
-                                        />
+                                        {/* IMAGE */}
 
-                                        <div className="absolute inset-0 bg-gradient-to-t from-[#080808] via-black/40 to-transparent" />
+                                        <div className="relative h-[225px] overflow-hidden sm:h-[245px] md:h-[255px] lg:h-[215px] xl:h-[235px]">
 
-                                        <div className="absolute inset-0 bg-[#e85d3a]/0 transition-colors duration-300 group-hover:bg-[#e85d3a]/5" />
+                                            {trainer.image ? (
+
+                                                <img
+                                                    src={trainer.image}
+                                                    alt={`${trainer.name} - ${trainer.role || "Trainer"}`}
+                                                    loading="lazy"
+                                                    className="h-full w-full object-cover object-top grayscale-[10%] transition-all duration-700 group-hover:scale-105 group-hover:grayscale-0"
+                                                />
+
+                                            ) : (
+
+                                                <div className="flex h-full w-full items-center justify-center bg-[#202020]">
+
+                                                    <Dumbbell
+                                                        size={45}
+                                                        strokeWidth={1}
+                                                        className="text-[#e85d3a]"
+                                                    />
+
+                                                </div>
+
+                                            )}
+
+                                            <div className="absolute inset-0 bg-gradient-to-t from-[#080808] via-black/40 to-transparent" />
+
+                                            <div className="absolute inset-0 bg-[#e85d3a]/0 transition-colors duration-300 group-hover:bg-[#e85d3a]/5" />
 
 
-                                        {/* NUMBER */}
+                                            {/* NUMBER */}
 
-                                        <span className="absolute left-3 top-3 font-['Bebas_Neue'] text-[20px] text-white/45">
-                                            {trainer.number}
-                                        </span>
+                                            <span className="absolute left-3 top-3 font-['Bebas_Neue'] text-[20px] text-white/45">
+                                                {trainerNumber}
+                                            </span>
 
 
-                                        {/* ICON */}
+                                            {/* ICON */}
 
-                                        <div className="absolute right-3 top-3 flex h-8 w-8 items-center justify-center border border-white/20 bg-black/30 text-[#e85d3a] backdrop-blur-sm">
+                                            <div className="absolute right-3 top-3 flex h-8 w-8 items-center justify-center border border-white/20 bg-black/30 text-[#e85d3a] backdrop-blur-sm">
 
-                                            <Icon
-                                                size={16}
-                                                strokeWidth={1.5}
-                                            />
+                                                <Icon
+                                                    size={16}
+                                                    strokeWidth={1.5}
+                                                />
+
+                                            </div>
+
+
+                                            {/* CONTENT */}
+
+                                            <div className="absolute bottom-0 left-0 right-0 p-3.5">
+
+                                                <h3 className="font-['Bebas_Neue'] text-[21px] leading-none tracking-wide text-white xl:text-[23px]">
+                                                    {trainer.name}
+                                                </h3>
+
+                                                <p className="mt-1 font-['Barlow'] text-[12px] font-medium text-white/65">
+                                                    {trainer.role || "Fitness Trainer"}
+                                                </p>
+
+                                                <div className="mt-2 h-[2px] w-0 bg-[#e85d3a] transition-all duration-300 group-hover:w-10" />
+
+                                            </div>
 
                                         </div>
 
 
-                                        {/* CONTENT */}
+                                        {/* CARD DETAILS */}
 
-                                        <div className="absolute bottom-0 left-0 right-0 p-3.5">
+                                        <div className="p-4">
 
-                                            <h3 className="font-['Bebas_Neue'] text-[21px] leading-none tracking-wide text-white xl:text-[23px]">
-                                                {trainer.name}
-                                            </h3>
-
-                                            <p className="mt-1 font-['Barlow'] text-[12px] font-medium text-white/65">
-                                                {trainer.role}
+                                            <p className="font-['Barlow'] text-[13px] font-semibold uppercase tracking-[0.05em] text-[#e85d3a]">
+                                                {trainer.specialty || "Fitness Training"}
                                             </p>
 
-                                            <div className="mt-2 h-[2px] w-0 bg-[#e85d3a] transition-all duration-300 group-hover:w-10" />
+                                            <div className="mt-3 flex items-center justify-between border-t border-white/10 pt-3">
+
+                                                <span className="font-['Barlow'] text-[12px] uppercase tracking-[0.05em] text-white/40">
+                                                    Experience
+                                                </span>
+
+                                                <span className="font-['Barlow'] text-[12px] font-semibold text-white/65">
+                                                    {trainer.experience || "—"}
+                                                </span>
+
+                                            </div>
 
                                         </div>
 
-                                    </div>
 
+                                        {/* BOTTOM ACCENT */}
 
-                                    {/* CARD DETAILS */}
+                                        <span className="absolute bottom-0 left-0 h-[2px] w-0 bg-[#e85d3a] transition-all duration-300 group-hover:w-full" />
 
-                                    <div className="p-4">
+                                    </article>
+                                );
+                            })}
 
-                                        <p className="font-['Barlow'] text-[13px] font-semibold uppercase tracking-[0.05em] text-[#e85d3a]">
-                                            {trainer.specialty}
-                                        </p>
-
-                                        <div className="mt-3 flex items-center justify-between border-t border-white/10 pt-3">
-
-                                            <span className="font-['Barlow'] text-[12px] uppercase tracking-[0.05em] text-white/40">
-                                                Experience
-                                            </span>
-
-                                            <span className="font-['Barlow'] text-[12px] font-semibold text-white/65">
-                                                {trainer.experience}
-                                            </span>
-
-                                        </div>
-
-                                    </div>
-
-
-                                    {/* BOTTOM ACCENT */}
-
-                                    <span className="absolute bottom-0 left-0 h-[2px] w-0 bg-[#e85d3a] transition-all duration-300 group-hover:w-full" />
-
-                                </article>
-                            );
-                        })}
-
-                    </div>
+                        </div>
+                    )}
 
 
                     {/* PAGINATION */}
 
-                    <div className="mt-6 flex items-center justify-center gap-2">
+                    {!loading && !error && totalPages > 1 && (
 
-                        {Array.from({ length: totalPages }).map((_, index) => (
+                        <div className="mt-6 flex items-center justify-center gap-2">
 
-                            <button
-                                key={index}
-                                type="button"
-                                onClick={() => setActivePage(index)}
-                                aria-label={`Go to trainer page ${index + 1}`}
-                                className={`h-[4px] transition-all duration-300 ${activePage === index
-                                    ? "w-8 bg-[#e85d3a]"
-                                    : "w-4 bg-white/25 hover:bg-white/50"
+                            {Array.from({ length: totalPages }).map((_, index) => (
+
+                                <button
+                                    key={index}
+                                    type="button"
+                                    onClick={() => {
+                                        setActivePage(index);
+                                        window.scrollTo({
+                                            top: 0,
+                                            behavior: "smooth",
+                                        });
+                                    }}
+                                    aria-label={`Go to trainer page ${index + 1}`}
+                                    className={`h-[4px] transition-all duration-300 ${
+                                        activePage === index
+                                            ? "w-8 bg-[#e85d3a]"
+                                            : "w-4 bg-white/25 hover:bg-white/50"
                                     }`}
-                            />
+                                />
 
-                        ))}
+                            ))}
 
-                    </div>
+                        </div>
+                    )}
 
                 </div>
 
