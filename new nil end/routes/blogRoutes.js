@@ -9,48 +9,34 @@ const {
   deleteBlog,
 } = require("../controllers/blogController");
 
+const upload = require("../middleware/uploadMiddleware");
+
 const router = express.Router();
 
-// ==========================================
-// CREATE BLOG
-// POST /api/blogs
-// ==========================================
+// CREATE
+router.post(
+  "/",
+  upload.single("image"),
+  createBlog
+);
 
-router.post("/", createBlog);
-
-// ==========================================
-// GET ALL BLOGS
-// GET /api/blogs
-// ==========================================
-
+// GET ALL
 router.get("/", getBlogs);
 
-// ==========================================
-// GET BLOG BY SLUG
-// GET /api/blogs/slug/:slug
-// ==========================================
-
+// GET BY SLUG
 router.get("/slug/:slug", getBlogBySlug);
 
-// ==========================================
-// GET SINGLE BLOG
-// GET /api/blogs/:id
-// ==========================================
-
+// GET BY ID
 router.get("/:id", getBlog);
 
-// ==========================================
-// UPDATE BLOG
-// PUT /api/blogs/:id
-// ==========================================
+// UPDATE
+router.put(
+  "/:id",
+  upload.single("image"),
+  updateBlog
+);
 
-router.put("/:id", updateBlog);
-
-// ==========================================
-// DELETE BLOG
-// DELETE /api/blogs/:id
-// ==========================================
-
+// DELETE
 router.delete("/:id", deleteBlog);
 
 module.exports = router;

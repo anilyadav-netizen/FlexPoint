@@ -1,4 +1,5 @@
 const Blog = require("../models/blogModel");
+const uploadToImgBB = require("../utils/uploadToImgBB");
 
 // ==========================================
 // CREATE BLOG
@@ -13,7 +14,6 @@ const createBlog = async (req, res) => {
       title,
       description,
       content,
-      image,
       isPublished,
     } = req.body;
 
@@ -56,10 +56,14 @@ const createBlog = async (req, res) => {
       });
     }
 
-    if (!image) {
+    // ==========================================
+    // IMAGE VALIDATION
+    // ==========================================
+
+    if (!req.file) {
       return res.status(400).json({
         success: false,
-        message: "Image is required",
+        message: "Blog image is required",
       });
     }
 
@@ -79,7 +83,13 @@ const createBlog = async (req, res) => {
     }
 
     // ==========================================
-    // CREATE
+    // UPLOAD IMAGE TO IMGBB
+    // ==========================================
+
+    const imageUrl = await uploadToImgBB(req.file);
+
+    // ==========================================
+    // CREATE BLOG
     // ==========================================
 
     const blog = await Blog.create({
@@ -89,11 +99,11 @@ const createBlog = async (req, res) => {
       title,
       description,
       content,
-      image,
+      image: imageUrl,
       isPublished:
-        typeof isPublished === "boolean"
-          ? isPublished
-          : true,
+        isPublished === undefined
+          ? true
+          : isPublished === "true" || isPublished === true,
     });
 
     return res.status(201).json({
@@ -122,10 +132,12 @@ const getBlogs = async (req, res) => {
 
     const filter = {};
 
+    // Category filter
     if (category) {
       filter.category = category.toUpperCase();
     }
 
+    // Published filter
     if (published !== undefined) {
       filter.isPublished = published === "true";
     }
@@ -151,7 +163,7 @@ const getBlogs = async (req, res) => {
 };
 
 // ==========================================
-// GET SINGLE BLOG
+// GET SINGLE BLOG BY ID
 // ==========================================
 
 const getBlog = async (req, res) => {
@@ -240,9 +252,12 @@ const updateBlog = async (req, res) => {
       title,
       description,
       content,
-      image,
       isPublished,
     } = req.body;
+
+    // ==========================================
+    // UPDATE TEXT FIELDS
+    // ==========================================
 
     if (category !== undefined) {
       blog.category = category;
@@ -268,13 +283,25 @@ const updateBlog = async (req, res) => {
       blog.content = content;
     }
 
-    if (image !== undefined) {
-      blog.image = image;
+    if (isPublished !== undefined) {
+      blog.isPublished =
+        isPublished === "true" || isPublished === true;
     }
 
-    if (isPublished !== undefined) {
-      blog.isPublished = isPublished;
+    // ==========================================
+    // UPDATE IMAGE
+    // Only upload if new image is provided
+    // ==========================================
+
+    if (req.file) {
+      const imageUrl = await uploadToImgBB(req.file);
+
+      blog.image = imageUrl;
     }
+
+    // ==========================================
+    // SAVE
+    // ==========================================
 
     const updatedBlog = await blog.save();
 

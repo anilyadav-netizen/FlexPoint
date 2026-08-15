@@ -12,6 +12,7 @@ const planRoutes = require("./routes/planRoutes");
 const programRoutes = require("./routes/programRoutes");
 const trainerRoutes = require("./routes/trainerRoutes");
 const blogRoutes = require("./routes/blogRoutes");
+const galleryRoutes = require("./routes/galleryRoutes");
 
 
 const app = express();
@@ -40,6 +41,7 @@ app.use("/api/plans", planRoutes);
 app.use("/api/programs", programRoutes);
 app.use("/api/trainers", trainerRoutes);
 app.use("/api/blogs", blogRoutes);
+app.use("/api/gallery", galleryRoutes);
 
 // Test route
 app.get("/", (req, res) => {
