@@ -101,7 +101,6 @@ blogSchema.pre("save", function (next) {
       .replace(/^-+|-+$/g, "");
   }
 
-  next();
 });
 
 const Blog = mongoose.model("Blog", blogSchema);
