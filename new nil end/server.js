@@ -10,6 +10,7 @@ dns.setServers(['1.1.1.1','8.8.8.8'])
 const authRoutes = require("./routes/authRoutes");
 const planRoutes = require("./routes/planRoutes");
 const programRoutes = require("./routes/programRoutes");
+const trainerRoutes = require("./routes/trainerRoutes");
 
 const app = express();
 
@@ -35,6 +36,7 @@ app.use(cookieParser());
 app.use("/api/auth", authRoutes);
 app.use("/api/plans", planRoutes);
 app.use("/api/programs", programRoutes);
+app.use("/api/trainers", trainerRoutes);
 
 // Test route
 app.get("/", (req, res) => {
