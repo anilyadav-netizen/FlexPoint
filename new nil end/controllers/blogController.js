@@ -355,9 +355,6 @@ const deleteBlog = async (req, res) => {
   }
 };
 
-// ==========================================
-// EXPORT
-// ==========================================
 
 module.exports = {
   createBlog,
