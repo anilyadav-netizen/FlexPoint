@@ -12,6 +12,7 @@ const Navbar = () => {
         { name: "ABOUT US", path: "/about" },
         { name: "TRAINERS", path: "/trainers" },
         { name: "BLOG", path: "/blog" },
+        { name: "GALLERY", path: "/gallery" },
         { name: "CONTACT", path: "/contact" },
     ];
 
@@ -96,7 +97,7 @@ const Navbar = () => {
                                         {item.name}
 
                                         <span
-                                            className={`absolute bottom-0 left-1/2 h-[2px] -translate-x-1/2 bg-[#e85d3a] transition-all duration-300 ${
+                                            className={`absolute bottom-[20px] left-1/2 h-[2px] -translate-x-1/2 bg-[#e85d3a] transition-all duration-300 ${
                                                 isActive
                                                     ? "w-7"
                                                     : "w-0 group-hover:w-7"

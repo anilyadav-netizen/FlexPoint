@@ -1,56 +1,137 @@
-import React from "react";
+import React, { useEffect, useMemo } from "react";
 import { Link } from "react-router-dom";
 import { FaArrowRight } from "react-icons/fa";
+import { useDispatch, useSelector } from "react-redux";
+import { getBlogs } from "../redux/Slicer/blogSlice";
 
-const blogs = [
-    {
-        id: 1,
-        category: "TRAINING",
-        date: "AUG 02, 2026",
-        title: "How To Build A Stronger Training Routine",
-        description:
-            "Learn how to create a structured workout routine that keeps you consistent, focused and progressing.",
-        image:
-            "https://images.unsplash.com/photo-1534438327276-14e5300c3a48?auto=format&fit=crop&w=900&q=80",
-    },
-    {
-        id: 2,
-        category: "NUTRITION",
-        date: "JUL 28, 2026",
-        title: "Simple Nutrition Habits For Better Results",
-        description:
-            "Small changes in your daily nutrition can make a big difference in your energy, recovery and performance.",
-        image:
-            "https://images.unsplash.com/photo-1490645935967-10de6ba17061?auto=format&fit=crop&w=900&q=80",
-    },
-    {
-        id: 3,
-        category: "FITNESS",
-        date: "JUL 21, 2026",
-        title: "Why Consistency Beats Motivation",
-        description:
-            "Motivation comes and goes. Discover why building consistent habits are the real key to long-term fitness.",
-        image:
-            "https://images.unsplash.com/photo-1517836357463-d25dfeac3438?auto=format&fit=crop&w=900&q=80",
-    },
-    {
-        id: 4,
-        category: "RECOVERY",
-        date: "JUL 15, 2026",
-        title: "The Importance Of Rest And Recovery",
-        description:
-            "Training hard is only one part of the process. Learn how proper recovery helps your body perform better.",
-        image:
-            "https://images.unsplash.com/photo-1518611012118-696072aa579a?auto=format&fit=crop&w=900&q=80",
-    },
-];
+const fallbackImage =
+    "https://images.unsplash.com/photo-1534438327276-14e5300c3a48?auto=format&fit=crop&w=900&q=80";
 
 const BlogSection = () => {
+    const dispatch = useDispatch();
+
+    const { blogs, loading, error } = useSelector(
+        (state) => state.blog
+    );
+
+    useEffect(() => {
+        dispatch(getBlogs());
+    }, [dispatch]);
+
+    // ============================
+    // BACKEND DATA
+    // ============================
+    const blogList = Array.isArray(blogs) ? blogs : [];
+
+    // ============================
+    // ONLY PUBLISHED BLOGS
+    // ============================
+    const publishedBlogs = useMemo(() => {
+        return blogList.filter(
+            (blog) => blog.isPublished === true
+        );
+    }, [blogList]);
+
+    // ============================
+    // SHOW LATEST 4 BLOGS
+    // ============================
+    const latestBlogs = useMemo(() => {
+        return publishedBlogs.slice(0, 4);
+    }, [publishedBlogs]);
+
+    // ============================
+    // GET BLOG ID
+    // ============================
+    const getBlogId = (blog) => {
+        return blog?._id || blog?.id;
+    };
+
+    // ============================
+    // GET IMAGE
+    // ============================
+    const getImage = (blog) => {
+        return (
+            blog?.image ||
+            blog?.imageUrl ||
+            blog?.coverImage ||
+            fallbackImage
+        );
+    };
+
+    // ============================
+    // FORMAT DATE
+    // ============================
+    const formatDate = (date) => {
+        if (!date) return "";
+
+        const parsedDate = new Date(date);
+
+        if (Number.isNaN(parsedDate.getTime())) {
+            return "";
+        }
+
+        return parsedDate
+            .toLocaleDateString("en-US", {
+                month: "short",
+                day: "2-digit",
+                year: "numeric",
+            })
+            .toUpperCase();
+    };
+
+    // ============================
+    // FORMAT PROGRAM
+    // ============================
+    const formatProgram = (program) => {
+        if (!program) return "FITNESS";
+
+        return String(program).toUpperCase();
+    };
+
+    // ============================
+    // LOADING
+    // ============================
+    if (loading) {
+        return (
+            <section
+                id="blogs"
+                className="w-full overflow-hidden border-t border-white/10 bg-[#0d0d0d] py-8 text-white"
+            >
+                <div className="flex min-h-[250px] items-center justify-center">
+                    <div className="text-center">
+
+                        <div className="mx-auto h-8 w-8 animate-spin rounded-full border-2 border-white/10 border-t-[#e85d3a]" />
+
+                        <p className="mt-3 font-['Barlow'] text-[12px] uppercase tracking-[0.1em] text-white/40">
+                            Loading Articles...
+                        </p>
+
+                    </div>
+                </div>
+            </section>
+        );
+    }
+
+    // ============================
+    // API ERROR
+    // ============================
+    if (error) {
+        return null;
+    }
+
+    // ============================
+    // NO BLOGS
+    // ============================
+    if (latestBlogs.length === 0) {
+        return null;
+    }
+
     return (
         <section
             id="blogs"
             className="w-full overflow-hidden border-t border-white/10 bg-[#0d0d0d] py-2 text-white md:py-5 lg:py-6"
         >
+
             {/* ================= CONTAINER ================= */}
 
             <div className="mx-auto w-full max-w-[110rem] px-6 sm:px-10 lg:px-16 xl:px-[7%]">
@@ -60,6 +141,7 @@ const BlogSection = () => {
                 <div className="flex items-end justify-between">
 
                     <div>
+
                         <h2 className="font-['Bebas_Neue'] text-[20px] leading-none tracking-[0.02em] text-white md:text-[35px] lg:text-[40px]">
                             LATEST{" "}
                             <span className="text-[#e85d3a]">
@@ -71,83 +153,99 @@ const BlogSection = () => {
                             Training tips, nutrition advice and practical fitness
                             insights to help you train smarter and get better results.
                         </p>
+
                     </div>
 
                 </div>
+
 
                 {/* ================= BLOG GRID ================= */}
 
                 <div className="mt-4 grid grid-cols-1 gap-2.5 sm:mt-5 sm:grid-cols-2 sm:gap-3 lg:mt-4 lg:grid-cols-4 lg:gap-4">
 
-                    {blogs.map((blog) => (
-                        <Link
-                            key={blog.id}
-                            to={`/blogs/${blog.id}`}
-                            className="group block"
-                        >
-                            <article className="h-full overflow-hidden border border-white/10 bg-[#151515] transition-all duration-300 hover:-translate-y-1 hover:border-[#e85d3a]/60 hover:shadow-[0_12px_30px_rgba(0,0,0,0.4)]">
+                    {latestBlogs.map((blog) => {
 
-                                {/* ================= IMAGE ================= */}
+                        const blogId = getBlogId(blog);
 
-                                <div className="relative h-[190px] overflow-hidden sm:h-[205px] lg:h-[190px] xl:h-[205px]">
+                        return (
+                            <Link
+                                key={blogId}
+                                to={`/blogs/${blogId}`}
+                                className="group block"
+                            >
 
-                                    <img
-                                        src={blog.image}
-                                        alt={blog.title}
-                                        loading="lazy"
-                                        className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-105"
-                                    />
+                                {/* ================= BLOG CARD ================= */}
 
-                                    {/* Overlay */}
+                                <article className="group relative h-full overflow-hidden border border-white/10 bg-[#151515] transition-all duration-300 hover:-translate-y-1 hover:border-[#e85d3a]/60 hover:shadow-[0_12px_30px_rgba(0,0,0,0.4)]">
 
-                                    <div className="absolute inset-0 bg-gradient-to-t from-black/65 via-black/10 to-transparent" />
+                                    {/* ================= IMAGE ================= */}
 
-                                    {/* Category */}
+                                    <div className="relative h-[190px] overflow-hidden sm:h-[205px] lg:h-[190px] xl:h-[205px]">
 
-                                    <div className="absolute left-3 top-3 bg-[#e85d3a] px-2.5 py-1">
+                                        <img
+                                            src={getImage(blog)}
+                                            alt={blog.title || "Fitness Blog"}
+                                            loading="lazy"
+                                            className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-105"
+                                        />
 
-                                        <span className="font-['Barlow'] text-[9px] font-bold uppercase tracking-[0.1em] text-white sm:text-[10px]">
-                                            {blog.category}
-                                        </span>
+                                        {/* IMAGE OVERLAY */}
+
+                                        <div className="absolute inset-0 bg-gradient-to-t from-black/65 via-black/10 to-transparent" />
+
+                                        {/* PROGRAM */}
+
+                                        <div className="absolute left-3 top-3 bg-[#e85d3a] px-2.5 py-1">
+
+                                            <span className="font-['Barlow'] text-[9px] font-bold uppercase tracking-[0.1em] text-white sm:text-[10px]">
+                                                {formatProgram(blog.program)}
+                                            </span>
+
+                                        </div>
 
                                     </div>
 
-                                </div>
 
-                                {/* ================= CONTENT ================= */}
+                                    {/* ================= CONTENT ================= */}
 
-                                <div className="p-4 sm:p-4.5">
+                                    <div className="p-4 sm:p-4.5">
 
-                                    {/* Date + Arrow */}
+                                        {/* DATE + ARROW */}
 
-                                    <div className="mb-2.5 flex items-center justify-between">
+                                        <div className="mb-2.5 flex items-center justify-between">
 
-                                        <span className="font-['Barlow'] text-[10px] font-medium uppercase tracking-[0.08em] text-white/35 sm:text-[11px]">
-                                            {blog.date}
-                                        </span>
-
-                                        <Link to="/blog">
+                                            <span className="font-['Barlow'] text-[10px] font-medium uppercase tracking-[0.08em] text-white/35 sm:text-[11px]">
+                                                {formatDate(
+                                                    blog.date ||
+                                                    blog.createdAt
+                                                )}
+                                            </span>
 
                                             <span className="flex h-6 w-6 items-center justify-center border border-white/10 text-white/40 transition-all duration-300 group-hover:border-[#e85d3a] group-hover:bg-[#e85d3a] group-hover:text-white">
+
                                                 <FaArrowRight size={9} />
+
                                             </span>
-                                        </Link>
-                                    </div>
 
-                                    {/* Title */}
+                                        </div>
 
-                                    <h3 className="font-['Bebas_Neue'] text-[21px] leading-[0.95] tracking-wide text-white transition-colors duration-300 group-hover:text-[#e85d3a] sm:text-[23px] lg:text-[21px] xl:text-[23px]">
-                                        {blog.title}
-                                    </h3>
 
-                                    {/* Description */}
+                                        {/* TITLE */}
 
-                                    <p className="mt-2.5 font-['Barlow'] text-[12px] leading-5 text-white/45 sm:text-[13px] sm:leading-[1.55]">
-                                        {blog.description}
-                                    </p>
+                                        <h3 className="font-['Bebas_Neue'] text-[21px] leading-[0.95] tracking-wide text-white transition-colors duration-300 group-hover:text-[#e85d3a] sm:text-[23px] lg:text-[21px] xl:text-[23px]">
+                                            {blog.title}
+                                        </h3>
 
-                                    {/* Read More */}
-                                    <Link to="/blog">
+
+                                        {/* DESCRIPTION */}
+
+                                        <p className="mt-2.5 font-['Barlow'] text-[12px] leading-5 text-white/45 sm:text-[13px] sm:leading-[1.55]">
+                                            {blog.description}
+                                        </p>
+
+
+                                        {/* READ MORE */}
+
                                         <div className="mt-4 flex items-center gap-2 font-['Barlow'] text-[10px] font-bold uppercase tracking-[0.1em] text-[#e85d3a] sm:text-[11px]">
 
                                             Read Article
@@ -158,19 +256,24 @@ const BlogSection = () => {
                                             />
 
                                         </div>
-                                    </Link>
 
-                                </div>
+                                    </div>
 
-                                {/* Bottom Accent */}
 
-                                <div className="h-[2px] w-0 bg-[#e85d3a] transition-all duration-300 group-hover:w-full" />
+                                    {/* ================= BOTTOM ACCENT ================= */}
 
-                            </article>
-                        </Link>
-                    ))}
+                                    <span
+                                        className="absolute bottom-0 left-0 h-[2px] w-0 bg-[#e85d3a] transition-[width] duration-300 group-hover:w-full"
+                                    />
+
+                                </article>
+
+                            </Link>
+                        );
+                    })}
 
                 </div>
+
 
                 {/* ================= VIEW ALL ================= */}
 
@@ -184,6 +287,7 @@ const BlogSection = () => {
                                 "polygon(6% 0, 100% 0, 94% 100%, 0 100%)",
                         }}
                     >
+
                         View All Blogs
 
                         <FaArrowRight
@@ -196,6 +300,7 @@ const BlogSection = () => {
                 </div>
 
             </div>
+
         </section>
     );
 };

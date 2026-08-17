@@ -37,7 +37,7 @@ const Program = () => {
   // Sirf active programs + maximum 6
   const displayedPrograms = programs
     .filter((item) => item.isActive === true)
-    .slice(0, 6);
+    .slice(0, 5);
 
   return (
     <section
@@ -81,7 +81,7 @@ const Program = () => {
 
         {/* ================= PROGRAM GRID ================= */}
         {!loading && !error && displayedPrograms.length > 0 && (
-          <div className="grid grid-cols-2 gap-2.5 sm:gap-3 md:grid-cols-3 lg:grid-cols-6 lg:gap-2.5 xl:gap-3">
+          <div className="grid grid-cols-1 gap-2.5 md:grid-cols-3 lg:grid-cols-5 lg:gap-2.5 xl:gap-3">
 
             {displayedPrograms.map((item) => {
               const Icon = iconMap[item.icon] || Dumbbell;
@@ -89,7 +89,7 @@ const Program = () => {
               return (
                 <article
                   key={item._id}
-                  className="group relative h-[235px] overflow-hidden border border-white/15 bg-[#151515] transition-all duration-300 hover:-translate-y-1 hover:border-[#e85d3a]/60 hover:shadow-[0_15px_35px_rgba(0,0,0,0.35)] sm:h-[245px] md:h-[255px] lg:h-[188px] xl:h-[205px]"
+                  className="group relative h-[280px] overflow-hidden border border-white/15 bg-[#151515] transition-all duration-300 hover:-translate-y-1 hover:border-[#e85d3a]/60 hover:shadow-[0_15px_35px_rgba(0,0,0,0.35) md:h-[310px] lg:h-[320px]"
                 >
 
                   {/* ================= BACKGROUND IMAGE ================= */}
@@ -98,7 +98,7 @@ const Program = () => {
                       src={item.image}
                       alt={`${item.title || ""} ${item.subtitle || ""}`}
                       loading="lazy"
-                      className="absolute inset-0 h-full w-full object-cover transition-transform duration-700 group-hover:scale-105"
+                      className="absolute inset-0 h-full w-full object-fill transition-transform duration-700 group-hover:scale-105"
                       onError={(e) => {
                         e.currentTarget.style.display = "none";
                       }}
@@ -139,17 +139,6 @@ const Program = () => {
                       <p className="mt-2 font-['Barlow'] text-[9px] leading-[1.45] text-white/65 sm:text-[10px] lg:mt-1.5 lg:text-[8px] xl:text-[9px]">
                         {item.description}
                       </p>
-
-                      {/* Arrow */}
-                      <div className="mt-2.5 flex justify-end sm:mt-3 lg:mt-2">
-                        <span className="flex h-5 w-5 items-center justify-center text-[#e85d3a] transition-transform duration-300 group-hover:translate-x-1">
-                          <ArrowRight
-                            size={17}
-                            strokeWidth={1.7}
-                          />
-                        </span>
-                      </div>
-
                     </div>
                   </div>
 

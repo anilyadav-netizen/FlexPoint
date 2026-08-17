@@ -40,42 +40,43 @@ const Premium = () => {
                 </div>
 
                 {/* ================= MAIN LAYOUT ================= */}
-                <div className="grid grid-cols-1 gap-4 lg:grid-cols-[1fr_0.43fr] lg:gap-5 mt-3">
+                <div className="mt-3 grid grid-cols-1 gap-4 lg:grid-cols-[1fr_0.43fr] lg:gap-5">
 
                     {/* ================= PLANS ================= */}
                     <div className="grid grid-cols-1 gap-3 sm:grid-cols-3 sm:gap-3">
 
-                        {/* Loading */}
+                        {/* ================= LOADING ================= */}
                         {loading && (
-                            <div className="col-span-full flex min-h-[255px] items-center justify-center text-white/60">
+                            <div className="col-span-full flex min-h-[255px] items-center justify-center font-['Barlow'] text-sm text-white/60">
                                 Loading membership plans...
                             </div>
                         )}
 
-                        {/* Error */}
+                        {/* ================= ERROR ================= */}
                         {!loading && error && (
-                            <div className="col-span-full flex min-h-[255px] items-center justify-center text-red-400">
+                            <div className="col-span-full flex min-h-[255px] items-center justify-center font-['Barlow'] text-sm text-red-400">
                                 {error}
                             </div>
                         )}
 
-                        {/* Empty */}
+                        {/* ================= EMPTY ================= */}
                         {!loading && !error && plans.length === 0 && (
-                            <div className="col-span-full flex min-h-[255px] items-center justify-center text-white/60">
+                            <div className="col-span-full flex min-h-[255px] items-center justify-center font-['Barlow'] text-sm text-white/60">
                                 No membership plans available.
                             </div>
                         )}
 
-                        {/* Dynamic Plans */}
+                        {/* ================= DYNAMIC PLANS ================= */}
                         {!loading &&
                             !error &&
                             plans.map((plan) => (
                                 <article
                                     key={plan._id}
-                                    className={`group relative flex min-h-[255px] flex-col overflow-visible border bg-[#111111] p-5 transition-all duration-300 sm:min-h-[265px] sm:p-4 md:p-5 lg:min-h-[255px] ${plan.popular
+                                    className={`group relative flex min-h-[255px] flex-col overflow-visible border bg-[#111111] p-5 transition-all duration-300 sm:min-h-[265px] sm:p-4 md:p-5 lg:min-h-[255px] ${
+                                        plan.popular
                                             ? "border-[#e85d3a]/70 shadow-[0_0_25px_rgba(232,93,58,0.08)]"
                                             : "border-white/15 hover:border-[#e85d3a]/50"
-                                        }`}
+                                    }`}
                                 >
 
                                     {/* ================= POPULAR BADGE ================= */}
@@ -91,6 +92,7 @@ const Premium = () => {
                                                 size={11}
                                                 strokeWidth={1.8}
                                             />
+
                                             Most Popular
                                         </div>
                                     )}
@@ -103,7 +105,10 @@ const Premium = () => {
 
                                         <div className="mt-2 flex items-end justify-center gap-1">
                                             <span className="font-['Barlow'] text-[25px] font-bold leading-none text-white sm:text-[27px]">
-                                                ₹{Number(plan.price).toLocaleString("en-IN")}
+                                                ₹
+                                                {Number(
+                                                    plan.price
+                                                ).toLocaleString("en-IN")}
                                             </span>
 
                                             <span className="mb-0.5 font-['Barlow'] text-[7px] text-white/45">
@@ -113,24 +118,28 @@ const Premium = () => {
                                     </div>
 
                                     {/* ================= FEATURES ================= */}
-                                    {/* ================= FEATURES ================= */}
-                                    <div className="mt-5 flex-1 space-y-2">
-                                        {plan.features?.map((feature, index) => (
-                                            <div
-                                                key={`${plan._id}-${index}`}
-                                                className="flex items-start gap-2"
-                                            >
-                                                <Check
-                                                    size={11}
-                                                    strokeWidth={2.5}
-                                                    className="mt-[1px] shrink-0 text-[#e85d3a]"
-                                                />
+                                    <div className="mt-5 flex-1 space-y-2.5">
 
-                                                <span className="font-['Barlow'] text-[10px] leading-[1.3] text-white/65">
-                                                    {index + 1}. {feature}
-                                                </span>
-                                            </div>
-                                        ))}
+                                        {plan.features?.map(
+                                            (feature, index) => (
+                                                <div
+                                                    key={`${plan._id}-${index}`}
+                                                    className="flex items-start gap-2.5"
+                                                >
+                                                    <Check
+                                                        size={13}
+                                                        strokeWidth={2.5}
+                                                        className="mt-[2px] shrink-0 text-[#e85d3a]"
+                                                    />
+
+                                                    <span className="font-['Barlow'] text-[14px] leading-[1.4] text-white/70">
+                                                        {index + 1}.{" "}
+                                                        {feature}
+                                                    </span>
+                                                </div>
+                                            )
+                                        )}
+
                                     </div>
 
                                     {/* ================= CHOOSE PLAN ================= */}
@@ -151,43 +160,54 @@ const Premium = () => {
                                         />
                                     </button>
 
-                                    {/* Bottom Accent */}
+                                    {/* ================= BOTTOM ACCENT ================= */}
                                     <span
-                                        className={`absolute bottom-0 left-0 h-[2px] bg-[#e85d3a] transition-all duration-300 ${plan.popular
+                                        className={`absolute bottom-0 left-0 h-[2px] bg-[#e85d3a] transition-all duration-300 ${
+                                            plan.popular
                                                 ? "w-full"
                                                 : "w-0 group-hover:w-full"
-                                            }`}
+                                        }`}
                                     />
                                 </article>
-                            ))}
+                            )
+                        )}
+
                     </div>
 
                     {/* ================= PROMOTIONAL IMAGE ================= */}
                     <div className="group relative min-h-[260px] overflow-hidden border border-white/15 bg-[#151515] sm:min-h-[280px] lg:min-h-full">
+
                         <img
                             src={MobileImage}
                             alt="Fitness Center Membership"
                             className="absolute inset-0 h-full w-full object-cover object-center transition-transform duration-700 group-hover:scale-105"
                         />
 
+                        {/* IMAGE OVERLAY */}
                         <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/35 to-black/10" />
 
                         <div className="absolute inset-0 bg-gradient-to-r from-[#0d0d0d]/40 via-transparent to-[#e85d3a]/5" />
 
+                        {/* PROMO CONTENT */}
                         <div className="relative z-10 flex h-full min-h-[260px] flex-col justify-between p-5 sm:min-h-[280px] sm:p-6">
+
                             <div className="max-w-[180px]">
+
                                 <span className="font-['Barlow'] text-[8px] font-bold uppercase tracking-[0.15em] text-[#e85d3a]">
                                     Train Different
                                 </span>
 
                                 <h3 className="mt-2 font-['Bebas_Neue'] text-[24px] leading-[0.88] tracking-wide text-white lg:text-[32px]">
                                     DISCIPLINE TODAY
+
                                     <span className="block text-[#e85d3a]">
                                         STRENGTH TOMORROW
                                     </span>
                                 </h3>
+
                             </div>
 
+                            {/* JOIN NOW */}
                             <button
                                 type="button"
                                 className="group/cta flex h-[37px] w-fit items-center gap-2 bg-[#e85d3a] px-6 font-['Barlow'] text-[8px] font-bold uppercase tracking-[0.08em] text-white transition-all duration-300 hover:bg-[#f16a49]"
@@ -204,9 +224,12 @@ const Premium = () => {
                                     className="transition-transform duration-300 group-hover/cta:translate-x-1"
                                 />
                             </button>
+
                         </div>
 
+                        {/* BOTTOM ACCENT */}
                         <span className="absolute bottom-0 left-0 h-[2px] w-full bg-[#e85d3a]" />
+
                     </div>
                 </div>
             </div>

@@ -2,62 +2,68 @@ import React, { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import { FaArrowRight, FaClock } from "react-icons/fa";
 import { useDispatch, useSelector } from "react-redux";
-import axios from "axios";
-import { getPrograms } from "../redux/Slicer/programSlice";
+import { getBlogs } from "../redux/Slicer/blogSlice";
 
-const DEFAULT_IMAGE =
+const fallbackImage =
     "https://images.unsplash.com/photo-1534438327276-14e5300c3a48?auto=format&fit=crop&w=1200&q=85";
 
 const BlogPage = () => {
     const dispatch = useDispatch();
 
-    /* ================= BLOG STATE ================= */
-    const [blogs, setBlogs] = useState([]);
+    const { blogs, loading, error } = useSelector((state) => state.blog);
+
     const [activeProgram, setActiveProgram] = useState("ALL");
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState("");
 
-    /* ================= PROGRAM REDUX ================= */
-    const {
-        program,
-        loading: programLoading,
-        error: programError,
-    } = useSelector((state) => state.program);
-
-    const programs = Array.isArray(program) ? program : [];
-
-    /* ================= FETCH BLOGS ================= */
     useEffect(() => {
-        const fetchBlogs = async () => {
-            try {
-                setLoading(true);
-                setError("");
-
-                const response = await axios.get("/api/blogs");
-
-                const data =
-                    response.data?.blogs ||
-                    response.data?.data ||
-                    [];
-
-                setBlogs(Array.isArray(data) ? data : []);
-            } catch (err) {
-                console.error("Failed to fetch blogs:", err);
-                setError("Unable to load blogs. Please try again later.");
-            } finally {
-                setLoading(false);
-            }
-        };
-
-        fetchBlogs();
-    }, []);
-
-    /* ================= FETCH PROGRAMS ================= */
-    useEffect(() => {
-        dispatch(getPrograms(true));
+        dispatch(getBlogs());
     }, [dispatch]);
 
-    /* ================= HELPERS ================= */
+    // =========================
+    // BLOG DATA
+    // =========================
+
+    const blogList = Array.isArray(blogs) ? blogs : [];
+
+    const publishedBlogs = useMemo(() => {
+        return blogList.filter((blog) => blog.isPublished === true);
+    }, [blogList]);
+
+    // =========================
+    // PROGRAMS
+    // =========================
+
+    const programs = useMemo(() => {
+        const uniquePrograms = publishedBlogs
+            .map((blog) => blog.program)
+            .filter(Boolean)
+            .map((program) => String(program).trim())
+            .filter((program) => program.length > 0);
+
+        return ["ALL", ...new Set(uniquePrograms)];
+    }, [publishedBlogs]);
+
+    // =========================
+    // FILTER BLOGS
+    // =========================
+
+    const filteredBlogs = useMemo(() => {
+        if (activeProgram === "ALL") {
+            return publishedBlogs;
+        }
+
+        return publishedBlogs.filter(
+            (blog) =>
+                String(blog.program || "").trim().toLowerCase() ===
+                activeProgram.trim().toLowerCase()
+        );
+    }, [publishedBlogs, activeProgram]);
+
+    const featuredBlog = filteredBlogs[0];
+    const remainingBlogs = filteredBlogs.slice(1);
+
+    // =========================
+    // HELPERS
+    // =========================
 
     const getBlogId = (blog) => {
         return blog?._id || blog?.id;
@@ -68,7 +74,7 @@ const BlogPage = () => {
             blog?.image ||
             blog?.imageUrl ||
             blog?.coverImage ||
-            DEFAULT_IMAGE
+            fallbackImage
         );
     };
 
@@ -90,8 +96,16 @@ const BlogPage = () => {
             .toUpperCase();
     };
 
+    const formatProgram = (program) => {
+        if (!program) return "FITNESS";
+
+        return String(program).toUpperCase();
+    };
+
     const formatReadTime = (readTime) => {
-        if (!readTime) return "5 MIN READ";
+        if (!readTime) {
+            return "5 MIN READ";
+        }
 
         if (typeof readTime === "number") {
             return `${readTime} MIN READ`;
@@ -99,156 +113,22 @@ const BlogPage = () => {
 
         const value = String(readTime).toUpperCase();
 
-        return value.includes("READ")
-            ? value
-            : `${value} MIN READ`;
+        return value.includes("READ") ? value : `${value} MIN READ`;
     };
-
-    /*
-     * Blog ke program ko safely get karega.
-     *
-     * Preferred:
-     * blog.program
-     *
-     * Backward compatibility:
-     * blog.category
-     */
-    const getBlogProgram = (blog) => {
-        return (
-            blog?.program ||
-            blog?.programName ||
-            blog?.category ||
-            ""
-        );
-    };
-
-    /*
-     * Program ka display name.
-     *
-     * Backend program object agar blog.program me aa raha ho
-     * to title/name bhi handle karega.
-     */
-    const getProgramName = (program) => {
-        if (!program) return "";
-
-        if (typeof program === "string") {
-            return program;
-        }
-
-        return (
-            program.title ||
-            program.name ||
-            program.programName ||
-            ""
-        );
-    };
-
-    /*
-     * Blog ke program ko compare karne ke liye
-     * normalized value.
-     */
-    const normalizeProgram = (value) => {
-        if (!value) return "";
-
-        if (typeof value === "object") {
-            value = getProgramName(value);
-        }
-
-        return String(value)
-            .trim()
-            .toLowerCase();
-    };
-
-    /* ================= DYNAMIC PROGRAMS ================= */
-
-    const programCategories = useMemo(() => {
-        const uniquePrograms = [];
-
-        programs.forEach((item) => {
-            if (!item?.isActive) return;
-
-            const name = getProgramName(item);
-
-            if (!name) return;
-
-            const alreadyExists = uniquePrograms.some(
-                (programName) =>
-                    normalizeProgram(programName) ===
-                    normalizeProgram(name)
-            );
-
-            if (!alreadyExists) {
-                uniquePrograms.push(name);
-            }
-        });
-
-        return ["ALL", ...uniquePrograms];
-    }, [programs]);
-
-    /*
-     * Agar backend se program list late aaye aur
-     * currently selected program available na ho,
-     * to ALL select kar denge.
-     */
-    useEffect(() => {
-        if (
-            activeProgram !== "ALL" &&
-            !programCategories.some(
-                (item) =>
-                    normalizeProgram(item) ===
-                    normalizeProgram(activeProgram)
-            )
-        ) {
-            setActiveProgram("ALL");
-        }
-    }, [programCategories, activeProgram]);
-
-    /* ================= FILTER BLOGS ================= */
-
-    const filteredBlogs = useMemo(() => {
-        if (activeProgram === "ALL") {
-            return blogs;
-        }
-
-        return blogs.filter((blog) => {
-            const blogProgram = getBlogProgram(blog);
-
-            /*
-             * Agar blog.program object hai:
-             * { _id, title }
-             *
-             * Agar string hai:
-             * "Strength Training"
-             *
-             * Dono handle honge.
-             */
-            return (
-                normalizeProgram(blogProgram) ===
-                normalizeProgram(activeProgram)
-            );
-        });
-    }, [blogs, activeProgram]);
-
-    /* ================= FEATURED ================= */
-
-    const featuredBlog = filteredBlogs[0];
-    const remainingBlogs = filteredBlogs.slice(1);
 
     return (
         <main className="mt-[0px] w-full overflow-hidden bg-[#0d0d0d] text-white">
 
-            {/* =====================================================
-                HERO
-            ====================================================== */}
+            {/* ================= HERO ================= */}
 
             <section className="border-b border-white/10">
-
                 <div className="mx-auto w-full max-w-[110rem] px-6 py-4 sm:px-10 md:py-7 lg:px-16 xl:px-[7%]">
 
                     <div className="grid items-end gap-5 lg:grid-cols-[1fr_0.7fr] lg:gap-16">
 
-                        <div>
+                        {/* LEFT */}
 
+                        <div>
                             <div className="mb-3 flex items-center gap-2">
 
                                 <span className="h-[2px] w-8 bg-[#e85d3a]" />
@@ -265,23 +145,23 @@ const BlogPage = () => {
                                     {" "}LIVE STRONGER.
                                 </span>
                             </h1>
-
                         </div>
+
+                        {/* RIGHT */}
 
                         <div className="max-w-[500px] lg:justify-self-end">
 
                             <p className="font-['Barlow'] text-[13px] leading-6 text-white/50 sm:text-[14px] sm:leading-7">
-                                Training tips, nutrition advice, recovery
-                                strategies and practical fitness insights to
-                                help you make better decisions inside and
-                                outside the gym.
+                                Training tips, nutrition advice, recovery strategies
+                                and practical fitness insights to help you make
+                                better decisions inside and outside the gym.
                             </p>
 
                             <div className="mt-3 flex flex-wrap gap-2">
 
                                 <div className="border border-white/10 bg-[#151515] px-3.5 py-2">
                                     <span className="font-['Barlow'] text-[10px] font-semibold uppercase tracking-[0.08em] text-white/65 sm:text-[11px]">
-                                        {blogs.length} Articles
+                                        {publishedBlogs.length} Articles
                                     </span>
                                 </div>
 
@@ -292,63 +172,44 @@ const BlogPage = () => {
                                 </div>
 
                             </div>
-
                         </div>
-
                     </div>
-
                 </div>
-
             </section>
 
-            {/* =====================================================
-                PROGRAM FILTER BAR
-            ====================================================== */}
+            {/* ================= PROGRAM BAR ================= */}
 
             <section className="border-b border-white/10 bg-[#111111]">
 
                 <div className="mx-auto flex w-full max-w-[110rem] items-center gap-2 overflow-x-auto px-6 py-3 sm:px-10 lg:px-16 xl:px-[7%]">
 
                     <span className="mr-2 shrink-0 font-['Barlow'] text-[10px] font-bold uppercase tracking-[0.12em] text-white/35">
-                        Explore Programs:
+                        Explore:
                     </span>
 
-                    {programCategories.map((programName) => (
+                    {programs.map((program) => (
 
                         <button
-                            key={programName}
+                            key={program}
                             type="button"
-                            onClick={() =>
-                                setActiveProgram(programName)
-                            }
+                            onClick={() => setActiveProgram(program)}
                             className={`shrink-0 border px-4 py-2 font-['Barlow'] text-[10px] font-semibold uppercase tracking-[0.08em] transition-all duration-300 ${
-                                normalizeProgram(activeProgram) ===
-                                normalizeProgram(programName)
+                                activeProgram === program
                                     ? "border-[#e85d3a] bg-[#e85d3a] text-white"
                                     : "border-white/10 bg-[#151515] text-white/55 hover:border-[#e85d3a]/60 hover:text-white"
                             }`}
                         >
-                            {programName}
+                            {program}
                         </button>
 
                     ))}
 
-                    {programLoading && (
-                        <span className="ml-2 shrink-0 font-['Barlow'] text-[10px] uppercase tracking-wider text-white/30">
-                            Loading...
-                        </span>
-                    )}
-
                 </div>
-
             </section>
 
-            {/* =====================================================
-                LOADING
-            ====================================================== */}
+            {/* ================= LOADING ================= */}
 
             {loading && (
-
                 <section className="flex min-h-[400px] items-center justify-center">
 
                     <div className="text-center">
@@ -362,15 +223,11 @@ const BlogPage = () => {
                     </div>
 
                 </section>
-
             )}
 
-            {/* =====================================================
-                ERROR
-            ====================================================== */}
+            {/* ================= ERROR ================= */}
 
             {!loading && error && (
-
                 <section className="px-6 py-20 text-center">
 
                     <p className="font-['Barlow'] text-[14px] text-red-400">
@@ -378,50 +235,30 @@ const BlogPage = () => {
                     </p>
 
                 </section>
-
             )}
 
-            {/* =====================================================
-                PROGRAM ERROR
-            ====================================================== */}
-
-            {!loading && !error && programError && (
-
-                <div className="px-6 pt-5 text-center">
-
-                    <p className="font-['Barlow'] text-[12px] text-yellow-500/80">
-                        Programs could not be loaded.
-                    </p>
-
-                </div>
-
-            )}
-
-            {/* =====================================================
-                NO BLOGS
-            ====================================================== */}
+            {/* ================= EMPTY ================= */}
 
             {!loading &&
                 !error &&
                 filteredBlogs.length === 0 && (
-
                     <section className="px-6 py-20 text-center">
 
                         <p className="font-['Barlow'] text-[14px] text-white/40">
-                            No articles found for this program.
+                            No articles found in this program.
                         </p>
 
                     </section>
                 )}
+
+            {/* ================= BLOG CONTENT ================= */}
 
             {!loading &&
                 !error &&
                 featuredBlog && (
                     <>
 
-                        {/* =====================================================
-                            FEATURED ARTICLE
-                        ====================================================== */}
+                        {/* ================= FEATURED ARTICLE ================= */}
 
                         <section>
 
@@ -453,10 +290,6 @@ const BlogPage = () => {
                                                 alt={featuredBlog.title}
                                                 loading="lazy"
                                                 className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-105"
-                                                onError={(e) => {
-                                                    e.currentTarget.src =
-                                                        DEFAULT_IMAGE;
-                                                }}
                                             />
 
                                             <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/15 to-transparent" />
@@ -464,11 +297,7 @@ const BlogPage = () => {
                                             <div className="absolute left-4 top-4 bg-[#e85d3a] px-3 py-1.5">
 
                                                 <span className="font-['Barlow'] text-[10px] font-bold uppercase tracking-[0.1em]">
-                                                    {getProgramName(
-                                                        getBlogProgram(
-                                                            featuredBlog
-                                                        )
-                                                    )}
+                                                    {formatProgram(featuredBlog.program)}
                                                 </span>
 
                                             </div>
@@ -483,8 +312,8 @@ const BlogPage = () => {
 
                                                 <span className="font-['Barlow'] text-[10px] font-medium uppercase tracking-[0.08em] text-white/35">
                                                     {formatDate(
-                                                        featuredBlog.createdAt ||
-                                                            featuredBlog.date
+                                                        featuredBlog.date ||
+                                                        featuredBlog.createdAt
                                                     )}
                                                 </span>
 
@@ -523,14 +352,10 @@ const BlogPage = () => {
                                     </article>
 
                                 </Link>
-
                             </div>
-
                         </section>
 
-                        {/* =====================================================
-                            ALL ARTICLES
-                        ====================================================== */}
+                        {/* ================= ALL ARTICLES ================= */}
 
                         <section className="border-t border-white/10">
 
@@ -560,9 +385,8 @@ const BlogPage = () => {
                                     </div>
 
                                     <p className="max-w-[430px] font-['Barlow'] text-[12px] leading-5 text-white/40 sm:text-[13px] sm:leading-6">
-                                        Practical information to help you train
-                                        consistently, recover properly and make
-                                        smarter fitness choices.
+                                        Practical information to help you train consistently,
+                                        recover properly and make smarter fitness choices.
                                     </p>
 
                                 </div>
@@ -577,9 +401,10 @@ const BlogPage = () => {
                                             className="group block"
                                         >
 
-                                            <article className="h-full overflow-hidden border border-white/10 bg-[#151515] transition-all duration-300 hover:-translate-y-1 hover:border-[#e85d3a]/60 hover:shadow-[0_15px_35px_rgba(0,0,0,0.35)]">
+                                            {/* FIXED CARD */}
+                                            <article className="group relative h-full overflow-hidden border border-white/10 bg-[#151515] transition-all duration-300 hover:-translate-y-1 hover:border-[#e85d3a]/60 hover:shadow-[0_15px_35px_rgba(0,0,0,0.35)]">
 
-                                                {/* IMAGE */}
+                                                {/* ================= IMAGE ================= */}
 
                                                 <div className="relative h-[205px] overflow-hidden sm:h-[220px] lg:h-[210px] xl:h-[225px]">
 
@@ -588,10 +413,6 @@ const BlogPage = () => {
                                                         alt={blog.title}
                                                         loading="lazy"
                                                         className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-105"
-                                                        onError={(e) => {
-                                                            e.currentTarget.src =
-                                                                DEFAULT_IMAGE;
-                                                        }}
                                                     />
 
                                                     <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/10 to-transparent" />
@@ -601,11 +422,7 @@ const BlogPage = () => {
                                                     <div className="absolute left-3 top-3 bg-[#e85d3a] px-2.5 py-1">
 
                                                         <span className="font-['Barlow'] text-[9px] font-bold uppercase tracking-[0.1em]">
-                                                            {getProgramName(
-                                                                getBlogProgram(
-                                                                    blog
-                                                                )
-                                                            )}
+                                                            {formatProgram(blog.program)}
                                                         </span>
 
                                                     </div>
@@ -613,15 +430,12 @@ const BlogPage = () => {
                                                     {/* NUMBER */}
 
                                                     <span className="absolute right-3 top-3 font-['Bebas_Neue'] text-[20px] text-white/40">
-                                                        {String(index + 2).padStart(
-                                                            2,
-                                                            "0"
-                                                        )}
+                                                        {String(index + 2).padStart(2, "0")}
                                                     </span>
 
                                                 </div>
 
-                                                {/* CONTENT */}
+                                                {/* ================= CONTENT ================= */}
 
                                                 <div className="p-4 sm:p-5">
 
@@ -631,8 +445,8 @@ const BlogPage = () => {
 
                                                             <span className="font-['Barlow'] text-[10px] font-medium uppercase tracking-[0.08em] text-white/35">
                                                                 {formatDate(
-                                                                    blog.createdAt ||
-                                                                        blog.date
+                                                                    blog.date ||
+                                                                    blog.createdAt
                                                                 )}
                                                             </span>
 
@@ -675,7 +489,9 @@ const BlogPage = () => {
 
                                                 </div>
 
-                                                <div className="h-[2px] w-0 bg-[#e85d3a] transition-all duration-300 group-hover:w-full" />
+                                                {/* ================= FIXED HOVER LINE ================= */}
+
+                                                <span className="pointer-events-none absolute bottom-0 left-0 z-20 h-[2px] w-0 bg-[#e85d3a] transition-all duration-300 group-hover:w-full" />
 
                                             </article>
 
@@ -684,17 +500,12 @@ const BlogPage = () => {
                                     ))}
 
                                 </div>
-
                             </div>
-
                         </section>
-
                     </>
                 )}
 
-            {/* =====================================================
-                FITNESS PHILOSOPHY
-            ====================================================== */}
+            {/* ================= PHILOSOPHY ================= */}
 
             <section className="border-y border-white/10 bg-[#111111]">
 
@@ -722,10 +533,9 @@ const BlogPage = () => {
                             </h2>
 
                             <p className="mt-3 max-w-[480px] font-['Barlow'] text-[13px] leading-6 text-white/40 sm:text-[14px] sm:leading-7">
-                                The better you understand your training,
-                                nutrition and recovery, the better decisions
-                                you can make for your body and your long-term
-                                fitness journey.
+                                The better you understand your training, nutrition
+                                and recovery, the better decisions you can make
+                                for your body and your long-term fitness journey.
                             </p>
 
                         </div>
@@ -774,14 +584,10 @@ const BlogPage = () => {
                         </div>
 
                     </div>
-
                 </div>
-
             </section>
 
-            {/* =====================================================
-                CTA
-            ====================================================== */}
+            {/* ================= CTA ================= */}
 
             <section>
 
@@ -828,15 +634,11 @@ const BlogPage = () => {
                                     size={9}
                                     className="transition-transform duration-300 group-hover:translate-x-1"
                                 />
-
                             </Link>
 
                         </div>
-
                     </div>
-
                 </div>
-
             </section>
 
         </main>

@@ -35,6 +35,8 @@ import Payment from "./Admin/adPages/Payment";
 import Attandance from "./Admin/adPages/Attandance";
 import Progress from "./Admin/adPages/Progress";
 import MyProfile from "./Admin/adPages/MyProfile";
+import GalleryPage from "./pages/GalleryPage";
+import BlogDetailPage from "./pages/BlogDetailPage";
 
 const WebsiteLayout = () => {
   return (
@@ -47,6 +49,8 @@ const WebsiteLayout = () => {
           <Route path="/programs" element={<ProgramPage />} />
           <Route path="/trainers" element={<TrainerPage />} />
           <Route path="/blog" element={<BlogPage />} />
+          <Route path="/gallery" element={<GalleryPage />} />
+          <Route path="/blogs/:id" element={<BlogDetailPage />} />
           <Route path="/contact" element={<ContactPage />} />
           <Route path="/privacy" element={<Privacy />} />
           <Route path="/terms" element={<Terms />} />

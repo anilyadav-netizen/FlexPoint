@@ -91,7 +91,7 @@ const TrainerPage = () => {
     // =========================================================
     // PAGINATION
     // =========================================================
-    const trainersPerPage = 6;
+    const trainersPerPage = 10;
 
     const totalPages = Math.ceil(
         activeTrainers.length / trainersPerPage

@@ -9,6 +9,7 @@ import Premium from './Premium'
 import Banner from './Banner'
 import BlogSection from './BlogSection'
 import Faq from './Faq'
+import Gallery from './Gallery'
 
 const Home = () => {
     return (
@@ -22,6 +23,7 @@ const Home = () => {
                 <BlogSection />
                 <Facility />
                 <Premium />
+                <Gallery/>
                 <Banner />
                 <Faq />
             </div>
