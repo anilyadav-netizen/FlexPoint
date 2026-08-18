@@ -187,6 +187,31 @@ const getProfile = async (req, res) => {
 };
 
 // ==========================
+// Get All Users
+// ==========================
+const getAllUsers = async (req, res) => {
+  try {
+    const users = await User.find()
+      .select("-password")
+      .sort({ createdAt: -1 });
+
+    return res.status(200).json({
+      success: true,
+      count: users.length,
+      users,
+    });
+  } catch (error) {
+    console.error("Get All Users Error:", error);
+
+    return res.status(500).json({
+      success: false,
+      message: "Server error",
+      error: error.message,
+    });
+  }
+};
+
+// ==========================
 // Logout
 // ==========================
 const logout = async (req, res) => {
@@ -213,5 +238,6 @@ module.exports = {
   register,
   login,
   getProfile,
+  getAllUsers,
   logout,
 };

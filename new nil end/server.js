@@ -13,6 +13,7 @@ const programRoutes = require("./routes/programRoutes");
 const trainerRoutes = require("./routes/trainerRoutes");
 const blogRoutes = require("./routes/blogRoutes");
 const galleryRoutes = require("./routes/galleryRoutes");
+const contactRoutes = require("./routes/contactRoutes");
 
 
 const app = express();
@@ -42,6 +43,7 @@ app.use("/api/programs", programRoutes);
 app.use("/api/trainers", trainerRoutes);
 app.use("/api/blogs", blogRoutes);
 app.use("/api/gallery", galleryRoutes);
+app.use("/api/contact", contactRoutes);
 
 // Test route
 app.get("/", (req, res) => {
