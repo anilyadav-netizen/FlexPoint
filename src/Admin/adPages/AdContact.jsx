@@ -1,238 +1,525 @@
-import React, { useState } from "react";
-import { Search, Eye, Trash2, X, Users, Mail, MessageSquare, CheckCircle, Clock, Reply } from "lucide-react";
-
-const initialContacts = [
-    { id: 1, name: "Rahul Sharma", email: "rahul@gmail.com", phone: "+91 98765 43210", subject: "Membership Inquiry", message: "I want to know about your premium membership plans.", date: "11 Aug 2026", status: "New" },
-    { id: 2, name: "Priya Singh", email: "priya@gmail.com", phone: "+91 98765 12345", subject: "Trainer Inquiry", message: "I would like to know about personal training sessions.", date: "10 Aug 2026", status: "Replied" },
-    { id: 3, name: "Amit Kumar", email: "amit@gmail.com", phone: "+91 99887 66554", subject: "General Inquiry", message: "Please share your gym timings and available programs.", date: "09 Aug 2026", status: "Pending" },
-    { id: 4, name: "Neha Verma", email: "neha@gmail.com", phone: "+91 98765 11223", subject: "Membership Cancellation", message: "I want to cancel my current membership.", date: "08 Aug 2026", status: "Resolved" },
-];
+import React, { useEffect, useMemo, useState } from "react";
+import {
+    Search,
+    Eye,
+    Trash2,
+    X,
+    Users,
+    MessageSquare,
+    CheckCircle,
+} from "lucide-react";
+import { useDispatch, useSelector } from "react-redux";
+import {
+    getAllContacts,
+    getContactById,
+    deleteContact,
+    clearContactError,
+    clearContactSuccess,
+    clearSelectedContact,
+} from "../../redux/Slicer/contactSlice";
+import { toast } from "react-toastify";
 
 const AdContact = () => {
-    const [contacts, setContacts] = useState(initialContacts);
+    const dispatch = useDispatch();
+
+    const {
+        contacts = [],
+        selectedContact,
+        loading,
+        error,
+        success,
+    } = useSelector((state) => state.contact);
+
     const [search, setSearch] = useState("");
-    const [selectedContact, setSelectedContact] = useState(null);
 
-    const filteredContacts = contacts.filter((contact) =>
-        `${contact.name} ${contact.email} ${contact.subject}`.toLowerCase().includes(search.toLowerCase())
-    );
+    // =========================================
+    // GET ALL CONTACTS
+    // =========================================
+    useEffect(() => {
+        dispatch(getAllContacts());
+    }, [dispatch]);
 
-    const handleDelete = (id) => {
-        if (window.confirm("Are you sure you want to delete this inquiry?")) {
-            setContacts(contacts.filter((contact) => contact.id !== id));
-            if (selectedContact?.id === id) setSelectedContact(null);
+    // =========================================
+    // SUCCESS / ERROR HANDLING
+    // =========================================
+    useEffect(() => {
+        if (success) {
+            toast.success(success);
+            dispatch(clearContactSuccess());
+        }
+
+        if (error) {
+            toast.error(error);
+            dispatch(clearContactError());
+        }
+    }, [success, error, dispatch]);
+
+    // =========================================
+    // SEARCH
+    // =========================================
+    const filteredContacts = useMemo(() => {
+        const searchText = search.toLowerCase().trim();
+
+        if (!searchText) {
+            return contacts;
+        }
+
+        return contacts.filter((contact) => {
+            return `${contact.name || ""} ${contact.email || ""} ${
+                contact.mobile || ""
+            } ${contact.message || ""}`
+                .toLowerCase()
+                .includes(searchText);
+        });
+    }, [contacts, search]);
+
+    // =========================================
+    // VIEW CONTACT
+    // =========================================
+    const handleView = async (id) => {
+        const result = await dispatch(getContactById(id));
+
+        if (!getContactById.fulfilled.match(result)) {
+            toast.error(
+                result.payload || "Failed to get contact details"
+            );
         }
     };
 
-    const updateStatus = (id, status) => {
-        setContacts(contacts.map((contact) => contact.id === id ? { ...contact, status } : contact));
-        setSelectedContact((prev) => prev ? { ...prev, status } : null);
+    // =========================================
+    // DELETE CONTACT
+    // =========================================
+    const handleDelete = async (id) => {
+        if (
+            !window.confirm(
+                "Are you sure you want to delete this inquiry?"
+            )
+        ) {
+            return;
+        }
+
+        const result = await dispatch(deleteContact(id));
+
+        if (deleteContact.fulfilled.match(result)) {
+            toast.success(
+                result.payload?.message ||
+                    "Contact deleted successfully"
+            );
+        } else {
+            toast.error(
+                result.payload || "Failed to delete contact"
+            );
+        }
     };
 
-    const getStatusClass = (status) => {
-        const classes = {
-            New: "bg-blue-500 text-white",
-            Pending: "bg-yellow-500 text-white",
-            Replied: "bg-purple-500 text-white",
-            Resolved: "bg-green-500 text-white",
-        };
-        return classes[status] || "bg-gray-500 text-white";
+    // =========================================
+    // CLOSE MODAL
+    // =========================================
+    const handleCloseModal = () => {
+        dispatch(clearSelectedContact());
     };
+
+    // =========================================
+    // TODAY'S MESSAGES
+    // =========================================
+    const todaysMessages = contacts.filter((contact) => {
+        if (!contact.createdAt) return false;
+
+        const today = new Date();
+        const created = new Date(contact.createdAt);
+
+        return today.toDateString() === created.toDateString();
+    }).length;
 
     return (
-        <div className="min-h-full bg-[#F5F7F9] dark:bg-[#12181B] p-5 sm:p-8 lg:p-10">
-            <div className="">
+        <div className="min-h-full bg-[#F5F7F9] p-5 dark:bg-[#12181B] sm:p-8 lg:p-10">
+            <div>
+                {/* =========================================
+                    HEADER
+                ========================================= */}
                 <div className="mb-6">
-                    <h1 className="text-xl sm:text-2xl font-bold text-[#1F272B] dark:text-[#F4F6F7]">Contact Inquiries</h1>
-                    <p className="text-xs sm:text-sm text-[#606E6E] dark:text-[#AEB7BA] mt-1">Manage messages, replies and customer inquiries</p>
+                    <h1 className="text-xl font-bold text-[#1F272B] dark:text-[#F4F6F7] sm:text-2xl">
+                        Contact Inquiries
+                    </h1>
+
+                    <p className="mt-1 text-xs text-[#606E6E] dark:text-[#AEB7BA] sm:text-sm">
+                        Manage customer contact messages
+                    </p>
                 </div>
 
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-                    <div className="bg-white dark:bg-[#1C2529] border border-[#E2E6E8] dark:border-[#303A3F] rounded-xl p-4">
+                {/* =========================================
+                    STATS
+                ========================================= */}
+                <div className="mb-6 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+                    {/* TOTAL */}
+                    <div className="rounded-xl border border-[#E2E6E8] bg-white p-4 dark:border-[#303A3F] dark:bg-[#1C2529]">
                         <div className="flex items-center justify-between">
                             <div>
-                                <p className="text-sm text-[#606E6E] dark:text-[#AEB7BA]">Total Messages</p>
-                                <h3 className="text-2xl font-bold text-[#1F272B] dark:text-[#F4F6F7] mt-1">{contacts.length}</h3>
+                                <p className="text-sm text-[#606E6E] dark:text-[#AEB7BA]">
+                                    Total Messages
+                                </p>
+
+                                <h3 className="mt-1 text-2xl font-bold text-[#1F272B] dark:text-[#F4F6F7]">
+                                    {contacts.length}
+                                </h3>
                             </div>
-                            <div className="w-10 h-10 rounded-lg bg-[#F3F0FF] dark:bg-[#3420FF]/10 flex items-center justify-center text-[#3420FF]">
+
+                            <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-[#F3F0FF] text-[#3420FF] dark:bg-[#3420FF]/10">
                                 <MessageSquare size={20} />
                             </div>
                         </div>
                     </div>
 
-                    <div className="bg-white dark:bg-[#1C2529] border border-[#E2E6E8] dark:border-[#303A3F] rounded-xl p-4">
+                    {/* NEW */}
+                    <div className="rounded-xl border border-[#E2E6E8] bg-white p-4 dark:border-[#303A3F] dark:bg-[#1C2529]">
                         <div className="flex items-center justify-between">
                             <div>
-                                <p className="text-sm text-[#606E6E] dark:text-[#AEB7BA]">Pending</p>
-                                <h3 className="text-2xl font-bold text-[#1F272B] dark:text-[#F4F6F7] mt-1">{contacts.filter((item) => item.status === "Pending").length}</h3>
+                                <p className="text-sm text-[#606E6E] dark:text-[#AEB7BA]">
+                                    New Messages
+                                </p>
+
+                                <h3 className="mt-1 text-2xl font-bold text-[#1F272B] dark:text-[#F4F6F7]">
+                                    {contacts.length}
+                                </h3>
                             </div>
-                            <div className="w-10 h-10 rounded-lg bg-yellow-50 dark:bg-yellow-500/10 flex items-center justify-center text-yellow-500">
-                                <Clock size={20} />
+
+                            <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-blue-50 text-blue-500 dark:bg-blue-500/10">
+                                <Users size={20} />
                             </div>
                         </div>
                     </div>
 
-                    <div className="bg-white dark:bg-[#1C2529] border border-[#E2E6E8] dark:border-[#303A3F] rounded-xl p-4">
+                    {/* TODAY */}
+                    <div className="rounded-xl border border-[#E2E6E8] bg-white p-4 dark:border-[#303A3F] dark:bg-[#1C2529]">
                         <div className="flex items-center justify-between">
                             <div>
-                                <p className="text-sm text-[#606E6E] dark:text-[#AEB7BA]">Replied</p>
-                                <h3 className="text-2xl font-bold text-[#1F272B] dark:text-[#F4F6F7] mt-1">{contacts.filter((item) => item.status === "Replied").length}</h3>
+                                <p className="text-sm text-[#606E6E] dark:text-[#AEB7BA]">
+                                    Today's Messages
+                                </p>
+
+                                <h3 className="mt-1 text-2xl font-bold text-[#1F272B] dark:text-[#F4F6F7]">
+                                    {todaysMessages}
+                                </h3>
                             </div>
-                            <div className="w-10 h-10 rounded-lg bg-purple-50 dark:bg-purple-500/10 flex items-center justify-center text-purple-500">
-                                <Reply size={20} />
+
+                            <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-yellow-50 text-yellow-500 dark:bg-yellow-500/10">
+                                <MessageSquare size={20} />
                             </div>
                         </div>
                     </div>
 
-                    <div className="bg-white dark:bg-[#1C2529] border border-[#E2E6E8] dark:border-[#303A3F] rounded-xl p-4">
+                    {/* LATEST */}
+                    <div className="rounded-xl border border-[#E2E6E8] bg-white p-4 dark:border-[#303A3F] dark:bg-[#1C2529]">
                         <div className="flex items-center justify-between">
                             <div>
-                                <p className="text-sm text-[#606E6E] dark:text-[#AEB7BA]">Resolved</p>
-                                <h3 className="text-2xl font-bold text-[#1F272B] dark:text-[#F4F6F7] mt-1">{contacts.filter((item) => item.status === "Resolved").length}</h3>
+                                <p className="text-sm text-[#606E6E] dark:text-[#AEB7BA]">
+                                    Latest Message
+                                </p>
+
+                                <h3 className="mt-1 text-2xl font-bold text-[#1F272B] dark:text-[#F4F6F7]">
+                                    {contacts.length > 0 ? "New" : "—"}
+                                </h3>
                             </div>
-                            <div className="w-10 h-10 rounded-lg bg-green-50 dark:bg-green-500/10 flex items-center justify-center text-green-500">
+
+                            <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-green-50 text-green-500 dark:bg-green-500/10">
                                 <CheckCircle size={20} />
                             </div>
                         </div>
                     </div>
                 </div>
 
-                <div className="bg-white dark:bg-[#1C2529] border border-[#E2E6E8] dark:border-[#303A3F] rounded-xl p-4 mb-6">
+                {/* =========================================
+                    SEARCH
+                ========================================= */}
+                <div className="mb-6 rounded-xl border border-[#E2E6E8] bg-white p-4 dark:border-[#303A3F] dark:bg-[#1C2529]">
                     <div className="relative max-w-md">
-                        <Search size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-[#778387]" />
-                        <input type="text" placeholder="Search contacts..." value={search} onChange={(e) => setSearch(e.target.value)} className="w-full pl-10 pr-4 py-2.5 rounded-lg border border-[#E2E6E8] dark:border-[#303A3F] bg-[#F8F9FB] dark:bg-[#12181B] text-sm text-[#1F272B] dark:text-[#F4F6F7] placeholder:text-[#778387] outline-none focus:border-[#3420FF]" />
+                        <Search
+                            size={18}
+                            className="absolute left-3 top-1/2 -translate-y-1/2 text-[#778387]"
+                        />
+
+                        <input
+                            type="text"
+                            placeholder="Search contacts..."
+                            value={search}
+                            onChange={(e) =>
+                                setSearch(e.target.value)
+                            }
+                            className="w-full rounded-lg border border-[#E2E6E8] bg-[#F8F9FB] py-2.5 pl-10 pr-4 text-sm text-[#1F272B] outline-none placeholder:text-[#778387] focus:border-[#3420FF] dark:border-[#303A3F] dark:bg-[#12181B] dark:text-[#F4F6F7]"
+                        />
                     </div>
                 </div>
 
-                <div className="bg-white dark:bg-[#1C2529] border border-[#E2E6E8] dark:border-[#303A3F] rounded-xl overflow-hidden">
-                    <div className="flex items-center gap-2 px-5 py-4 border-b border-[#E7EAED] dark:border-[#303A3F]">
-                        <Users size={19} className="text-[#3420FF]" />
-                        <h2 className="text-base font-semibold text-[#1F272B] dark:text-[#F4F6F7]">Contact Messages</h2>
+                {/* =========================================
+                    TABLE
+                ========================================= */}
+                <div className="overflow-hidden rounded-xl border border-[#E2E6E8] bg-white dark:border-[#303A3F] dark:bg-[#1C2529]">
+                    <div className="flex items-center gap-2 border-b border-[#E7EAED] px-5 py-4 dark:border-[#303A3F]">
+                        <Users
+                            size={19}
+                            className="text-[#3420FF]"
+                        />
+
+                        <h2 className="text-base font-semibold text-[#1F272B] dark:text-[#F4F6F7]">
+                            Contact Messages
+                        </h2>
                     </div>
 
                     <div className="overflow-x-auto">
-                        <table className="w-full min-w-[950px]">
+                        <table className="w-full min-w-[800px]">
                             <thead>
-                                <tr className="bg-[#F8F9FB] dark:bg-[#12181B] text-left">
-                                    <th className="px-5 py-4 text-xs font-semibold text-[#606E6E] dark:text-[#AEB7BA]">Name</th>
-                                    <th className="px-5 py-4 text-xs font-semibold text-[#606E6E] dark:text-[#AEB7BA]">Contact</th>
-                                    <th className="px-5 py-4 text-xs font-semibold text-[#606E6E] dark:text-[#AEB7BA]">Subject</th>
-                                    <th className="px-5 py-4 text-xs font-semibold text-[#606E6E] dark:text-[#AEB7BA]">Date</th>
-                                    <th className="px-5 py-4 text-xs font-semibold text-[#606E6E] dark:text-[#AEB7BA]">Status</th>
-                                    <th className="px-5 py-4 text-xs font-semibold text-[#606E6E] dark:text-[#AEB7BA] text-right">Actions</th>
+                                <tr className="bg-[#F8F9FB] text-left dark:bg-[#12181B]">
+                                    <th className="px-5 py-4 text-xs font-semibold text-[#606E6E] dark:text-[#AEB7BA]">
+                                        Name
+                                    </th>
+
+                                    <th className="px-5 py-4 text-xs font-semibold text-[#606E6E] dark:text-[#AEB7BA]">
+                                        Contact
+                                    </th>
+
+                                    <th className="px-5 py-4 text-xs font-semibold text-[#606E6E] dark:text-[#AEB7BA]">
+                                        Message
+                                    </th>
+
+                                    <th className="px-5 py-4 text-xs font-semibold text-[#606E6E] dark:text-[#AEB7BA]">
+                                        Date
+                                    </th>
+
+                                    <th className="px-5 py-4 text-right text-xs font-semibold text-[#606E6E] dark:text-[#AEB7BA]">
+                                        Actions
+                                    </th>
                                 </tr>
                             </thead>
 
                             <tbody>
-                                {filteredContacts.map((contact) => (
-                                    <tr key={contact.id} className="border-t border-[#E7EAED] dark:border-[#303A3F] hover:bg-[#F8F9FB] dark:hover:bg-white/[0.02] transition">
-                                        <td className="px-5 py-4">
-                                            <p className="text-sm font-semibold text-[#1F272B] dark:text-[#F4F6F7]">{contact.name}</p>
-                                            <p className="text-xs text-[#778387] dark:text-[#AEB7BA] mt-1">{contact.email}</p>
-                                        </td>
-
-                                        <td className="px-5 py-4 text-sm text-[#606E6E] dark:text-[#AEB7BA]">{contact.phone}</td>
-                                        <td className="px-5 py-4 text-sm font-medium text-[#1F272B] dark:text-[#F4F6F7]">{contact.subject}</td>
-                                        <td className="px-5 py-4 text-sm text-[#606E6E] dark:text-[#AEB7BA]">{contact.date}</td>
-
-                                        <td className="px-5 py-4">
-                                            <span className={`px-2.5 py-1 rounded-full text-xs font-semibold ${getStatusClass(contact.status)}`}>
-                                                {contact.status}
-                                            </span>
-                                        </td>
-
-                                        <td className="px-5 py-4">
-                                            <div className="flex justify-end items-center gap-2">
-                                                <button onClick={() => setSelectedContact(contact)} className="w-9 h-9 flex items-center justify-center rounded-lg bg-[#F1F3F4] dark:bg-white/5 text-[#606E6E] dark:text-[#AEB7BA] hover:bg-[#E5E8EA] dark:hover:bg-white/10 transition">
-                                                    <Eye size={15} />
-                                                </button>
-
-                                                {contact.status !== "Resolved" && (
-                                                    <button onClick={() => updateStatus(contact.id, "Resolved")} className="w-9 h-9 flex items-center justify-center rounded-lg bg-green-50 dark:bg-green-500/10 text-green-500 hover:bg-green-100 dark:hover:bg-green-500/20 transition" title="Mark as Resolved">
-                                                        <CheckCircle size={15} />
-                                                    </button>
-                                                )}
-
-                                                <button onClick={() => handleDelete(contact.id)} className="w-9 h-9 flex items-center justify-center rounded-lg bg-red-50 dark:bg-red-500/10 text-red-500 hover:bg-red-100 dark:hover:bg-red-500/20 transition">
-                                                    <Trash2 size={15} />
-                                                </button>
-                                            </div>
+                                {loading ? (
+                                    <tr>
+                                        <td
+                                            colSpan="5"
+                                            className="px-5 py-16 text-center text-sm text-[#778387]"
+                                        >
+                                            Loading contact messages...
                                         </td>
                                     </tr>
-                                ))}
+                                ) : filteredContacts.length > 0 ? (
+                                    filteredContacts.map(
+                                        (contact) => (
+                                            <tr
+                                                key={contact._id}
+                                                className="border-t border-[#E7EAED] transition hover:bg-[#F8F9FB] dark:border-[#303A3F] dark:hover:bg-white/[0.02]"
+                                            >
+                                                {/* NAME */}
+                                                <td className="px-5 py-4">
+                                                    <p className="text-sm font-semibold text-[#1F272B] dark:text-[#F4F6F7]">
+                                                        {contact.name ||
+                                                            "—"}
+                                                    </p>
+
+                                                    <p className="mt-1 text-xs text-[#778387] dark:text-[#AEB7BA]">
+                                                        {contact.email ||
+                                                            "—"}
+                                                    </p>
+                                                </td>
+
+                                                {/* CONTACT */}
+                                                <td className="px-5 py-4">
+                                                    <p className="text-sm text-[#606E6E] dark:text-[#AEB7BA]">
+                                                        {contact.mobile ||
+                                                            "—"}
+                                                    </p>
+                                                </td>
+
+                                                {/* MESSAGE */}
+                                                <td className="max-w-[350px] px-5 py-4">
+                                                    <p className="truncate text-sm text-[#606E6E] dark:text-[#AEB7BA]">
+                                                        {contact.message ||
+                                                            "—"}
+                                                    </p>
+                                                </td>
+
+                                                {/* DATE */}
+                                                <td className="px-5 py-4 text-sm text-[#606E6E] dark:text-[#AEB7BA]">
+                                                    {contact.createdAt
+                                                        ? new Date(
+                                                              contact.createdAt
+                                                          ).toLocaleDateString(
+                                                              "en-IN",
+                                                              {
+                                                                  day: "2-digit",
+                                                                  month: "short",
+                                                                  year: "numeric",
+                                                              }
+                                                          )
+                                                        : "—"}
+                                                </td>
+
+                                                {/* ACTIONS */}
+                                                <td className="px-5 py-4">
+                                                    <div className="flex items-center justify-end gap-2">
+                                                        <button
+                                                            onClick={() =>
+                                                                handleView(
+                                                                    contact._id
+                                                                )
+                                                            }
+                                                            className="flex h-9 w-9 items-center justify-center rounded-lg bg-[#F1F3F4] text-[#606E6E] transition hover:bg-[#E5E8EA] dark:bg-white/5 dark:text-[#AEB7BA] dark:hover:bg-white/10"
+                                                            title="View"
+                                                        >
+                                                            <Eye
+                                                                size={
+                                                                    15
+                                                                }
+                                                            />
+                                                        </button>
+
+                                                        <button
+                                                            onClick={() =>
+                                                                handleDelete(
+                                                                    contact._id
+                                                                )
+                                                            }
+                                                            disabled={
+                                                                loading
+                                                            }
+                                                            className="flex h-9 w-9 items-center justify-center rounded-lg bg-red-50 text-red-500 transition hover:bg-red-100 disabled:cursor-not-allowed disabled:opacity-50 dark:bg-red-500/10 dark:hover:bg-red-500/20"
+                                                            title="Delete"
+                                                        >
+                                                            <Trash2
+                                                                size={
+                                                                    15
+                                                                }
+                                                            />
+                                                        </button>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        )
+                                    )
+                                ) : (
+                                    <tr>
+                                        <td
+                                            colSpan="5"
+                                            className="px-5 py-16 text-center text-[#778387] dark:text-[#AEB7BA]"
+                                        >
+                                            No contact messages
+                                            found.
+                                        </td>
+                                    </tr>
+                                )}
                             </tbody>
                         </table>
                     </div>
-
-                    {filteredContacts.length === 0 && <div className="text-center py-16 text-[#778387] dark:text-[#AEB7BA]">No contact messages found.</div>}
                 </div>
             </div>
 
+            {/* =========================================
+                DETAILS MODAL
+            ========================================= */}
             {selectedContact && (
-                <div className="fixed inset-0 z-[100] bg-black/60 flex items-center justify-center p-4">
-                    <div className="w-full max-w-lg bg-white dark:bg-[#1C2529] rounded-xl shadow-2xl border border-[#E2E6E8] dark:border-[#303A3F]">
-                        <div className="flex items-center justify-between px-5 py-4 border-b border-[#E7EAED] dark:border-[#303A3F]">
+                <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/60 p-4">
+                    <div className="w-full max-w-lg rounded-xl border border-[#E2E6E8] bg-white shadow-2xl dark:border-[#303A3F] dark:bg-[#1C2529]">
+                        {/* MODAL HEADER */}
+                        <div className="flex items-center justify-between border-b border-[#E7EAED] px-5 py-4 dark:border-[#303A3F]">
                             <div>
-                                <h2 className="text-lg font-bold text-[#1F272B] dark:text-[#F4F6F7]">Contact Details</h2>
-                                <p className="text-xs text-[#778387] dark:text-[#AEB7BA] mt-1">Manage inquiry from {selectedContact.name}</p>
+                                <h2 className="text-lg font-bold text-[#1F272B] dark:text-[#F4F6F7]">
+                                    Contact Details
+                                </h2>
+
+                                <p className="mt-1 text-xs text-[#778387] dark:text-[#AEB7BA]">
+                                    Message from{" "}
+                                    {selectedContact.name}
+                                </p>
                             </div>
 
-                            <button onClick={() => setSelectedContact(null)} className="w-9 h-9 flex items-center justify-center rounded-lg hover:bg-[#F8F9FB] dark:hover:bg-white/5 text-[#606E6E] dark:text-[#AEB7BA]">
+                            <button
+                                onClick={handleCloseModal}
+                                className="flex h-9 w-9 items-center justify-center rounded-lg text-[#606E6E] hover:bg-[#F8F9FB] dark:text-[#AEB7BA] dark:hover:bg-white/5"
+                            >
                                 <X size={19} />
                             </button>
                         </div>
 
-                        <div className="p-5 space-y-4">
-                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        {/* MODAL BODY */}
+                        <div className="space-y-4 p-5">
+                            {/* BASIC DETAILS */}
+                            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                                {/* NAME */}
                                 <div>
-                                    <p className="text-xs text-[#778387] dark:text-[#AEB7BA] mb-1">Name</p>
-                                    <p className="text-sm font-medium text-[#1F272B] dark:text-[#F4F6F7]">{selectedContact.name}</p>
+                                    <p className="mb-1 text-xs text-[#778387] dark:text-[#AEB7BA]">
+                                        Name
+                                    </p>
+
+                                    <p className="text-sm font-medium text-[#1F272B] dark:text-[#F4F6F7]">
+                                        {selectedContact.name ||
+                                            "—"}
+                                    </p>
                                 </div>
 
+                                {/* EMAIL */}
                                 <div>
-                                    <p className="text-xs text-[#778387] dark:text-[#AEB7BA] mb-1">Email</p>
-                                    <p className="text-sm font-medium text-[#1F272B] dark:text-[#F4F6F7]">{selectedContact.email}</p>
+                                    <p className="mb-1 text-xs text-[#778387] dark:text-[#AEB7BA]">
+                                        Email
+                                    </p>
+
+                                    <p className="break-all text-sm font-medium text-[#1F272B] dark:text-[#F4F6F7]">
+                                        {selectedContact.email ||
+                                            "—"}
+                                    </p>
                                 </div>
 
+                                {/* PHONE */}
                                 <div>
-                                    <p className="text-xs text-[#778387] dark:text-[#AEB7BA] mb-1">Phone</p>
-                                    <p className="text-sm font-medium text-[#1F272B] dark:text-[#F4F6F7]">{selectedContact.phone}</p>
+                                    <p className="mb-1 text-xs text-[#778387] dark:text-[#AEB7BA]">
+                                        Phone
+                                    </p>
+
+                                    <p className="text-sm font-medium text-[#1F272B] dark:text-[#F4F6F7]">
+                                        {selectedContact.mobile ||
+                                            "—"}
+                                    </p>
                                 </div>
 
+                                {/* DATE */}
                                 <div>
-                                    <p className="text-xs text-[#778387] dark:text-[#AEB7BA] mb-1">Date</p>
-                                    <p className="text-sm font-medium text-[#1F272B] dark:text-[#F4F6F7]">{selectedContact.date}</p>
+                                    <p className="mb-1 text-xs text-[#778387] dark:text-[#AEB7BA]">
+                                        Date
+                                    </p>
+
+                                    <p className="text-sm font-medium text-[#1F272B] dark:text-[#F4F6F7]">
+                                        {selectedContact.createdAt
+                                            ? new Date(
+                                                  selectedContact.createdAt
+                                              ).toLocaleDateString(
+                                                  "en-IN",
+                                                  {
+                                                      day: "2-digit",
+                                                      month: "short",
+                                                      year: "numeric",
+                                                  }
+                                              )
+                                            : "—"}
+                                    </p>
                                 </div>
                             </div>
 
+                            {/* MESSAGE */}
                             <div>
-                                <p className="text-xs text-[#778387] dark:text-[#AEB7BA] mb-1">Subject</p>
-                                <p className="text-sm font-semibold text-[#1F272B] dark:text-[#F4F6F7]">{selectedContact.subject}</p>
-                            </div>
+                                <p className="mb-1 text-xs text-[#778387] dark:text-[#AEB7BA]">
+                                    Message
+                                </p>
 
-                            <div>
-                                <p className="text-xs text-[#778387] dark:text-[#AEB7BA] mb-1">Message</p>
-                                <div className="p-3 rounded-lg bg-[#F8F9FB] dark:bg-[#12181B] border border-[#E2E6E8] dark:border-[#303A3F] text-sm leading-6 text-[#606E6E] dark:text-[#AEB7BA]">
-                                    {selectedContact.message}
+                                <div className="max-h-60 overflow-y-auto rounded-lg border border-[#E2E6E8] bg-[#F8F9FB] p-3 text-sm leading-6 text-[#606E6E] dark:border-[#303A3F] dark:bg-[#12181B] dark:text-[#AEB7BA]">
+                                    {selectedContact.message ||
+                                        "No message"}
                                 </div>
                             </div>
 
-                            <div>
-                                <label className="block text-xs text-[#778387] dark:text-[#AEB7BA] mb-1.5">Update Status</label>
-                                <select value={selectedContact.status} onChange={(e) => updateStatus(selectedContact.id, e.target.value)} className="w-full px-3 py-2.5 rounded-lg border border-[#E2E6E8] dark:border-[#303A3F] bg-white dark:bg-[#12181B] text-sm text-[#1F272B] dark:text-[#F4F6F7] outline-none focus:border-[#3420FF]">
-                                    <option value="New">New</option>
-                                    <option value="Pending">Pending</option>
-                                    <option value="Replied">Replied</option>
-                                    <option value="Resolved">Resolved</option>
-                                </select>
-                            </div>
-
-                            <div className="flex items-center justify-between pt-2">
-                                <span className={`px-3 py-1.5 rounded-full text-xs font-semibold ${getStatusClass(selectedContact.status)}`}>
-                                    {selectedContact.status}
-                                </span>
-
-                                <button onClick={() => setSelectedContact(null)} className="px-5 py-2.5 rounded-lg bg-[#3420FF] text-white text-sm font-medium hover:bg-[#2818D9]">
+                            {/* CLOSE */}
+                            <div className="flex justify-end pt-2">
+                                <button
+                                    onClick={handleCloseModal}
+                                    className="rounded-lg bg-[#3420FF] px-5 py-2.5 text-sm font-medium text-white hover:bg-[#2818D9]"
+                                >
                                     Close
                                 </button>
                             </div>

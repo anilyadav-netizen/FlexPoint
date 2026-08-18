@@ -5,6 +5,7 @@ import programReducer from './Slicer/programSlice'
 import trainerReducer from './Slicer/trainerSlice'
 import blogReducer from './Slicer/blogSlice'
 import galleryReducer from './Slicer/gallerySlice'
+import contactReducer from './Slicer/contactSlice'
 
 export const store = configureStore({
     reducer: {
@@ -13,6 +14,7 @@ export const store = configureStore({
         program: programReducer,
         trainer: trainerReducer,
         blog: blogReducer,
-        gallery: galleryReducer
+        gallery: galleryReducer,
+        contact: contactReducer
     }
 })
