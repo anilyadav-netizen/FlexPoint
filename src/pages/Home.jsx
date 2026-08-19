@@ -10,6 +10,7 @@ import Banner from './Banner'
 import BlogSection from './BlogSection'
 import Faq from './Faq'
 import Gallery from './Gallery'
+import TestimonailPage from './TestimonailPage'
 
 const Home = () => {
     return (
@@ -25,6 +26,7 @@ const Home = () => {
                 <Premium />
                 <Gallery/>
                 <Banner />
+                <TestimonailPage/>
                 <Faq />
             </div>
         </>

@@ -239,7 +239,7 @@ const BlogSection = () => {
 
                                         {/* DESCRIPTION */}
 
-                                        <p className="mt-2.5 font-['Barlow'] text-[12px] leading-5 text-white/45 sm:text-[13px] sm:leading-[1.55]">
+                                        <p className="mt-2.5 font-['Barlow'] text-[12px] leading-5 text-white/45 md:text-[14px] sm:leading-[1.55]">
                                             {blog.description}
                                         </p>
 

@@ -6,6 +6,7 @@ import trainerReducer from './Slicer/trainerSlice'
 import blogReducer from './Slicer/blogSlice'
 import galleryReducer from './Slicer/gallerySlice'
 import contactReducer from './Slicer/contactSlice'
+import testimonialReducer from './Slicer/testimonialSlice'
 
 export const store = configureStore({
     reducer: {
@@ -15,6 +16,7 @@ export const store = configureStore({
         trainer: trainerReducer,
         blog: blogReducer,
         gallery: galleryReducer,
-        contact: contactReducer
+        contact: contactReducer,
+        testimonial: testimonialReducer
     }
 })

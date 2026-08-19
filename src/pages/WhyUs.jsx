@@ -130,7 +130,7 @@ const WhyUs = () => {
                                         {reason.title}
                                     </h3>
 
-                                    <p className="mt-3 font-['Barlow'] text-[10px] leading-[1.65] text-white/50 sm:text-[11px] sm:leading-[1.7]">
+                                    <p className="mt-3 font-['Barlow'] text-[13px] leading-[1.65] text-white/50 md:text-[17px] sm:leading-[1.7]">
                                         {reason.text}
                                     </p>
 
@@ -138,11 +138,11 @@ const WhyUs = () => {
 
                                 {/* Bottom Line */}
 
-                                <div className="mt-7 flex items-center gap-2 sm:mt-8">
+                                <div className="mt-2 flex items-center gap-2 md:mt-4">
 
                                     <span className="h-[2px] w-0 bg-[#e85d3a] transition-all duration-500 group-hover:w-10" />
 
-                                    <span className="font-['Barlow'] text-[8px] uppercase tracking-[0.15em] text-white/25">
+                                    <span className="font-['Barlow'] text-[12px] uppercase tracking-[0.15em] text-white/25">
                                         Fitness Center Advantage
                                     </span>
 

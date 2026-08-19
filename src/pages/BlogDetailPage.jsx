@@ -119,7 +119,7 @@ const BlogDetailPage = () => {
                     </p>
 
                     <Link
-                        to="/blogs"
+                        to="/blog"
                         className="mt-6 inline-flex items-center gap-2 bg-[#e85d3a] px-6 py-3 font-['Barlow'] text-[11px] font-bold uppercase tracking-[0.08em] text-white transition-all duration-300 hover:bg-[#f16a49]"
                         style={{
                             clipPath:
