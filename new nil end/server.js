@@ -14,6 +14,7 @@ const trainerRoutes = require("./routes/trainerRoutes");
 const blogRoutes = require("./routes/blogRoutes");
 const galleryRoutes = require("./routes/galleryRoutes");
 const contactRoutes = require("./routes/contactRoutes");
+const testimonialRoutes = require("./routes/testimonialRoutes");
 
 
 const app = express();
@@ -44,6 +45,7 @@ app.use("/api/trainers", trainerRoutes);
 app.use("/api/blogs", blogRoutes);
 app.use("/api/gallery", galleryRoutes);
 app.use("/api/contact", contactRoutes);
+app.use("/api/testimonials", testimonialRoutes);
 
 // Test route
 app.get("/", (req, res) => {
