@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { ArrowLeft, Star, Upload } from "lucide-react";
+import { ArrowLeft, Star, Upload, X } from "lucide-react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
@@ -30,6 +30,8 @@ const AddReview = () => {
         status: "Published",
     });
 
+    const [imagePreview, setImagePreview] = useState("");
+
     // ==========================================
     // SUCCESS / ERROR HANDLING
     // ==========================================
@@ -58,10 +60,56 @@ const AddReview = () => {
     const handleChange = (e) => {
         const { name, value, files } = e.target;
 
+        if (name === "image") {
+            const file = files?.[0];
+
+            if (!file) {
+                return;
+            }
+
+            // Image type validation
+            if (!file.type.startsWith("image/")) {
+                toast.error("Please select a valid image file.");
+                return;
+            }
+
+            // 5MB validation
+            if (file.size > 5 * 1024 * 1024) {
+                toast.error(
+                    "Image size must be less than 5MB."
+                );
+                return;
+            }
+
+            setFormData((prev) => ({
+                ...prev,
+                image: file,
+            }));
+
+            // Preview
+            const previewUrl = URL.createObjectURL(file);
+            setImagePreview(previewUrl);
+
+            return;
+        }
+
         setFormData((prev) => ({
             ...prev,
-            [name]: files ? files[0] : value,
+            [name]: value,
         }));
+    };
+
+    // ==========================================
+    // REMOVE IMAGE
+    // ==========================================
+
+    const handleRemoveImage = () => {
+        setFormData((prev) => ({
+            ...prev,
+            image: null,
+        }));
+
+        setImagePreview("");
     };
 
     // ==========================================
@@ -69,10 +117,18 @@ const AddReview = () => {
     // ==========================================
 
     const generateInitials = (name) => {
-        const words = name.trim().split(/\s+/);
+        const trimmedName = name.trim();
+
+        if (!trimmedName) {
+            return "";
+        }
+
+        const words = trimmedName.split(/\s+/);
 
         if (words.length === 1) {
-            return words[0].slice(0, 2).toUpperCase();
+            return words[0]
+                .slice(0, 2)
+                .toUpperCase();
         }
 
         return (
@@ -88,6 +144,22 @@ const AddReview = () => {
     const handleSubmit = (e) => {
         e.preventDefault();
 
+        // Basic validation
+        if (!formData.name.trim()) {
+            toast.error("Please enter member name.");
+            return;
+        }
+
+        if (!formData.program) {
+            toast.error("Please select a program.");
+            return;
+        }
+
+        if (!formData.review.trim()) {
+            toast.error("Please write a review.");
+            return;
+        }
+
         /*
          * Backend fields:
          *
@@ -96,27 +168,37 @@ const AddReview = () => {
          * rating
          * review
          * initials
+         * image
          * status
          */
 
         const testimonialData = {
-            name: formData.name,
+            name: formData.name.trim(),
 
-            // Your backend has "role"
-            // We are storing selected program here
+            // Backend has "role"
+            // We are using selected program as role
             role: formData.program,
 
             rating: Number(formData.rating),
 
-            review: formData.review,
+            review: formData.review.trim(),
 
-            initials: generateInitials(formData.name),
+            initials: generateInitials(
+                formData.name
+            ),
+
+            // IMPORTANT:
+            // Send actual File object
+            image: formData.image,
 
             // Backend expects Boolean
-            status: formData.status === "Published",
+            status:
+                formData.status === "Published",
         };
 
-        dispatch(createTestimonial(testimonialData));
+        dispatch(
+            createTestimonial(testimonialData)
+        );
     };
 
     // ==========================================
@@ -128,8 +210,8 @@ const AddReview = () => {
             <div className="max-w-5xl mx-auto">
 
                 {/* Header */}
-                <div className="flex items-center gap-3 mb-6">
 
+                <div className="flex items-center gap-3 mb-6">
                     <button
                         onClick={() => navigate(-1)}
                         type="button"
@@ -150,13 +232,13 @@ const AddReview = () => {
                 </div>
 
                 {/* Form */}
-                <form onSubmit={handleSubmit}>
 
+                <form onSubmit={handleSubmit}>
                     <div className="bg-white dark:bg-[#1C2529] rounded-xl border border-[#E2E6E8] dark:border-[#303A3F] shadow-sm">
 
                         {/* Form Header */}
-                        <div className="p-4 sm:p-6 border-b border-[#E7EAED] dark:border-[#303A3F]">
 
+                        <div className="p-4 sm:p-6 border-b border-[#E7EAED] dark:border-[#303A3F]">
                             <h2 className="text-base sm:text-lg font-semibold text-[#1F272B] dark:text-[#F4F6F7]">
                                 Review Information
                             </h2>
@@ -164,53 +246,122 @@ const AddReview = () => {
                             <p className="text-xs sm:text-sm text-[#778387] dark:text-[#AEB7BA] mt-1">
                                 Add member feedback and assign it to a program
                             </p>
-
                         </div>
 
                         {/* Form Body */}
+
                         <div className="p-4 sm:p-6 space-y-5">
 
-                            {/* Image */}
-                            <div>
+                            {/* IMAGE */}
 
+                            <div>
                                 <label className="form-label">
                                     Member Image
                                 </label>
 
-                                <label className="w-28 h-28 rounded-xl border-2 border-dashed border-[#D7DCDF] dark:border-[#3A454A] bg-[#F8F9FB] dark:bg-[#12181B] flex flex-col items-center justify-center cursor-pointer hover:border-[#3420FF]">
+                                <div className="flex items-start gap-4">
 
-                                    <Upload
-                                        size={21}
-                                        className="text-[#778387] mb-2"
-                                    />
+                                    {/* Preview */}
 
-                                    <span className="text-xs text-[#778387]">
-                                        Upload Image
-                                    </span>
+                                    {imagePreview ? (
+                                        <div className="relative">
+                                            <img
+                                                src={imagePreview}
+                                                alt="Preview"
+                                                className="w-28 h-28 rounded-xl object-cover border border-[#E2E6E8] dark:border-[#303A3F]"
+                                            />
 
-                                    <input
-                                        type="file"
-                                        name="image"
-                                        accept="image/*"
-                                        onChange={handleChange}
-                                        className="hidden"
-                                    />
+                                            <button
+                                                type="button"
+                                                onClick={
+                                                    handleRemoveImage
+                                                }
+                                                className="absolute -top-2 -right-2 w-6 h-6 rounded-full bg-red-500 text-white flex items-center justify-center hover:bg-red-600"
+                                            >
+                                                <X size={14} />
+                                            </button>
+                                        </div>
+                                    ) : (
+                                        <label className="w-28 h-28 rounded-xl border-2 border-dashed border-[#D7DCDF] dark:border-[#3A454A] bg-[#F8F9FB] dark:bg-[#12181B] flex flex-col items-center justify-center cursor-pointer hover:border-[#3420FF] transition">
 
-                                </label>
+                                            <Upload
+                                                size={21}
+                                                className="text-[#778387] mb-2"
+                                            />
 
-                                {formData.image && (
-                                    <p className="text-xs text-[#606E6E] mt-2">
-                                        {formData.image.name}
-                                    </p>
-                                )}
+                                            <span className="text-xs text-[#778387] text-center px-2">
+                                                Upload Image
+                                            </span>
 
+                                            <input
+                                                type="file"
+                                                name="image"
+                                                accept="image/*"
+                                                onChange={
+                                                    handleChange
+                                                }
+                                                className="hidden"
+                                            />
+                                        </label>
+                                    )}
+
+                                    {/* File Information */}
+
+                                    <div className="pt-2">
+                                        {formData.image ? (
+                                            <>
+                                                <p className="text-sm font-medium text-[#1F272B] dark:text-[#F4F6F7]">
+                                                    {
+                                                        formData
+                                                            .image
+                                                            .name
+                                                    }
+                                                </p>
+
+                                                <p className="text-xs text-[#778387] mt-1">
+                                                    {(
+                                                        formData
+                                                            .image
+                                                            .size /
+                                                        (1024 *
+                                                            1024)
+                                                    ).toFixed(
+                                                        2
+                                                    )}{" "}
+                                                    MB
+                                                </p>
+
+                                                <button
+                                                    type="button"
+                                                    onClick={
+                                                        handleRemoveImage
+                                                    }
+                                                    className="text-xs text-red-500 hover:text-red-600 mt-2"
+                                                >
+                                                    Remove Image
+                                                </button>
+                                            </>
+                                        ) : (
+                                            <div>
+                                                <p className="text-sm text-[#606E6E] dark:text-[#AEB7BA]">
+                                                    Upload member photo
+                                                </p>
+
+                                                <p className="text-xs text-[#778387] mt-1">
+                                                    JPG, PNG, WEBP
+                                                    up to 5MB
+                                                </p>
+                                            </div>
+                                        )}
+                                    </div>
+                                </div>
                             </div>
 
                             {/* Name + Email */}
+
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
 
                                 <div>
-
                                     <label className="form-label">
                                         Member Name
                                     </label>
@@ -218,17 +369,19 @@ const AddReview = () => {
                                     <input
                                         type="text"
                                         name="name"
-                                        value={formData.name}
-                                        onChange={handleChange}
+                                        value={
+                                            formData.name
+                                        }
+                                        onChange={
+                                            handleChange
+                                        }
                                         placeholder="Enter member name"
                                         className="form-input"
                                         required
                                     />
-
                                 </div>
 
                                 <div>
-
                                     <label className="form-label">
                                         Email Address
                                     </label>
@@ -236,34 +389,40 @@ const AddReview = () => {
                                     <input
                                         type="email"
                                         name="email"
-                                        value={formData.email}
-                                        onChange={handleChange}
+                                        value={
+                                            formData.email
+                                        }
+                                        onChange={
+                                            handleChange
+                                        }
                                         placeholder="member@example.com"
                                         className="form-input"
                                     />
-
                                 </div>
-
                             </div>
 
                             {/* Program + Rating */}
+
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
 
                                 {/* Program */}
-                                <div>
 
+                                <div>
                                     <label className="form-label">
                                         Program
                                     </label>
 
                                     <select
                                         name="program"
-                                        value={formData.program}
-                                        onChange={handleChange}
+                                        value={
+                                            formData.program
+                                        }
+                                        onChange={
+                                            handleChange
+                                        }
                                         className="form-input"
                                         required
                                     >
-
                                         <option value="">
                                             Select Program
                                         </option>
@@ -291,20 +450,17 @@ const AddReview = () => {
                                         <option value="Zumba">
                                             Zumba
                                         </option>
-
                                     </select>
-
                                 </div>
 
                                 {/* Rating */}
-                                <div>
 
+                                <div>
                                     <label className="form-label">
                                         Rating
                                     </label>
 
                                     <div className="relative">
-
                                         <Star
                                             size={16}
                                             className="absolute left-3 top-1/2 -translate-y-1/2 text-yellow-500"
@@ -312,12 +468,15 @@ const AddReview = () => {
 
                                         <select
                                             name="rating"
-                                            value={formData.rating}
-                                            onChange={handleChange}
+                                            value={
+                                                formData.rating
+                                            }
+                                            onChange={
+                                                handleChange
+                                            }
                                             className="form-input pl-9"
                                             required
                                         >
-
                                             <option value="5">
                                                 5 - Excellent
                                             </option>
@@ -337,48 +496,50 @@ const AddReview = () => {
                                             <option value="1">
                                                 1 - Poor
                                             </option>
-
                                         </select>
-
                                     </div>
-
                                 </div>
-
                             </div>
 
                             {/* Review */}
-                            <div>
 
+                            <div>
                                 <label className="form-label">
                                     Review
                                 </label>
 
                                 <textarea
                                     name="review"
-                                    value={formData.review}
-                                    onChange={handleChange}
+                                    value={
+                                        formData.review
+                                    }
+                                    onChange={
+                                        handleChange
+                                    }
                                     rows="6"
                                     placeholder="Write member review..."
                                     className="form-input resize-none"
                                     required
                                 />
-
                             </div>
 
                             {/* Status */}
-                            <div>
 
+                            <div>
                                 <label className="form-label">
                                     Status
                                 </label>
 
                                 <select
                                     name="status"
-                                    value={formData.status}
-                                    onChange={handleChange}
+                                    value={
+                                        formData.status
+                                    }
+                                    onChange={
+                                        handleChange
+                                    }
                                     className="form-input"
                                 >
-
                                     <option value="Published">
                                         Published
                                     </option>
@@ -386,19 +547,19 @@ const AddReview = () => {
                                     <option value="Pending">
                                         Pending
                                     </option>
-
                                 </select>
-
                             </div>
-
                         </div>
 
                         {/* Buttons */}
+
                         <div className="flex flex-col sm:flex-row justify-end gap-3 p-4 sm:p-6 border-t border-[#E7EAED] dark:border-[#303A3F]">
 
                             <button
                                 type="button"
-                                onClick={() => navigate(-1)}
+                                onClick={() =>
+                                    navigate(-1)
+                                }
                                 disabled={loading}
                                 className="px-5 py-2.5 rounded-lg border border-[#E2E6E8] dark:border-[#303A3F] text-sm font-medium text-[#606E6E] dark:text-[#AEB7BA] hover:bg-[#F8F9FB] dark:hover:bg-white/5 disabled:opacity-50"
                             >
@@ -414,11 +575,8 @@ const AddReview = () => {
                                     ? "Adding Review..."
                                     : "Add Review"}
                             </button>
-
                         </div>
-
                     </div>
-
                 </form>
             </div>
 

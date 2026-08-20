@@ -15,7 +15,7 @@ const TestimonailPage = () => {
     const [activeIndex, setActiveIndex] = useState(0);
 
     const {
-        testimonials,
+        testimonials = [],
         loading,
         error,
     } = useSelector((state) => state.testimonial);
@@ -26,6 +26,78 @@ const TestimonailPage = () => {
     useEffect(() => {
         dispatch(getActiveTestimonials());
     }, [dispatch]);
+
+    // ==========================================
+    // RESET ACTIVE INDEX
+    // ==========================================
+    useEffect(() => {
+        if (testimonials.length === 0) {
+            setActiveIndex(0);
+            return;
+        }
+
+        if (activeIndex >= testimonials.length) {
+            setActiveIndex(testimonials.length - 1);
+        }
+    }, [testimonials.length, activeIndex]);
+
+    // ==========================================
+    // DEBUG API DATA
+    // ==========================================
+    useEffect(() => {
+        console.log("ACTIVE TESTIMONIALS:", testimonials);
+    }, [testimonials]);
+
+    // ==========================================
+    // GET IMAGE URL
+    // ==========================================
+    const getImageUrl = (testimonial) => {
+        if (!testimonial) return "";
+
+        // Main API field
+        if (
+            typeof testimonial.image === "string" &&
+            testimonial.image.trim() !== ""
+        ) {
+            return testimonial.image.trim();
+        }
+
+        // Backup fields in case API uses another name
+        if (
+            typeof testimonial.imageUrl === "string" &&
+            testimonial.imageUrl.trim() !== ""
+        ) {
+            return testimonial.imageUrl.trim();
+        }
+
+        if (
+            typeof testimonial.photo === "string" &&
+            testimonial.photo.trim() !== ""
+        ) {
+            return testimonial.photo.trim();
+        }
+
+        return "";
+    };
+
+    // ==========================================
+    // GET INITIALS
+    // ==========================================
+    const getInitials = (testimonial) => {
+        if (testimonial?.initials) {
+            return testimonial.initials
+                .substring(0, 2)
+                .toUpperCase();
+        }
+
+        if (testimonial?.name) {
+            return testimonial.name
+                .substring(0, 2)
+                .toUpperCase();
+        }
+
+        return "GY";
+    };
 
     // ==========================================
     // SCROLL SLIDER
@@ -51,21 +123,25 @@ const TestimonailPage = () => {
     const handleScroll = () => {
         if (!sliderRef.current) return;
 
-        const scrollLeft = sliderRef.current.scrollLeft;
+        const firstCard =
+            sliderRef.current.firstElementChild;
 
-        const cardWidth =
-            sliderRef.current.firstElementChild?.offsetWidth || 1;
+        if (!firstCard) return;
 
+        const cardWidth = firstCard.offsetWidth;
         const gap = 16;
 
+        if (!cardWidth) return;
+
         const index = Math.round(
-            scrollLeft / (cardWidth + gap)
+            sliderRef.current.scrollLeft /
+                (cardWidth + gap)
         );
 
         setActiveIndex(
             Math.min(
                 Math.max(index, 0),
-                testimonials.length - 1
+                Math.max(testimonials.length - 1, 0)
             )
         );
     };
@@ -79,14 +155,31 @@ const TestimonailPage = () => {
         const card =
             sliderRef.current.children[index];
 
-        if (card) {
-            sliderRef.current.scrollTo({
-                left: card.offsetLeft,
-                behavior: "smooth",
-            });
-        }
+        if (!card) return;
+
+        sliderRef.current.scrollTo({
+            left: card.offsetLeft,
+            behavior: "smooth",
+        });
 
         setActiveIndex(index);
+    };
+
+    // ==========================================
+    // IMAGE ERROR HANDLER
+    // ==========================================
+    const handleImageError = (event) => {
+        event.currentTarget.style.display = "none";
+
+        const fallback =
+            event.currentTarget.parentElement?.querySelector(
+                ".testimonial-image-fallback"
+            );
+
+        if (fallback) {
+            fallback.classList.remove("hidden");
+            fallback.classList.add("flex");
+        }
     };
 
     // ==========================================
@@ -132,7 +225,7 @@ const TestimonailPage = () => {
     // ==========================================
     // NO TESTIMONIALS
     // ==========================================
-    if (!testimonials || testimonials.length === 0) {
+    if (testimonials.length === 0) {
         return (
             <section
                 id="testimonials"
@@ -202,7 +295,9 @@ const TestimonailPage = () => {
                     {/* ARROWS */}
                     <div className="flex items-center gap-2">
                         <button
-                            onClick={() => scrollSlider("prev")}
+                            onClick={() =>
+                                scrollSlider("prev")
+                            }
                             className="group flex h-9 w-9 items-center justify-center border border-white/10 bg-[#151515] text-white/60 transition-all duration-300 hover:border-[#e85d3a] hover:bg-[#e85d3a] hover:text-white"
                             aria-label="Previous testimonials"
                         >
@@ -213,7 +308,9 @@ const TestimonailPage = () => {
                         </button>
 
                         <button
-                            onClick={() => scrollSlider("next")}
+                            onClick={() =>
+                                scrollSlider("next")
+                            }
                             className="group flex h-9 w-9 items-center justify-center border border-white/10 bg-[#151515] text-white/60 transition-all duration-300 hover:border-[#e85d3a] hover:bg-[#e85d3a] hover:text-white"
                             aria-label="Next testimonials"
                         >
@@ -233,86 +330,140 @@ const TestimonailPage = () => {
                     onScroll={handleScroll}
                     className="flex snap-x snap-mandatory gap-4 overflow-x-auto scroll-smooth pb-2 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
                 >
-                    {testimonials.map((testimonial, index) => (
-                        <article
-                            key={testimonial._id}
-                            className="group relative min-w-[88%] snap-start overflow-hidden rounded-lg border border-white/10 bg-[#151515] p-4 transition-all duration-500 hover:border-[#e85d3a]/50 sm:min-w-[47%] sm:p-5 lg:min-w-[31.5%] xl:min-w-[31.8%]"
-                        >
-                            {/* TOP LINE */}
-                            <span className="absolute left-0 top-0 h-[2px] w-full origin-left scale-x-60 bg-[#e85d3a] transition-transform duration-500 group-hover:scale-x-100" />
+                    {testimonials.map(
+                        (testimonial, index) => {
+                            const imageUrl =
+                                getImageUrl(testimonial);
 
-                            {/* NUMBER */}
-                            <span className="absolute right-4 top-3 font-['Bebas_Neue'] text-[36px] leading-none text-white/[0.035] transition-colors duration-300 group-hover:text-[#e85d3a]/10">
-                                {String(index + 1).padStart(2, "0")}
-                            </span>
+                            return (
+                                <article
+                                    key={testimonial._id}
+                                    className="group relative min-w-[88%] snap-start overflow-hidden rounded-lg border border-white/10 bg-[#151515] p-4 transition-all duration-500 hover:border-[#e85d3a]/50 sm:min-w-[47%] sm:p-5 lg:min-w-[31.5%] xl:min-w-[31.8%]"
+                                >
+                                    {/* TOP LINE */}
+                                    <span className="absolute left-0 top-0 h-[2px] w-full origin-left scale-x-60 bg-[#e85d3a] transition-transform duration-500 group-hover:scale-x-100" />
 
-                            {/* TOP */}
-                            <div className="flex items-start justify-between">
+                                    {/* NUMBER */}
+                                    <span className="absolute right-4 top-3 font-['Bebas_Neue'] text-[36px] leading-none text-white/[0.035] transition-colors duration-300 group-hover:text-[#e85d3a]/10">
+                                        {String(index + 1).padStart(
+                                            2,
+                                            "0"
+                                        )}
+                                    </span>
 
-                                {/* QUOTE */}
-                                <div className="flex h-9 w-9 items-center justify-center bg-[#e85d3a]/10 text-[#e85d3a] transition-all duration-300 group-hover:bg-[#e85d3a] group-hover:text-white">
-                                    <Quote
-                                        size={17}
-                                        strokeWidth={1.4}
-                                    />
-                                </div>
+                                    {/* TOP */}
+                                    <div className="flex items-start justify-between">
 
-                                {/* RATING */}
-                                <div className="flex gap-1 pt-1">
-                                    {Array.from({
-                                        length: testimonial.rating || 0,
-                                    }).map((_, starIndex) => (
-                                        <Star
-                                            key={starIndex}
-                                            size={11}
-                                            fill="currentColor"
-                                            strokeWidth={1.5}
-                                            className="text-[#e85d3a]"
-                                        />
-                                    ))}
-                                </div>
-                            </div>
+                                        {/* QUOTE */}
+                                        <div className="flex h-9 w-9 items-center justify-center bg-[#e85d3a]/10 text-[#e85d3a] transition-all duration-300 group-hover:bg-[#e85d3a] group-hover:text-white">
+                                            <Quote
+                                                size={17}
+                                                strokeWidth={1.4}
+                                            />
+                                        </div>
 
-                            {/* REVIEW */}
-                            <p className="mt-2.5 font-['Barlow'] text-[16px] leading-[1.65] text-white/60 sm:mt-5">
-                                "{testimonial.review}"
-                            </p>
-
-                            {/* DIVIDER */}
-                            <div className="my-4 h-[1px] w-full bg-white/10 sm:my-5" />
-
-                            {/* MEMBER */}
-                            <div className="flex items-center justify-between">
-
-                                <div className="flex items-center gap-3">
-
-                                    {/* INITIALS */}
-                                    <div className="flex h-9 w-9 shrink-0 items-center justify-center bg-[#e85d3a] font-['Barlow'] text-[12px] font-bold text-white">
-                                        {testimonial.initials ||
-                                            testimonial.name
-                                                ?.substring(0, 2)
-                                                .toUpperCase()}
+                                        {/* RATING */}
+                                        <div className="flex gap-1 pt-1">
+                                            {Array.from({
+                                                length: Math.min(
+                                                    Math.max(
+                                                        Number(
+                                                            testimonial.rating
+                                                        ) || 0,
+                                                        0
+                                                    ),
+                                                    5
+                                                ),
+                                            }).map(
+                                                (
+                                                    _,
+                                                    starIndex
+                                                ) => (
+                                                    <Star
+                                                        key={
+                                                            starIndex
+                                                        }
+                                                        size={11}
+                                                        fill="currentColor"
+                                                        strokeWidth={
+                                                            1.5
+                                                        }
+                                                        className="text-[#e85d3a]"
+                                                    />
+                                                )
+                                            )}
+                                        </div>
                                     </div>
 
-                                    {/* NAME + ROLE */}
-                                    <div>
-                                        <h3 className="font-['Barlow'] text-[14px] font-bold tracking-[0.05em] text-white">
-                                            {testimonial.name}
-                                        </h3>
+                                    {/* REVIEW */}
+                                    <p className="mt-2.5 font-['Barlow'] text-[16px] leading-[1.65] text-white/60 sm:mt-5">
+                                        "{testimonial.review}"
+                                    </p>
 
-                                        <p className="mt-1 font-['Barlow'] text-[10px] uppercase tracking-[0.12em] text-white/35">
-                                            {testimonial.role}
-                                        </p>
+                                    {/* DIVIDER */}
+                                    <div className="my-4 h-[1px] w-full bg-white/10 sm:my-5" />
+
+                                    {/* MEMBER */}
+                                    <div className="flex items-center justify-between">
+
+                                        <div className="flex items-center gap-3">
+
+                                            {/* AVATAR */}
+                                            <div className="relative h-9 w-9 shrink-0 overflow-hidden rounded-full">
+
+                                                {imageUrl ? (
+                                                    <img
+                                                        src={imageUrl}
+                                                        alt={
+                                                            testimonial.name ||
+                                                            "Member"
+                                                        }
+                                                        className="block h-full w-full rounded-full object-cover"
+                                                        onError={
+                                                            handleImageError
+                                                        }
+                                                    />
+                                                ) : null}
+
+                                                {/* INITIALS FALLBACK */}
+                                                <div
+                                                    className={`testimonial-image-fallback absolute inset-0 items-center justify-center rounded-full bg-[#e85d3a] font-['Barlow'] text-[12px] font-bold text-white ${
+                                                        imageUrl
+                                                            ? "hidden"
+                                                            : "flex"
+                                                    }`}
+                                                >
+                                                    {getInitials(
+                                                        testimonial
+                                                    )}
+                                                </div>
+                                            </div>
+
+                                            {/* NAME + ROLE */}
+                                            <div>
+                                                <h3 className="font-['Barlow'] text-[14px] font-bold tracking-[0.05em] text-white">
+                                                    {
+                                                        testimonial.name
+                                                    }
+                                                </h3>
+
+                                                <p className="mt-1 font-['Barlow'] text-[10px] uppercase tracking-[0.12em] text-white/35">
+                                                    {
+                                                        testimonial.role
+                                                    }
+                                                </p>
+                                            </div>
+                                        </div>
+
+                                        {/* VERIFIED */}
+                                        <span className="font-['Barlow'] text-[7px] font-bold uppercase tracking-[0.12em] text-[#e85d3a] opacity-0 transition-opacity duration-300 group-hover:opacity-100">
+                                            VERIFIED
+                                        </span>
                                     </div>
-                                </div>
-
-                                {/* VERIFIED */}
-                                <span className="font-['Barlow'] text-[7px] font-bold uppercase tracking-[0.12em] text-[#e85d3a] opacity-0 transition-opacity duration-300 group-hover:opacity-100">
-                                    VERIFIED
-                                </span>
-                            </div>
-                        </article>
-                    ))}
+                                </article>
+                            );
+                        }
+                    )}
                 </div>
 
                 {/* ==========================================
@@ -322,22 +473,27 @@ const TestimonailPage = () => {
 
                     {/* DOTS */}
                     <div className="flex items-center gap-1.5">
-                        {testimonials.map((_, index) => (
-                            <button
-                                key={index}
-                                onClick={() =>
-                                    scrollToCard(index)
-                                }
-                                className={`h-[2px] transition-all duration-300 ${
-                                    activeIndex === index
-                                        ? "w-7 bg-[#e85d3a]"
-                                        : "w-3 bg-white/15 hover:bg-white/40"
-                                }`}
-                                aria-label={`Go to testimonial ${
-                                    index + 1
-                                }`}
-                            />
-                        ))}
+                        {testimonials.map(
+                            (_, index) => (
+                                <button
+                                    key={index}
+                                    onClick={() =>
+                                        scrollToCard(
+                                            index
+                                        )
+                                    }
+                                    className={`h-[2px] transition-all duration-300 ${
+                                        activeIndex ===
+                                        index
+                                            ? "w-7 bg-[#e85d3a]"
+                                            : "w-3 bg-white/15 hover:bg-white/40"
+                                    }`}
+                                    aria-label={`Go to testimonial ${
+                                        index + 1
+                                    }`}
+                                />
+                            )
+                        )}
                     </div>
 
                     {/* COUNTER */}

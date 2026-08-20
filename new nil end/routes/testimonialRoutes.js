@@ -1,6 +1,7 @@
 const express = require("express");
 
 const {
+  upload,
   createTestimonial,
   getAllTestimonials,
   getActiveTestimonials,
@@ -12,7 +13,11 @@ const {
 const router = express.Router();
 
 // Create testimonial
-router.post("/", createTestimonial);
+router.post(
+  "/",
+  upload.single("image"),
+  createTestimonial
+);
 
 // Get all testimonials
 router.get("/", getAllTestimonials);
@@ -24,7 +29,11 @@ router.get("/active", getActiveTestimonials);
 router.get("/:id", getTestimonialById);
 
 // Update testimonial
-router.put("/:id", updateTestimonial);
+router.put(
+  "/:id",
+  upload.single("image"),
+  updateTestimonial
+);
 
 // Delete testimonial
 router.delete("/:id", deleteTestimonial);

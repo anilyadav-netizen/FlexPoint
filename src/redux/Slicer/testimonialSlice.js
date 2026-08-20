@@ -1,12 +1,36 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import api from "../../Api/Api";
+
+// ======================================================
+// CREATE TESTIMONIAL
+// ======================================================
+
 export const createTestimonial = createAsyncThunk(
     "testimonial/createTestimonial",
     async (testimonialData, { rejectWithValue }) => {
         try {
+            const formData = new FormData();
+
+            formData.append("name", testimonialData.name);
+            formData.append("role", testimonialData.role);
+            formData.append("rating", testimonialData.rating);
+            formData.append("review", testimonialData.review);
+            formData.append("initials", testimonialData.initials || "");
+            formData.append(
+                "status",
+                testimonialData.status !== undefined
+                    ? testimonialData.status
+                    : true
+            );
+
+            // Image
+            if (testimonialData.image) {
+                formData.append("image", testimonialData.image);
+            }
+
             const response = await api.post(
                 "/testimonials",
-                testimonialData
+                formData
             );
 
             return response.data;
@@ -19,13 +43,15 @@ export const createTestimonial = createAsyncThunk(
     }
 );
 
+// ======================================================
+// GET ALL TESTIMONIALS
+// ======================================================
+
 export const getTestimonials = createAsyncThunk(
     "testimonial/getTestimonials",
     async (_, { rejectWithValue }) => {
         try {
-            const response = await api.get(
-                "/testimonials"
-            );
+            const response = await api.get("/testimonials");
 
             return response.data;
         } catch (error) {
@@ -36,6 +62,10 @@ export const getTestimonials = createAsyncThunk(
         }
     }
 );
+
+// ======================================================
+// GET ACTIVE TESTIMONIALS
+// ======================================================
 
 export const getActiveTestimonials = createAsyncThunk(
     "testimonial/getActiveTestimonials",
@@ -55,6 +85,10 @@ export const getActiveTestimonials = createAsyncThunk(
     }
 );
 
+// ======================================================
+// GET SINGLE TESTIMONIAL
+// ======================================================
+
 export const getTestimonialById = createAsyncThunk(
     "testimonial/getTestimonialById",
     async (id, { rejectWithValue }) => {
@@ -73,6 +107,10 @@ export const getTestimonialById = createAsyncThunk(
     }
 );
 
+// ======================================================
+// UPDATE TESTIMONIAL
+// ======================================================
+
 export const updateTestimonial = createAsyncThunk(
     "testimonial/updateTestimonial",
     async (
@@ -80,9 +118,61 @@ export const updateTestimonial = createAsyncThunk(
         { rejectWithValue }
     ) => {
         try {
+            const formData = new FormData();
+
+            if (testimonialData.name !== undefined) {
+                formData.append(
+                    "name",
+                    testimonialData.name
+                );
+            }
+
+            if (testimonialData.role !== undefined) {
+                formData.append(
+                    "role",
+                    testimonialData.role
+                );
+            }
+
+            if (testimonialData.rating !== undefined) {
+                formData.append(
+                    "rating",
+                    testimonialData.rating
+                );
+            }
+
+            if (testimonialData.review !== undefined) {
+                formData.append(
+                    "review",
+                    testimonialData.review
+                );
+            }
+
+            if (testimonialData.initials !== undefined) {
+                formData.append(
+                    "initials",
+                    testimonialData.initials
+                );
+            }
+
+            if (testimonialData.status !== undefined) {
+                formData.append(
+                    "status",
+                    testimonialData.status
+                );
+            }
+
+            // New image only if selected
+            if (testimonialData.image) {
+                formData.append(
+                    "image",
+                    testimonialData.image
+                );
+            }
+
             const response = await api.put(
                 `/testimonials/${id}`,
-                testimonialData
+                formData
             );
 
             return response.data;
@@ -94,6 +184,10 @@ export const updateTestimonial = createAsyncThunk(
         }
     }
 );
+
+// ======================================================
+// DELETE TESTIMONIAL
+// ======================================================
 
 export const deleteTestimonial = createAsyncThunk(
     "testimonial/deleteTestimonial",
@@ -116,6 +210,10 @@ export const deleteTestimonial = createAsyncThunk(
     }
 );
 
+// ======================================================
+// INITIAL STATE
+// ======================================================
+
 const initialState = {
     testimonials: [],
     testimonial: null,
@@ -123,6 +221,10 @@ const initialState = {
     error: null,
     success: null,
 };
+
+// ======================================================
+// SLICE
+// ======================================================
 
 const testimonialSlice = createSlice({
     name: "testimonial",
@@ -152,6 +254,11 @@ const testimonialSlice = createSlice({
 
     extraReducers: (builder) => {
         builder
+
+            // ==================================================
+            // CREATE
+            // ==================================================
+
             .addCase(
                 createTestimonial.pending,
                 (state) => {
@@ -184,6 +291,11 @@ const testimonialSlice = createSlice({
                     state.error = action.payload;
                 }
             )
+
+            // ==================================================
+            // GET ALL
+            // ==================================================
+
             .addCase(
                 getTestimonials.pending,
                 (state) => {
@@ -211,6 +323,11 @@ const testimonialSlice = createSlice({
                     state.error = action.payload;
                 }
             )
+
+            // ==================================================
+            // GET ACTIVE
+            // ==================================================
+
             .addCase(
                 getActiveTestimonials.pending,
                 (state) => {
@@ -238,6 +355,11 @@ const testimonialSlice = createSlice({
                     state.error = action.payload;
                 }
             )
+
+            // ==================================================
+            // GET BY ID
+            // ==================================================
+
             .addCase(
                 getTestimonialById.pending,
                 (state) => {
@@ -265,6 +387,11 @@ const testimonialSlice = createSlice({
                     state.error = action.payload;
                 }
             )
+
+            // ==================================================
+            // UPDATE
+            // ==================================================
+
             .addCase(
                 updateTestimonial.pending,
                 (state) => {
@@ -311,6 +438,11 @@ const testimonialSlice = createSlice({
                     state.error = action.payload;
                 }
             )
+
+            // ==================================================
+            // DELETE
+            // ==================================================
+
             .addCase(
                 deleteTestimonial.pending,
                 (state) => {
@@ -354,11 +486,19 @@ const testimonialSlice = createSlice({
     },
 });
 
+// ======================================================
+// ACTIONS
+// ======================================================
+
 export const {
     clearTestimonialError,
     clearTestimonialSuccess,
     clearSelectedTestimonial,
     resetTestimonialState,
 } = testimonialSlice.actions;
+
+// ======================================================
+// REDUCER
+// ======================================================
 
 export default testimonialSlice.reducer;
