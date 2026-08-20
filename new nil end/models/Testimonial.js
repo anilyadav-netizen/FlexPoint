@@ -34,6 +34,13 @@ const testimonialSchema = new mongoose.Schema(
       uppercase: true,
     },
 
+    // Testimonial Image
+    image: {
+      type: String,
+      default: "",
+      trim: true,
+    },
+
     status: {
       type: Boolean,
       default: true,
@@ -44,4 +51,6 @@ const testimonialSchema = new mongoose.Schema(
   }
 );
 
-module.exports = mongoose.model("Testimonial", testimonialSchema);
+module.exports =
+  mongoose.models.Testimonial ||
+  mongoose.model("Testimonial", testimonialSchema);
