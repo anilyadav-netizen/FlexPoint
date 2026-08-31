@@ -1,3 +1,4 @@
+
 import React, { useState } from "react";
 import {
     FaInstagram,
@@ -26,9 +27,6 @@ const ContactPage = () => {
         message: "",
     });
 
-    // ==========================
-    // HANDLE INPUT CHANGE
-    // ==========================
     const handleChange = (e) => {
         const { id, value } = e.target;
 
@@ -38,35 +36,21 @@ const ContactPage = () => {
         }));
     };
 
-    // ==========================
-    // HANDLE FORM SUBMIT
-    // ==========================
     const handleSubmit = async (e) => {
         e.preventDefault();
 
-        console.log("FORM SUBMITTED");
-        console.log("FORM DATA:", formData);
-
         const { name, mobile, email, message } = formData;
 
-        // ==========================
-        // VALIDATION
-        // ==========================
         if (
             !name.trim() ||
             !mobile.trim() ||
             !email.trim() ||
             !message.trim()
         ) {
-            console.log("VALIDATION FAILED");
-
             toast.error("Please fill all the fields");
             return;
         }
 
-        // ==========================
-        // API PAYLOAD
-        // ==========================
         const contactData = {
             name: name.trim(),
             mobile: mobile.trim(),
@@ -74,25 +58,15 @@ const ContactPage = () => {
             message: message.trim(),
         };
 
-        console.log("API PAYLOAD:", contactData);
-
         try {
-            // ==========================
-            // API CALL
-            // ==========================
             const response = await dispatch(
                 createContact(contactData)
             ).unwrap();
-
-            console.log("API SUCCESS:", response);
 
             toast.success(
                 response?.message || "Message sent successfully"
             );
 
-            // ==========================
-            // RESET FORM
-            // ==========================
             setFormData({
                 name: "",
                 mobile: "",
@@ -100,8 +74,6 @@ const ContactPage = () => {
                 message: "",
             });
         } catch (err) {
-            console.error("API ERROR:", err);
-
             toast.error(
                 typeof err === "string"
                     ? err
@@ -111,60 +83,58 @@ const ContactPage = () => {
     };
 
     return (
-        <main className="mt-[0px] w-full overflow-hidden bg-[#0d0d0d] text-white">
+        <main className="mt-0 w-full overflow-hidden bg-[#0d0d0d] text-white">
 
-            {/* =====================================================
+            {/* =========================
                 HERO
-            ====================================================== */}
-            <section className="border-b border-white/10">
-                <div className="mx-auto w-full max-w-[110rem] px-6 py-4 sm:px-10 md:py-7 lg:px-16 xl:px-[7%]">
+            ========================== */}
+            <section className="border-white/10">
+                <div className="mx-auto w-full max-w-[110rem] px-5 py-5 sm:px-8 md:py-7 lg:px-12 xl:px-[7%]">
 
-                    <div className="grid gap-3 lg:grid-cols-[1.1fr_0.9fr] lg:items-end lg:gap-14">
+                    <div className="grid gap-4 lg:grid-cols-[1.1fr_0.9fr] lg:items-end lg:gap-14">
 
+                        {/* LEFT */}
                         <div>
-                            <div className="mb-3 flex items-center gap-2">
-                                <span className="h-[2px] w-8 bg-[#e85d3a]" />
+                            <div className="mb-2 flex items-center gap-2">
+                                <span className="h-[2px] w-6 bg-[#e85d3a]" />
 
-                                <span className="font-['Barlow'] text-[11px] font-semibold uppercase tracking-[0.16em] text-[#e85d3a] sm:text-[13px]">
+                                <span className="text-[10px] font-semibold uppercase tracking-[0.15em] text-[#e85d3a] md:text-[11px]">
                                     Get In Touch
                                 </span>
                             </div>
 
-                            <h1 className="font-['Bebas_Neue'] text-[24px] leading-[0.82] tracking-[0.015em] md:text-[40px] lg:text-[52px]">
+                            <h1 className="text-[14px] font-bold leading-tight tracking-wide md:text-[16px]">
                                 LET'S GET
-
                                 <span className="text-[#e85d3a]">
                                     {" "}MOVING.
                                 </span>
-
                                 <br />
-
                                 YOUR FITNESS
-
                                 <span className="text-white/40">
                                     {" "}STARTS HERE.
                                 </span>
                             </h1>
                         </div>
 
-                        <div className="max-w-[400px] lg:justify-self-end">
-                            <p className="font-['Barlow'] text-[13px] leading-6 text-white/50 sm:text-[15px] sm:leading-7">
+                        {/* RIGHT */}
+                        <div className="max-w-[430px] lg:justify-self-end">
+                            <p className="text-[10px] leading-5 text-white/45 sm:text-[11px] md:text-[12px]">
                                 Have a question about our programs,
                                 membership or training sessions? Reach out
                                 to our team and we'll help you find the right
                                 way to get started.
                             </p>
 
-                            <div className="mt-2 flex flex-wrap gap-2">
+                            <div className="mt-3 flex flex-wrap gap-2">
 
-                                <div className="border border-white/10 bg-[#151515] px-3.5 py-2">
-                                    <span className="font-['Barlow'] text-[10px] font-semibold uppercase tracking-[0.08em] text-white/60 sm:text-[11px]">
+                                <div className="rounded-md border border-white/10 bg-[#151515] px-3 py-2">
+                                    <span className="text-[9px] font-semibold uppercase tracking-[0.08em] text-white/60 sm:text-[10px]">
                                         Quick Response
                                     </span>
                                 </div>
 
-                                <div className="border border-white/10 bg-[#151515] px-3.5 py-2">
-                                    <span className="font-['Barlow'] text-[10px] font-semibold uppercase tracking-[0.08em] text-white/60 sm:text-[11px]">
+                                <div className="rounded-md border border-white/10 bg-[#151515] px-3 py-2">
+                                    <span className="text-[9px] font-semibold uppercase tracking-[0.08em] text-white/60 sm:text-[10px]">
                                         Visit Our Center
                                     </span>
                                 </div>
@@ -173,97 +143,87 @@ const ContactPage = () => {
                         </div>
 
                     </div>
-
                 </div>
             </section>
 
-            {/* =====================================================
+            {/* =========================
                 CONTACT INFO
-            ====================================================== */}
-            <section className="border-b border-white/10 bg-[#111111]">
+            ========================== */}
 
-                <div className="mx-auto grid w-full max-w-[110rem] grid-cols-1 sm:grid-cols-3">
+            <div className="mx-auto w-full max-w-[110rem] px-5 sm:px-8 md:px-10 lg:px-12 xl:px-[7%]">
+                <div className="grid grid-cols-1 overflow-hidden rounded-md border border-white/10 bg-[#111111] sm:grid-cols-3">
 
                     {/* PHONE */}
                     <a
                         href="tel:+919876543210"
-                        className="group border-b border-white/10 px-6 py-5 transition-colors duration-300 hover:bg-[#151515] sm:border-b-0 sm:border-r"
+                        className="group border-b border-white/10 px-5 py-4 transition-colors duration-300 hover:bg-[#151515] sm:border-b-0 sm:border-r"
                     >
-                        <div className="flex items-start gap-3">
-
-                            <div className="flex h-9 w-9 shrink-0 items-center justify-center border border-white/10 text-[#e85d3a] transition-colors duration-300 group-hover:border-[#e85d3a]">
-                                <FaPhoneAlt size={16} />
+                        <div className="flex items-center gap-3">
+                            <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-md border border-white/10 text-[#e85d3a] transition-colors duration-300 group-hover:border-[#e85d3a]">
+                                <FaPhoneAlt size={13} />
                             </div>
 
-                            <div>
-                                <p className="font-['Barlow'] text-[10px] font-semibold uppercase tracking-[0.12em] text-white/35">
+                            <div className="min-w-0">
+                                <p className="text-[9px] font-semibold uppercase tracking-[0.12em] text-white/35">
                                     Call Us
                                 </p>
 
-                                <p className="mt-1 font-['Barlow'] text-[13px] font-medium text-white/80">
+                                <p className="mt-1 truncate text-[11px] font-medium text-white/80 md:text-[12px]">
                                     +91 98765 43210
                                 </p>
                             </div>
-
                         </div>
                     </a>
 
                     {/* EMAIL */}
                     <a
                         href="mailto:hello@fitcenter.com"
-                        className="group border-b border-white/10 px-6 py-5 transition-colors duration-300 hover:bg-[#151515] sm:border-b-0 sm:border-r"
+                        className="group border-b border-white/10 px-5 py-4 transition-colors duration-300 hover:bg-[#151515] sm:border-b-0 sm:border-r"
                     >
-                        <div className="flex items-start gap-3">
-
-                            <div className="flex h-9 w-9 shrink-0 items-center justify-center border border-white/10 text-[#e85d3a] transition-colors duration-300 group-hover:border-[#e85d3a]">
-                                <IoMdMail size={16} />
+                        <div className="flex items-center gap-3">
+                            <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-md border border-white/10 text-[#e85d3a] transition-colors duration-300 group-hover:border-[#e85d3a]">
+                                <IoMdMail size={14} />
                             </div>
 
-                            <div>
-                                <p className="font-['Barlow'] text-[10px] font-semibold uppercase tracking-[0.12em] text-white/35">
+                            <div className="min-w-0">
+                                <p className="text-[9px] font-semibold uppercase tracking-[0.12em] text-white/35">
                                     Email Us
                                 </p>
 
-                                <p className="mt-1 font-['Barlow'] text-[13px] font-medium text-white/80">
+                                <p className="mt-1 truncate text-[11px] font-medium text-white/80 md:text-[12px]">
                                     hello@fitcenter.com
                                 </p>
                             </div>
-
                         </div>
                     </a>
 
                     {/* LOCATION */}
-                    <div className="group px-6 py-5 transition-colors duration-300 hover:bg-[#151515]">
-
-                        <div className="flex items-start gap-3">
-
-                            <div className="flex h-9 w-9 shrink-0 items-center justify-center border border-white/10 text-[#e85d3a] transition-colors duration-300 group-hover:border-[#e85d3a]">
-                                <FiMapPin size={16} />
+                    <div className="group px-5 py-4 transition-colors duration-300 hover:bg-[#151515]">
+                        <div className="flex items-center gap-3">
+                            <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-md border border-white/10 text-[#e85d3a] transition-colors duration-300 group-hover:border-[#e85d3a]">
+                                <FiMapPin size={14} />
                             </div>
 
-                            <div>
-                                <p className="font-['Barlow'] text-[10px] font-semibold uppercase tracking-[0.12em] text-white/35">
+                            <div className="min-w-0">
+                                <p className="text-[9px] font-semibold uppercase tracking-[0.12em] text-white/35">
                                     Visit Us
                                 </p>
 
-                                <p className="mt-1 font-['Barlow'] text-[13px] font-medium text-white/80">
+                                <p className="mt-1 truncate text-[11px] font-medium text-white/80 md:text-[12px]">
                                     New Delhi, India
                                 </p>
                             </div>
-
                         </div>
-
                     </div>
 
                 </div>
-            </section>
+            </div>
 
-            {/* =====================================================
+            {/* =========================
                 CONTACT FORM
-            ====================================================== */}
+            ========================== */}
             <section>
-
-                <div className="mx-auto w-full max-w-[110rem] px-6 py-5 sm:px-10 sm:py-7 lg:px-16 lg:py-9 xl:px-[7%]">
+                <div className="mx-auto w-full max-w-[110rem] px-5 py-6 sm:px-8 sm:py-7 lg:px-12 lg:py-9 xl:px-[7%]">
 
                     <div className="grid gap-6 lg:grid-cols-[1.15fr_0.85fr] lg:gap-12">
 
@@ -273,22 +233,21 @@ const ContactPage = () => {
                             <div className="mb-5">
 
                                 <div className="mb-2 flex items-center gap-2">
-                                    <span className="h-[2px] w-7 bg-[#e85d3a]" />
+                                    <span className="h-[2px] w-6 bg-[#e85d3a]" />
 
-                                    <span className="font-['Barlow'] text-[10px] font-semibold uppercase tracking-[0.15em] text-[#e85d3a] sm:text-[12px]">
+                                    <span className="text-[9px] font-semibold uppercase tracking-[0.15em] text-[#e85d3a] sm:text-[10px]">
                                         Send A Message
                                     </span>
                                 </div>
 
-                                <h2 className="font-['Bebas_Neue'] text-[28px] leading-[0.85] tracking-wide sm:text-[34px] md:text-[42px]">
+                                <h2 className="text-[14px] font-bold leading-tight tracking-wide sm:text-[15px] md:text-[16px]">
                                     HAVE A QUESTION?
-
                                     <span className="block text-[#e85d3a]">
                                         WE'RE HERE TO HELP.
                                     </span>
                                 </h2>
 
-                                <p className="mt-2 max-w-[560px] font-['Barlow'] text-[12px] leading-5 text-white/40 sm:text-[13px] sm:leading-6">
+                                <p className="mt-2 max-w-[560px] text-[10px] leading-5 text-white/40 sm:text-[11px] md:text-[12px]">
                                     Fill out the form below and our team will
                                     get back to you as soon as possible.
                                 </p>
@@ -305,7 +264,7 @@ const ContactPage = () => {
                                 <div>
                                     <label
                                         htmlFor="name"
-                                        className="mb-1.5 block font-['Barlow'] text-[10px] font-semibold uppercase tracking-[0.1em] text-white/45"
+                                        className="mb-1.5 block text-[9px] font-semibold uppercase tracking-[0.1em] text-white/45"
                                     >
                                         Your Name
                                     </label>
@@ -317,7 +276,7 @@ const ContactPage = () => {
                                         onChange={handleChange}
                                         placeholder="Enter your name"
                                         autoComplete="name"
-                                        className="h-11 w-full border border-white/10 bg-[#151515] px-4 font-['Barlow'] text-[12px] text-white outline-none placeholder:text-white/25 transition-all duration-300 focus:border-[#e85d3a]/70"
+                                        className="h-10 w-full rounded-md border border-white/10 bg-[#151515] px-3.5 text-[11px] text-white outline-none transition-all duration-300 placeholder:text-white/25 focus:border-[#e85d3a]/70 md:text-[12px]"
                                     />
                                 </div>
 
@@ -325,7 +284,7 @@ const ContactPage = () => {
                                 <div>
                                     <label
                                         htmlFor="mobile"
-                                        className="mb-1.5 block font-['Barlow'] text-[10px] font-semibold uppercase tracking-[0.1em] text-white/45"
+                                        className="mb-1.5 block text-[9px] font-semibold uppercase tracking-[0.1em] text-white/45"
                                     >
                                         Phone Number
                                     </label>
@@ -337,7 +296,7 @@ const ContactPage = () => {
                                         onChange={handleChange}
                                         placeholder="Enter phone number"
                                         autoComplete="tel"
-                                        className="h-11 w-full border border-white/10 bg-[#151515] px-4 font-['Barlow'] text-[12px] text-white outline-none placeholder:text-white/25 transition-all duration-300 focus:border-[#e85d3a]/70"
+                                        className="h-10 w-full rounded-md border border-white/10 bg-[#151515] px-3.5 text-[11px] text-white outline-none transition-all duration-300 placeholder:text-white/25 focus:border-[#e85d3a]/70 md:text-[12px]"
                                     />
                                 </div>
 
@@ -345,7 +304,7 @@ const ContactPage = () => {
                                 <div>
                                     <label
                                         htmlFor="email"
-                                        className="mb-1.5 block font-['Barlow'] text-[10px] font-semibold uppercase tracking-[0.1em] text-white/45"
+                                        className="mb-1.5 block text-[9px] font-semibold uppercase tracking-[0.1em] text-white/45"
                                     >
                                         Email Address
                                     </label>
@@ -357,7 +316,7 @@ const ContactPage = () => {
                                         onChange={handleChange}
                                         placeholder="Enter your email"
                                         autoComplete="email"
-                                        className="h-11 w-full border border-white/10 bg-[#151515] px-4 font-['Barlow'] text-[12px] text-white outline-none placeholder:text-white/25 transition-all duration-300 focus:border-[#e85d3a]/70"
+                                        className="h-10 w-full rounded-md border border-white/10 bg-[#151515] px-3.5 text-[11px] text-white outline-none transition-all duration-300 placeholder:text-white/25 focus:border-[#e85d3a]/70 md:text-[12px]"
                                     />
                                 </div>
 
@@ -365,7 +324,7 @@ const ContactPage = () => {
                                 <div className="sm:col-span-2">
                                     <label
                                         htmlFor="message"
-                                        className="mb-1.5 block font-['Barlow'] text-[10px] font-semibold uppercase tracking-[0.1em] text-white/45"
+                                        className="mb-1.5 block text-[9px] font-semibold uppercase tracking-[0.1em] text-white/45"
                                     >
                                         Your Message
                                     </label>
@@ -376,7 +335,7 @@ const ContactPage = () => {
                                         value={formData.message}
                                         onChange={handleChange}
                                         placeholder="Tell us how we can help..."
-                                        className="w-full resize-none border border-white/10 bg-[#151515] px-4 py-3 font-['Barlow'] text-[12px] leading-5 text-white outline-none placeholder:text-white/25 transition-all duration-300 focus:border-[#e85d3a]/70"
+                                        className="w-full resize-none rounded-md border border-white/10 bg-[#151515] px-3.5 py-3 text-[11px] leading-5 text-white outline-none transition-all duration-300 placeholder:text-white/25 focus:border-[#e85d3a]/70 md:text-[12px]"
                                     />
                                 </div>
 
@@ -386,11 +345,7 @@ const ContactPage = () => {
                                     <button
                                         type="submit"
                                         disabled={loading}
-                                        className="group inline-flex h-[42px] items-center gap-3 bg-[#e85d3a] px-7 font-['Barlow'] text-[11px] font-bold uppercase tracking-[0.1em] text-white transition-all duration-300 hover:bg-[#f16a49] disabled:cursor-not-allowed disabled:opacity-60"
-                                        style={{
-                                            clipPath:
-                                                "polygon(6% 0, 100% 0, 94% 100%, 0 100%)",
-                                        }}
+                                        className="group inline-flex h-10 items-center gap-2 rounded-md bg-[#e85d3a] px-6 text-[9px] font-bold uppercase tracking-[0.1em] text-white transition-all duration-300 hover:bg-[#f16a49] disabled:cursor-not-allowed disabled:opacity-60 md:text-[10px]"
                                     >
                                         {loading
                                             ? "Sending..."
@@ -408,36 +363,35 @@ const ContactPage = () => {
 
                             </form>
 
-                            {/* REDUX ERROR */}
                             {error && (
-                                <p className="mt-3 font-['Barlow'] text-[12px] text-red-400">
+                                <p className="mt-3 text-[10px] text-red-400 md:text-[11px]">
                                     {error}
                                 </p>
                             )}
 
                         </div>
 
-                        {/* =================================================
+                        {/* =========================
                             CONTACT DETAILS
-                        ================================================== */}
+                        ========================== */}
                         <div className="lg:pt-1">
 
-                            <div className="border border-white/10 bg-[#111111]">
+                            <div className="rounded-md border border-white/10 bg-[#111111] overflow-hidden">
 
                                 <div className="border-b border-white/10 p-5 sm:p-6">
 
-                                    <div className="mb-3 flex h-10 w-10 items-center justify-center border border-[#e85d3a]/40 text-[#e85d3a]">
-                                        <BiDumbbell size={19} />
+                                    <div className="mb-3 flex h-9 w-9 items-center justify-center rounded-md border border-[#e85d3a]/40 text-[#e85d3a]">
+                                        <BiDumbbell size={17} />
                                     </div>
 
-                                    <h3 className="font-['Bebas_Neue'] text-[27px] leading-none tracking-wide">
+                                    <h3 className="text-[14px] font-bold leading-tight tracking-wide md:text-[16px]">
                                         VISIT OUR
                                         <span className="text-[#e85d3a]">
                                             {" "}FITNESS CENTER
                                         </span>
                                     </h3>
 
-                                    <p className="mt-2 font-['Barlow'] text-[12px] leading-5 text-white/40">
+                                    <p className="mt-2 text-[10px] leading-5 text-white/40 sm:text-[11px] md:text-[12px]">
                                         Come in, meet the team and take a look
                                         around our training space before you
                                         decide where to start.
@@ -449,16 +403,16 @@ const ContactPage = () => {
                                 <div className="flex gap-3 border-b border-white/10 p-5">
 
                                     <FiMapPin
-                                        size={18}
+                                        size={16}
                                         className="mt-0.5 shrink-0 text-[#e85d3a]"
                                     />
 
                                     <div>
-                                        <p className="font-['Barlow'] text-[10px] font-bold uppercase tracking-[0.1em] text-white/35">
+                                        <p className="text-[9px] font-bold uppercase tracking-[0.1em] text-white/35">
                                             Address
                                         </p>
 
-                                        <p className="mt-1 font-['Barlow'] text-[13px] leading-5 text-white/65">
+                                        <p className="mt-1 text-[11px] leading-5 text-white/65 md:text-[12px]">
                                             24 Fitness Avenue,
                                             <br />
                                             New Delhi, India - 110001
@@ -471,43 +425,41 @@ const ContactPage = () => {
                                 <div className="flex gap-3 border-b border-white/10 p-5">
 
                                     <LuClock3
-                                        size={18}
+                                        size={16}
                                         className="mt-0.5 shrink-0 text-[#e85d3a]"
                                     />
 
                                     <div className="w-full">
 
-                                        <p className="font-['Barlow'] text-[10px] font-bold uppercase tracking-[0.1em] text-white/35">
+                                        <p className="text-[9px] font-bold uppercase tracking-[0.1em] text-white/35">
                                             Opening Hours
                                         </p>
 
-                                        <div className="mt-2 space-y-1.5 font-['Barlow'] text-[12px] text-white/55">
+                                        <div className="mt-2 space-y-1.5 text-[10px] text-white/55 md:text-[11px]">
 
-                                            <div className="flex justify-between">
+                                            <div className="flex justify-between gap-3">
                                                 <span>Monday - Friday</span>
-                                                <span className="text-white/75">
+                                                <span className="text-right text-white/75">
                                                     6:00 AM - 10:00 PM
                                                 </span>
                                             </div>
 
-                                            <div className="flex justify-between">
+                                            <div className="flex justify-between gap-3">
                                                 <span>Saturday</span>
-                                                <span className="text-white/75">
+                                                <span className="text-right text-white/75">
                                                     7:00 AM - 9:00 PM
                                                 </span>
                                             </div>
 
-                                            <div className="flex justify-between">
+                                            <div className="flex justify-between gap-3">
                                                 <span>Sunday</span>
-                                                <span className="text-[#e85d3a]">
+                                                <span className="text-right text-[#e85d3a]">
                                                     8:00 AM - 2:00 PM
                                                 </span>
                                             </div>
 
                                         </div>
-
                                     </div>
-
                                 </div>
 
                                 {/* SOCIAL */}
@@ -516,25 +468,25 @@ const ContactPage = () => {
                                     <a
                                         href="#"
                                         aria-label="Instagram"
-                                        className="flex h-10 w-10 items-center justify-center border border-white/10 text-white/50 transition-all duration-300 hover:border-[#e85d3a] hover:bg-[#e85d3a] hover:text-white"
+                                        className="flex h-9 w-9 items-center justify-center rounded-md border border-white/10 text-white/50 transition-all duration-300 hover:border-[#e85d3a] hover:bg-[#e85d3a] hover:text-white"
                                     >
-                                        <FaInstagram size={15} />
+                                        <FaInstagram size={14} />
                                     </a>
 
                                     <a
                                         href="#"
                                         aria-label="Facebook"
-                                        className="flex h-10 w-10 items-center justify-center border border-white/10 text-white/50 transition-all duration-300 hover:border-[#e85d3a] hover:bg-[#e85d3a] hover:text-white"
+                                        className="flex h-9 w-9 items-center justify-center rounded-md border border-white/10 text-white/50 transition-all duration-300 hover:border-[#e85d3a] hover:bg-[#e85d3a] hover:text-white"
                                     >
-                                        <FaFacebookF size={14} />
+                                        <FaFacebookF size={13} />
                                     </a>
 
                                     <a
                                         href="#"
                                         aria-label="LinkedIn"
-                                        className="flex h-10 w-10 items-center justify-center border border-white/10 text-white/50 transition-all duration-300 hover:border-[#e85d3a] hover:bg-[#e85d3a] hover:text-white"
+                                        className="flex h-9 w-9 items-center justify-center rounded-md border border-white/10 text-white/50 transition-all duration-300 hover:border-[#e85d3a] hover:bg-[#e85d3a] hover:text-white"
                                     >
-                                        <FaLinkedinIn size={14} />
+                                        <FaLinkedinIn size={13} />
                                     </a>
 
                                 </div>
@@ -543,17 +495,15 @@ const ContactPage = () => {
                         </div>
 
                     </div>
-
                 </div>
-
             </section>
 
-            {/* =====================================================
+            {/* =========================
                 WHY CONTACT US
-            ====================================================== */}
+            ========================== */}
             <section className="border-y border-white/10 bg-[#111111]">
 
-                <div className="mx-auto w-full max-w-[110rem] px-6 py-5 sm:px-10 sm:py-7 lg:px-16 xl:px-[7%]">
+                <div className="mx-auto w-full max-w-[110rem] px-5 py-6 sm:px-8 sm:py-7 lg:px-12 xl:px-[7%]">
 
                     <div className="grid gap-3 sm:grid-cols-3">
 
@@ -576,18 +526,18 @@ const ContactPage = () => {
                         ].map((item) => (
                             <div
                                 key={item.number}
-                                className="border border-white/10 bg-[#151515] p-5 transition-all duration-300 hover:-translate-y-1 hover:border-[#e85d3a]/50"
+                                className="rounded-md border border-white/10 bg-[#151515] p-4 transition-all duration-300 hover:-translate-y-1 hover:border-[#e85d3a]/50"
                             >
 
-                                <span className="font-['Bebas_Neue'] text-[20px] text-[#e85d3a]">
+                                <span className="text-[14px] font-bold text-[#e85d3a] md:text-[16px]">
                                     {item.number}
                                 </span>
 
-                                <h3 className="mt-2 font-['Bebas_Neue'] text-[21px] leading-none tracking-wide">
+                                <h3 className="mt-2 text-[13px] font-bold leading-tight tracking-wide md:text-[15px]">
                                     {item.title}
                                 </h3>
 
-                                <p className="mt-2 font-['Barlow'] text-[12px] leading-5 text-white/40">
+                                <p className="mt-2 text-[10px] leading-5 text-white/40 md:text-[11px]">
                                     {item.text}
                                 </p>
 
@@ -595,49 +545,42 @@ const ContactPage = () => {
                         ))}
 
                     </div>
-
                 </div>
-
             </section>
 
-            {/* =====================================================
+            {/* =========================
                 MAP
-            ====================================================== */}
+            ========================== */}
             <section>
-
-                <div className="mx-auto w-full max-w-[110rem] px-6 py-5 sm:px-10 sm:py-7 lg:px-16 lg:py-9 xl:px-[7%]">
+                <div className="mx-auto w-full max-w-[110rem] px-5 py-6 sm:px-8 sm:py-7 lg:px-12 lg:py-9 xl:px-[7%]">
 
                     <div className="mb-4 flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
 
                         <div>
-
                             <div className="mb-2 flex items-center gap-2">
+                                <span className="h-[2px] w-6 bg-[#e85d3a]" />
 
-                                <span className="h-[2px] w-7 bg-[#e85d3a]" />
-
-                                <span className="font-['Barlow'] text-[10px] font-semibold uppercase tracking-[0.15em] text-[#e85d3a] sm:text-[12px]">
+                                <span className="text-[9px] font-semibold uppercase tracking-[0.15em] text-[#e85d3a] sm:text-[10px]">
                                     Find Us
                                 </span>
-
                             </div>
 
-                            <h2 className="font-['Bebas_Neue'] text-[28px] leading-none tracking-wide sm:text-[38px]">
+                            <h2 className="text-[14px] font-bold leading-tight tracking-wide sm:text-[15px] md:text-[16px]">
                                 OUR
                                 <span className="text-[#e85d3a]">
                                     {" "}LOCATION
                                 </span>
                             </h2>
-
                         </div>
 
-                        <p className="max-w-[420px] font-['Barlow'] text-[12px] leading-5 text-white/40">
+                        <p className="max-w-[420px] text-[10px] leading-5 text-white/40 sm:text-[11px] md:text-[12px]">
                             We're easy to find. Visit us at our fitness center
                             in New Delhi and let's get your training started.
                         </p>
 
                     </div>
 
-                    <div className="relative h-[280px] overflow-hidden border border-white/10 bg-[#151515] sm:h-[350px] lg:h-[420px]">
+                    <div className="relative h-[260px] overflow-hidden rounded-md border border-white/10 bg-[#151515] sm:h-[330px] lg:h-[400px]">
 
                         <iframe
                             title="Fitness Center Location"
@@ -647,62 +590,56 @@ const ContactPage = () => {
                             referrerPolicy="no-referrer-when-downgrade"
                         />
 
-                        <div className="absolute bottom-4 left-4 border border-white/10 bg-[#0d0d0d]/90 px-4 py-3 backdrop-blur-md">
+                        <div className="absolute bottom-3 left-3 rounded-md border border-white/10 bg-[#0d0d0d]/90 px-3 py-2.5 backdrop-blur-md">
 
                             <div className="flex items-center gap-2">
 
                                 <LuMapPin
-                                    size={15}
+                                    size={14}
                                     className="text-[#e85d3a]"
                                 />
 
                                 <div>
-
-                                    <p className="font-['Barlow'] text-[10px] font-bold uppercase tracking-[0.1em] text-white">
+                                    <p className="text-[9px] font-bold uppercase tracking-[0.1em] text-white">
                                         Fitness Center
                                     </p>
 
-                                    <p className="mt-0.5 font-['Barlow'] text-[10px] text-white/45">
+                                    <p className="mt-0.5 text-[9px] text-white/45">
                                         New Delhi, India
                                     </p>
-
                                 </div>
 
                             </div>
-
                         </div>
-
                     </div>
-
                 </div>
-
             </section>
 
-            {/* =====================================================
+            {/* =========================
                 FINAL CTA
-            ====================================================== */}
+            ========================== */}
             <section className="border-t border-white/10">
 
-                <div className="mx-auto w-full max-w-[110rem] px-6 py-5 sm:px-10 sm:py-7 lg:px-16 lg:py-9 xl:px-[7%]">
+                <div className="mx-auto w-full max-w-[110rem] px-5 py-6 sm:px-8 sm:py-7 lg:px-12 lg:py-9 xl:px-[7%]">
 
-                    <div className="relative overflow-hidden border border-white/10 bg-[#151515] px-6 py-8 sm:px-10 md:flex md:items-center md:justify-between md:gap-8 md:py-10 lg:px-14">
+                    <div className="relative overflow-hidden rounded-md border border-white/10 bg-[#151515] px-5 py-7 sm:px-8 md:flex md:items-center md:justify-between md:gap-8 md:py-8 lg:px-12">
 
                         <div className="absolute -right-16 -top-20 h-56 w-56 rounded-full bg-[#e85d3a]/10 blur-3xl" />
 
                         <div className="relative z-10">
 
-                            <p className="font-['Barlow'] text-[10px] font-bold uppercase tracking-[0.14em] text-[#e85d3a] sm:text-[11px]">
+                            <p className="text-[9px] font-bold uppercase tracking-[0.14em] text-[#e85d3a] sm:text-[10px]">
                                 Your Next Step
                             </p>
 
-                            <h2 className="mt-2 font-['Bebas_Neue'] text-[27px] leading-[0.85] tracking-wide sm:text-[36px]">
+                            <h2 className="mt-2 text-[14px] font-bold leading-tight tracking-wide sm:text-[15px] md:text-[16px]">
                                 READY TO
                                 <span className="text-[#e85d3a]">
                                     {" "}START?
                                 </span>
                             </h2>
 
-                            <p className="mt-2 max-w-[500px] font-['Barlow'] text-[12px] leading-5 text-white/40">
+                            <p className="mt-2 max-w-[500px] text-[10px] leading-5 text-white/40 sm:text-[11px] md:text-[12px]">
                                 Don't wait for the perfect time. Take the first
                                 step toward becoming stronger, healthier and fitter.
                             </p>
@@ -711,11 +648,7 @@ const ContactPage = () => {
 
                         <a
                             href="tel:+919876543210"
-                            className="group relative z-10 mt-5 inline-flex w-fit shrink-0 items-center gap-3 bg-[#e85d3a] px-7 py-3.5 font-['Barlow'] text-[11px] font-bold uppercase tracking-[0.08em] text-white transition-all duration-300 hover:bg-[#f16a49] md:mt-0"
-                            style={{
-                                clipPath:
-                                    "polygon(7% 0, 100% 0, 93% 100%, 0 100%)",
-                            }}
+                            className="group relative z-10 mt-5 inline-flex w-fit shrink-0 items-center gap-2 rounded-md bg-[#e85d3a] px-6 py-3 text-[9px] font-bold uppercase tracking-[0.08em] text-white transition-all duration-300 hover:bg-[#f16a49] md:mt-0 md:text-[10px]"
                         >
                             Call Now
 
@@ -726,9 +659,7 @@ const ContactPage = () => {
                         </a>
 
                     </div>
-
                 </div>
-
             </section>
 
         </main>
@@ -736,3 +667,4 @@ const ContactPage = () => {
 };
 
 export default ContactPage;
+

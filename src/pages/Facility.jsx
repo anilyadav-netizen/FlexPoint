@@ -62,7 +62,7 @@ const Facility = () => {
                     {facilities.map((facility) => (
                         <article
                             key={facility.title}
-                            className="group relative h-[160px] overflow-hidden border border-white/15 bg-[#151515] transition-all duration-300 hover:-translate-y-1 hover:border-[#e85d3a]/60 md:h-[180px] lg:h-[200px]"
+                            className="group relative h-[160px] overflow-hidden border border-white/15 rounded-md bg-[#151515] transition-all duration-300 hover:-translate-y-1 hover:border-[#e85d3a]/60 md:h-[180px] lg:h-[200px]"
                         >
 
                             {/* ================= IMAGE ================= */}

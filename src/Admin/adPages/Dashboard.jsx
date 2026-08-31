@@ -1,4 +1,6 @@
-import React from "react";
+import React, { useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+
 import {
     Users,
     UserRound,
@@ -10,6 +12,7 @@ import {
     IndianRupee,
     MoreHorizontal,
 } from "lucide-react";
+
 import {
     AreaChart,
     Area,
@@ -22,6 +25,16 @@ import {
     CartesianGrid,
 } from "recharts";
 
+import { useDispatch, useSelector } from "react-redux";
+
+import { getAllUsers } from "../../redux/Slicer/authSlice";
+import { getPrograms } from "../../redux/Slicer/programSlice";
+import { getTrainers } from "../../redux/Slicer/trainerSlice";
+
+// =====================================================
+// DUMMY REVENUE DATA
+// =====================================================
+
 const revenueData = [
     { month: "Jan", revenue: 42000 },
     { month: "Feb", revenue: 58000 },
@@ -30,61 +43,175 @@ const revenueData = [
     { month: "May", revenue: 65000 },
     { month: "Jun", revenue: 88000 },
     { month: "Jul", revenue: 96000 },
-    { month: "Aug", revenue: 92000 },
+    { month: "Aug", revenue: 92147 },
 ];
 
+// =====================================================
+// MEMBER GROWTH DATA
+// =====================================================
+
 const memberData = [
-    { month: "Jan", members: 420 },
-    { month: "Feb", members: 560 },
-    { month: "Mar", members: 510 },
-    { month: "Apr", members: 680 },
-    { month: "May", members: 620 },
-    { month: "Jun", members: 790 },
-    { month: "Jul", members: 850 },
-    { month: "Aug", members: 920 },
+    { month: "Jan", members: 1 },
+    { month: "Feb", members: 2 },
+    { month: "Mar", members: 2 },
+    { month: "Apr", members: 3 },
+    { month: "May", members: 3 },
+    { month: "Jun", members: 4 },
+    { month: "Jul", members: 4 },
+    { month: "Aug", members: 5 },
 ];
 
 const Dashboard = () => {
+    const navigate = useNavigate();
+    const dispatch = useDispatch();
+
+    // =====================================================
+    // REDUX DATA
+    // =====================================================
+
+    const { users = [] } = useSelector(
+        (state) => state.auth
+    );
+
+    const { programs = [] } = useSelector(
+        (state) => state.program
+    );
+
+    const { trainers = [] } = useSelector(
+        (state) => state.trainer
+    );
+
+    // =====================================================
+    // FETCH LIVE DATA
+    // =====================================================
+
+    useEffect(() => {
+        dispatch(getAllUsers());
+        dispatch(getPrograms());
+        dispatch(getTrainers());
+    }, [dispatch]);
+
+    // =====================================================
+    // MEMBERS
+    // =====================================================
+
+    const totalMembers = Array.isArray(users)
+        ? users.length
+        : 0;
+
+    const activeMembers = Array.isArray(users)
+        ? users.filter(
+              (user) =>
+                  user.isActive !== false &&
+                  user.status !== false &&
+                  user.status !== "Inactive"
+          ).length
+        : 0;
+
+    const premiumMembers = Array.isArray(users)
+        ? users.filter((user) => {
+              const plan =
+                  user.plan ||
+                  user.membershipPlan ||
+                  user.membership ||
+                  "";
+
+              return (
+                  typeof plan === "string" &&
+                  plan.toLowerCase().includes("premium")
+              );
+          }).length
+        : 0;
+
+    // =====================================================
+    // TRAINERS
+    // =====================================================
+
+    const totalTrainers = Array.isArray(trainers)
+        ? trainers.length
+        : 0;
+
+    const activeTrainers = Array.isArray(trainers)
+        ? trainers.filter(
+              (trainer) =>
+                  trainer.isActive !== false
+          ).length
+        : 0;
+
+    // =====================================================
+    // PROGRAMS
+    // =====================================================
+
+    const totalPrograms = Array.isArray(programs)
+        ? programs.length
+        : 0;
+
+    const activePrograms = Array.isArray(programs)
+        ? programs.filter(
+              (program) =>
+                  program.isActive !== false
+          ).length
+        : 0;
+
+    // =====================================================
+    // STATS CARDS
+    // =====================================================
+
     const stats = [
         {
             title: "Total Members",
-            value: "1,248",
-            change: "+12.5%",
+            value: totalMembers,
+            change: "Live",
             icon: Users,
             color: "#2679D1",
             bg: "#EEF6FF",
+            path: "/admin/members",
         },
+
         {
             title: "Active Trainers",
-            value: "18",
-            change: "+4.2%",
+            value: activeTrainers,
+            change: "Live",
             icon: UserRound,
             color: "#38C79A",
             bg: "#ECFBF5",
+            path: "/admin/adtrainers",
         },
+
         {
-            title: "Programs",
-            value: "24",
-            change: "+8.4%",
+            title: "Total Programs",
+            value: totalPrograms,
+            change: "Live",
             icon: Dumbbell,
             color: "#C03BB7",
             bg: "#FAEFF9",
+            path: "/admin/adprogram",
         },
+
         {
             title: "Premium Members",
-            value: "386",
-            change: "+15.8%",
+            value: premiumMembers,
+            change: "Live",
             icon: Crown,
             color: "#E7B84B",
             bg: "#FFF8E8",
+            path: "/admin/premium",
         },
     ];
+
+    // =====================================================
+    // RENDER
+    // =====================================================
 
     return (
         <div className="min-h-full bg-[#F5F7F9] dark:bg-[#12181B] p-5 sm:p-8 lg:p-10 transition-colors duration-300">
 
-            {/* Header */}
+            {/* =====================================================
+                HEADER
+            ===================================================== */}
+
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-5">
+
                 <div>
                     <h1 className="text-xl sm:text-2xl font-bold text-[#1F272B] dark:text-[#F4F6F7]">
                         Dashboard
@@ -95,63 +222,163 @@ const Dashboard = () => {
                     </p>
                 </div>
 
-                <button className="flex items-center gap-2 w-fit px-4 py-2.5 bg-white dark:bg-[#1C2529] border border-[#E2E6E8] dark:border-[#303A3F] rounded-lg text-sm text-[#606E6E] dark:text-[#AEB7BA] hover:bg-[#F8F9FB] dark:hover:bg-[#222D31] transition">
-                    <CalendarCheck size={16} className="text-[#3420FF]" />
+                <button
+                    className="flex items-center gap-2 w-fit px-4 py-2.5 bg-white dark:bg-[#1C2529] border border-[#E2E6E8] dark:border-[#303A3F] rounded-lg text-sm text-[#606E6E] dark:text-[#AEB7BA] hover:bg-[#F8F9FB] dark:hover:bg-[#222D31] transition"
+                >
+                    <CalendarCheck
+                        size={16}
+                        className="text-[#3420FF]"
+                    />
+
                     Today
                 </button>
             </div>
 
-            {/* Stats */}
+            {/* =====================================================
+                STATS
+            ===================================================== */}
+
             <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
-                {stats.map(({ title, value, change, icon: Icon, color, bg }) => (
-                    <div
-                        key={title}
-                        className="bg-white dark:bg-[#1C2529] rounded-xl border border-[#E2E6E8] dark:border-[#303A3F] p-4 sm:p-5 shadow-sm hover:bg-[#F8F9FB] dark:hover:bg-[#222D31] transition-all duration-300"
-                    >
-                        <div className="flex items-start justify-between">
-                            <div>
-                                <p className="text-xs sm:text-sm text-[#778387] dark:text-[#AEB7BA]">
-                                    {title}
-                                </p>
 
-                                <h2 className="text-2xl sm:text-3xl font-bold text-[#1F272B] dark:text-[#F4F6F7] mt-2">
-                                    {value}
-                                </h2>
+                {stats.map(
+                    ({
+                        title,
+                        value,
+                        change,
+                        icon: Icon,
+                        color,
+                        bg,
+                        path,
+                    }) => (
+
+                        <div
+                            key={title}
+                            onClick={() => navigate(path)}
+                            role="button"
+                            tabIndex={0}
+                            onKeyDown={(e) => {
+                                if (
+                                    e.key === "Enter" ||
+                                    e.key === " "
+                                ) {
+                                    navigate(path);
+                                }
+                            }}
+                            className="bg-white dark:bg-[#1C2529] rounded-xl border border-[#E2E6E8] dark:border-[#303A3F] p-4 sm:p-5 shadow-sm hover:bg-[#F8F9FB] dark:hover:bg-[#222D31] hover:-translate-y-0.5 hover:shadow-md cursor-pointer transition-all duration-300"
+                        >
+
+                            <div className="flex items-start justify-between">
+
+                                <div>
+                                    <p className="text-xs sm:text-sm text-[#778387] dark:text-[#AEB7BA]">
+                                        {title}
+                                    </p>
+
+                                    <h2 className="text-2xl sm:text-3xl font-bold text-[#1F272B] dark:text-[#F4F6F7] mt-2">
+                                        {value}
+                                    </h2>
+                                </div>
+
+                                <div
+                                    className="w-10 h-10 rounded-lg flex items-center justify-center"
+                                    style={{
+                                        backgroundColor: bg,
+                                        color: color,
+                                    }}
+                                >
+                                    <Icon size={19} />
+                                </div>
                             </div>
 
-                            <div
-                                className="w-10 h-10 rounded-lg flex items-center justify-center"
-                                style={{
-                                    backgroundColor: bg,
-                                    color: color,
-                                }}
-                            >
-                                <Icon size={19} />
+                            <div className="flex items-center gap-1 mt-4 text-xs sm:text-sm text-[#38C79A]">
+
+                                <TrendingUp size={14} />
+
+                                <span className="font-medium">
+                                    {change}
+                                </span>
+
+                                <span className="text-[#9AA3A6] dark:text-[#778387] ml-1">
+                                    from live data
+                                </span>
+
                             </div>
                         </div>
+                    )
+                )}
 
-                        <div className="flex items-center gap-1 mt-4 text-xs sm:text-sm text-[#38C79A]">
-                            <TrendingUp size={14} />
-
-                            <span className="font-medium">
-                                {change}
-                            </span>
-
-                            <span className="text-[#9AA3A6] dark:text-[#778387] ml-1">
-                                from last month
-                            </span>
-                        </div>
-                    </div>
-                ))}
             </div>
 
-            {/* Charts */}
+            {/* =====================================================
+                EXTRA LIVE SUMMARY
+            ===================================================== */}
+
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mt-4">
+
+                <div className="bg-white dark:bg-[#1C2529] border border-[#E2E6E8] dark:border-[#303A3F] rounded-xl p-4">
+
+                    <p className="text-xs text-[#778387] dark:text-[#AEB7BA]">
+                        Active Members
+                    </p>
+
+                    <p className="text-xl font-bold text-[#1F272B] dark:text-[#F4F6F7] mt-1">
+                        {activeMembers}
+                    </p>
+
+                </div>
+
+                <div className="bg-white dark:bg-[#1C2529] border border-[#E2E6E8] dark:border-[#303A3F] rounded-xl p-4">
+
+                    <p className="text-xs text-[#778387] dark:text-[#AEB7BA]">
+                        Total Trainers
+                    </p>
+
+                    <p className="text-xl font-bold text-[#1F272B] dark:text-[#F4F6F7] mt-1">
+                        {totalTrainers}
+                    </p>
+
+                </div>
+
+                <div className="bg-white dark:bg-[#1C2529] border border-[#E2E6E8] dark:border-[#303A3F] rounded-xl p-4">
+
+                    <p className="text-xs text-[#778387] dark:text-[#AEB7BA]">
+                        Active Programs
+                    </p>
+
+                    <p className="text-xl font-bold text-[#1F272B] dark:text-[#F4F6F7] mt-1">
+                        {activePrograms}
+                    </p>
+
+                </div>
+
+                <div className="bg-white dark:bg-[#1C2529] border border-[#E2E6E8] dark:border-[#303A3F] rounded-xl p-4">
+
+                    <p className="text-xs text-[#778387] dark:text-[#AEB7BA]">
+                        Total Programs
+                    </p>
+
+                    <p className="text-xl font-bold text-[#1F272B] dark:text-[#F4F6F7] mt-1">
+                        {totalPrograms}
+                    </p>
+
+                </div>
+
+            </div>
+
+            {/* =====================================================
+                CHARTS
+            ===================================================== */}
+
             <div className="grid grid-cols-1 xl:grid-cols-3 gap-4 mt-4">
 
-                {/* Revenue */}
+                {/* =====================================================
+                    REVENUE
+                ===================================================== */}
+
                 <div className="xl:col-span-2 bg-white dark:bg-[#1C2529] rounded-xl border border-[#E2E6E8] dark:border-[#303A3F] p-4 sm:p-5 shadow-sm transition-colors duration-300">
 
                     <div className="flex items-center justify-between mb-4">
+
                         <div>
                             <h3 className="font-semibold text-[#1F272B] dark:text-[#F4F6F7]">
                                 Revenue Overview
@@ -165,10 +392,15 @@ const Dashboard = () => {
                         <button className="p-1.5 rounded-lg text-[#778387] hover:bg-[#F8F9FB] dark:hover:bg-[#222D31] transition">
                             <MoreHorizontal size={18} />
                         </button>
+
                     </div>
 
                     <div className="h-[250px]">
-                        <ResponsiveContainer width="100%" height="100%">
+
+                        <ResponsiveContainer
+                            width="100%"
+                            height="100%"
+                        >
                             <AreaChart data={revenueData}>
 
                                 <defs>
@@ -228,7 +460,9 @@ const Dashboard = () => {
                                         color: "#F4F6F7",
                                     }}
                                     formatter={(value) => [
-                                        `₹${value.toLocaleString()}`,
+                                        `₹${Number(
+                                            value
+                                        ).toLocaleString()}`,
                                         "Revenue",
                                     ]}
                                 />
@@ -240,15 +474,21 @@ const Dashboard = () => {
                                     strokeWidth={3}
                                     fill="url(#revenueGradient)"
                                 />
+
                             </AreaChart>
                         </ResponsiveContainer>
+
                     </div>
                 </div>
 
-                {/* Member Growth */}
+                {/* =====================================================
+                    MEMBER GROWTH
+                ===================================================== */}
+
                 <div className="bg-white dark:bg-[#1C2529] rounded-xl border border-[#E2E6E8] dark:border-[#303A3F] p-4 sm:p-5 shadow-sm transition-colors duration-300">
 
                     <div className="flex items-center justify-between mb-4">
+
                         <div>
                             <h3 className="font-semibold text-[#1F272B] dark:text-[#F4F6F7]">
                                 Member Growth
@@ -262,10 +502,15 @@ const Dashboard = () => {
                         <button className="p-1.5 rounded-lg text-[#778387] hover:bg-[#F8F9FB] dark:hover:bg-[#222D31] transition">
                             <MoreHorizontal size={18} />
                         </button>
+
                     </div>
 
                     <div className="h-[250px]">
-                        <ResponsiveContainer width="100%" height="100%">
+
+                        <ResponsiveContainer
+                            width="100%"
+                            height="100%"
+                        >
                             <BarChart data={memberData}>
 
                                 <CartesianGrid
@@ -293,7 +538,9 @@ const Dashboard = () => {
                                 />
 
                                 <Tooltip
-                                    cursor={{ fill: "#222D31" }}
+                                    cursor={{
+                                        fill: "#222D31",
+                                    }}
                                     contentStyle={{
                                         border: "1px solid #303A3F",
                                         borderRadius: "10px",
@@ -305,22 +552,37 @@ const Dashboard = () => {
                                 <Bar
                                     dataKey="members"
                                     fill="#2679D1"
-                                    radius={[5, 5, 0, 0]}
+                                    radius={[
+                                        5,
+                                        5,
+                                        0,
+                                        0,
+                                    ]}
                                     barSize={22}
                                 />
+
                             </BarChart>
                         </ResponsiveContainer>
+
                     </div>
                 </div>
+
             </div>
 
-            {/* Bottom */}
+            {/* =====================================================
+                BOTTOM SECTION
+            ===================================================== */}
+
             <div className="grid grid-cols-1 xl:grid-cols-3 gap-4 mt-4">
 
-                {/* Revenue Summary */}
+                {/* =====================================================
+                    REVENUE SUMMARY
+                ===================================================== */}
+
                 <div className="bg-white dark:bg-[#1C2529] rounded-xl border border-[#E2E6E8] dark:border-[#303A3F] p-4 sm:p-5 shadow-sm">
 
                     <div className="flex items-center justify-between mb-5">
+
                         <div>
                             <h3 className="font-semibold text-[#1F272B] dark:text-[#F4F6F7]">
                                 Revenue Summary
@@ -334,11 +596,15 @@ const Dashboard = () => {
                         <div className="w-10 h-10 rounded-lg bg-[#ECFBF5] flex items-center justify-center text-[#38C79A]">
                             <IndianRupee size={18} />
                         </div>
+
                     </div>
 
                     <div className="space-y-4">
+
                         <div>
+
                             <div className="flex items-center justify-between mb-2">
+
                                 <span className="text-xs text-[#778387] dark:text-[#AEB7BA]">
                                     Monthly Target
                                 </span>
@@ -346,18 +612,26 @@ const Dashboard = () => {
                                 <span className="text-xs font-semibold text-[#1F272B] dark:text-[#F4F6F7]">
                                     78%
                                 </span>
+
                             </div>
 
                             <div className="h-2 bg-[#E7EAED] dark:bg-[#222D31] rounded-full overflow-hidden">
+
                                 <div
                                     className="h-full bg-[#38C79A] rounded-full"
-                                    style={{ width: "78%" }}
+                                    style={{
+                                        width: "78%",
+                                    }}
                                 />
+
                             </div>
+
                         </div>
 
                         <div className="flex items-end justify-between">
+
                             <div>
+
                                 <p className="text-xs text-[#9AA3A6] dark:text-[#778387]">
                                     This Month
                                 </p>
@@ -365,88 +639,121 @@ const Dashboard = () => {
                                 <p className="text-2xl font-bold text-[#1F272B] dark:text-[#F4F6F7] mt-1">
                                     ₹96,147
                                 </p>
+
                             </div>
 
                             <span className="text-xs font-medium text-[#38C79A]">
                                 +15.8%
                             </span>
+
                         </div>
+
                     </div>
+
                 </div>
 
-                {/* Queries */}
+                {/* =====================================================
+                    LIVE DATA SUMMARY
+                ===================================================== */}
+
                 <div className="xl:col-span-2 bg-white dark:bg-[#1C2529] rounded-xl border border-[#E2E6E8] dark:border-[#303A3F] p-4 sm:p-5 shadow-sm">
 
-                    <div className="flex items-center justify-between mb-5">
-                        <div className="flex items-center gap-3">
+                    <div className="flex items-center gap-3 mb-5">
 
-                            <div className="w-10 h-10 rounded-lg bg-[#EEF6FF] flex items-center justify-center text-[#2679D1]">
-                                <MessageSquare size={18} />
-                            </div>
-
-                            <div>
-                                <h3 className="font-semibold text-[#1F272B] dark:text-[#F4F6F7]">
-                                    Recent Queries
-                                </h3>
-
-                                <p className="text-xs text-[#778387] dark:text-[#AEB7BA]">
-                                    Latest contact requests
-                                </p>
-                            </div>
+                        <div className="w-10 h-10 rounded-lg bg-[#EEF6FF] flex items-center justify-center text-[#2679D1]">
+                            <MessageSquare size={18} />
                         </div>
 
-                        <button className="text-xs font-medium text-[#3420FF] hover:underline">
-                            View All
-                        </button>
+                        <div>
+
+                            <h3 className="font-semibold text-[#1F272B] dark:text-[#F4F6F7]">
+                                Fitness Center Overview
+                            </h3>
+
+                            <p className="text-xs text-[#778387] dark:text-[#AEB7BA]">
+                                Current live statistics
+                            </p>
+
+                        </div>
+
                     </div>
 
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-6">
-                        {[
-                            ["Rahul Sharma", "Membership enquiry"],
-                            ["Priya Singh", "Personal training"],
-                            ["Aman Verma", "Premium plan"],
-                            ["Neha Gupta", "Program enquiry"],
-                        ].map(([name, query], index) => (
-                            <div
-                                key={name}
-                                className="flex items-center justify-between py-3 border-b border-[#E7EAED] dark:border-[#303A3F]"
-                            >
-                                <div className="flex items-center gap-3 min-w-0">
+                    <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
 
-                                    <div className="w-9 h-9 shrink-0 rounded-full bg-[#F1F2FD] dark:bg-[#222D31] flex items-center justify-center text-xs font-semibold text-[#606E6E] dark:text-[#AEB7BA]">
-                                        {name
-                                            .split(" ")
-                                            .map((n) => n[0])
-                                            .join("")}
-                                    </div>
+                        <div className="rounded-lg bg-[#F8F9FB] dark:bg-[#222D31] p-4">
 
-                                    <div className="min-w-0">
-                                        <p className="text-sm font-medium text-[#1F272B] dark:text-[#F4F6F7] truncate">
-                                            {name}
-                                        </p>
+                            <Users
+                                size={20}
+                                className="text-[#2679D1]"
+                            />
 
-                                        <p className="text-xs text-[#778387] dark:text-[#AEB7BA] mt-0.5 truncate">
-                                            {query}
-                                        </p>
-                                    </div>
-                                </div>
+                            <p className="text-xs text-[#778387] dark:text-[#AEB7BA] mt-3">
+                                Members
+                            </p>
 
-                                <span
-                                    className={`w-2 h-2 shrink-0 rounded-full ${
-                                        index === 0
-                                            ? "bg-[#C03BB7]"
-                                            : index === 1
-                                            ? "bg-[#2679D1]"
-                                            : index === 2
-                                            ? "bg-[#38C79A]"
-                                            : "bg-[#E7B84B]"
-                                    }`}
-                                />
-                            </div>
-                        ))}
+                            <p className="text-xl font-bold text-[#1F272B] dark:text-[#F4F6F7]">
+                                {totalMembers}
+                            </p>
+
+                        </div>
+
+                        <div className="rounded-lg bg-[#F8F9FB] dark:bg-[#222D31] p-4">
+
+                            <UserRound
+                                size={20}
+                                className="text-[#38C79A]"
+                            />
+
+                            <p className="text-xs text-[#778387] dark:text-[#AEB7BA] mt-3">
+                                Trainers
+                            </p>
+
+                            <p className="text-xl font-bold text-[#1F272B] dark:text-[#F4F6F7]">
+                                {totalTrainers}
+                            </p>
+
+                        </div>
+
+                        <div className="rounded-lg bg-[#F8F9FB] dark:bg-[#222D31] p-4">
+
+                            <Dumbbell
+                                size={20}
+                                className="text-[#C03BB7]"
+                            />
+
+                            <p className="text-xs text-[#778387] dark:text-[#AEB7BA] mt-3">
+                                Programs
+                            </p>
+
+                            <p className="text-xl font-bold text-[#1F272B] dark:text-[#F4F6F7]">
+                                {totalPrograms}
+                            </p>
+
+                        </div>
+
+                        <div className="rounded-lg bg-[#F8F9FB] dark:bg-[#222D31] p-4">
+
+                            <Crown
+                                size={20}
+                                className="text-[#E7B84B]"
+                            />
+
+                            <p className="text-xs text-[#778387] dark:text-[#AEB7BA] mt-3">
+                                Premium
+                            </p>
+
+                            <p className="text-xl font-bold text-[#1F272B] dark:text-[#F4F6F7]">
+                                {premiumMembers}
+                            </p>
+
+                        </div>
+
                     </div>
+
                 </div>
+
             </div>
+
         </div>
     );
 };

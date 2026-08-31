@@ -126,7 +126,7 @@ const Trainer = () => {
                                 return (
                                     <article
                                         key={trainer._id}
-                                        className="group relative h-[205px] overflow-hidden border border-white/15 bg-[#111111] transition-all duration-300 hover:-translate-y-1 hover:border-[#e85d3a]/60 hover:shadow-[0_12px_30px_rgba(0,0,0,0.4)] sm:h-[225px] md:h-[240px] lg:h-[205px] xl:h-[220px]"
+                                        className="group relative h-[205px] overflow-hidden rounded-md border border-white/15 bg-[#111111] transition-all duration-300 hover:-translate-y-1 hover:border-[#e85d3a]/60 hover:shadow-[0_12px_30px_rgba(0,0,0,0.4)] sm:h-[225px] md:h-[240px] lg:h-[205px] xl:h-[220px]"
                                     >
 
                                         {/* ================= IMAGE ================= */}
@@ -159,15 +159,15 @@ const Trainer = () => {
 
                                         <div className="absolute bottom-0 left-0 right-0 z-10 p-3 text-center sm:p-3.5">
 
-                                            <h3 className="font-['Bebas_Neue'] text-[17px] leading-none tracking-wide text-white sm:text-[19px] lg:text-[18px] xl:text-[20px]">
+                                            <h3 className=" text-[17px] leading-none tracking-wide text-white md:text-[19px] lg:text-[18px] xl:text-[20px]">
                                                 {trainer.name}
                                             </h3>
 
-                                            <p className="mt-1 font-['Barlow'] text-[8px] font-medium text-white/65 sm:text-[9px]">
+                                            <p className="mt-1 text-[12px] font-medium text-white/65 md:text-[14px]">
                                                 {trainer.role}
                                             </p>
 
-                                            <p className="mt-1 font-['Barlow'] text-[7px] font-medium uppercase tracking-wide text-white/45 sm:text-[8px]">
+                                            <p className="mt-1 text-[10px] font-medium uppercase tracking-wide text-white/45 md:text-[12px]">
                                                 {trainer.specialty}
                                             </p>
 
@@ -202,8 +202,8 @@ const Trainer = () => {
                                     }
                                     aria-label={`Go to trainer page ${index + 1}`}
                                     className={`h-[4px] transition-all duration-300 ${activePage === index
-                                            ? "w-7 bg-[#e85d3a]"
-                                            : "w-4 bg-white/25 hover:bg-white/50"
+                                        ? "w-7 bg-[#e85d3a]"
+                                        : "w-4 bg-white/25 hover:bg-white/50"
                                         }`}
                                 />
                             ))}

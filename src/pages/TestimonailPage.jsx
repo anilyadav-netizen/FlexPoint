@@ -1,35 +1,24 @@
+
 import React, { useEffect, useRef, useState } from "react";
-import {
-    Star,
-    Quote,
-    ArrowLeft,
-    ArrowRight,
-} from "lucide-react";
+import { Star, Quote, ArrowLeft, ArrowRight } from "lucide-react";
 import { useDispatch, useSelector } from "react-redux";
 import { getActiveTestimonials } from "../redux/Slicer/testimonialSlice";
 
 const TestimonailPage = () => {
     const dispatch = useDispatch();
     const sliderRef = useRef(null);
-
     const [activeIndex, setActiveIndex] = useState(0);
 
-    const {
-        testimonials = [],
-        loading,
-        error,
-    } = useSelector((state) => state.testimonial);
+    const { testimonials = [], loading, error } = useSelector(
+        (state) => state.testimonial
+    );
 
-    // ==========================================
     // GET ACTIVE TESTIMONIALS
-    // ==========================================
     useEffect(() => {
         dispatch(getActiveTestimonials());
     }, [dispatch]);
 
-    // ==========================================
     // RESET ACTIVE INDEX
-    // ==========================================
     useEffect(() => {
         if (testimonials.length === 0) {
             setActiveIndex(0);
@@ -41,20 +30,10 @@ const TestimonailPage = () => {
         }
     }, [testimonials.length, activeIndex]);
 
-    // ==========================================
-    // DEBUG API DATA
-    // ==========================================
-    useEffect(() => {
-        console.log("ACTIVE TESTIMONIALS:", testimonials);
-    }, [testimonials]);
-
-    // ==========================================
     // GET IMAGE URL
-    // ==========================================
     const getImageUrl = (testimonial) => {
         if (!testimonial) return "";
 
-        // Main API field
         if (
             typeof testimonial.image === "string" &&
             testimonial.image.trim() !== ""
@@ -62,7 +41,6 @@ const TestimonailPage = () => {
             return testimonial.image.trim();
         }
 
-        // Backup fields in case API uses another name
         if (
             typeof testimonial.imageUrl === "string" &&
             testimonial.imageUrl.trim() !== ""
@@ -80,52 +58,36 @@ const TestimonailPage = () => {
         return "";
     };
 
-    // ==========================================
     // GET INITIALS
-    // ==========================================
     const getInitials = (testimonial) => {
         if (testimonial?.initials) {
-            return testimonial.initials
-                .substring(0, 2)
-                .toUpperCase();
+            return testimonial.initials.substring(0, 2).toUpperCase();
         }
 
         if (testimonial?.name) {
-            return testimonial.name
-                .substring(0, 2)
-                .toUpperCase();
+            return testimonial.name.substring(0, 2).toUpperCase();
         }
 
         return "GY";
     };
 
-    // ==========================================
     // SCROLL SLIDER
-    // ==========================================
     const scrollSlider = (direction) => {
         if (!sliderRef.current) return;
 
-        const scrollAmount =
-            window.innerWidth < 640 ? 300 : 420;
+        const scrollAmount = window.innerWidth < 640 ? 300 : 420;
 
         sliderRef.current.scrollBy({
-            left:
-                direction === "next"
-                    ? scrollAmount
-                    : -scrollAmount,
+            left: direction === "next" ? scrollAmount : -scrollAmount,
             behavior: "smooth",
         });
     };
 
-    // ==========================================
     // HANDLE SCROLL
-    // ==========================================
     const handleScroll = () => {
         if (!sliderRef.current) return;
 
-        const firstCard =
-            sliderRef.current.firstElementChild;
-
+        const firstCard = sliderRef.current.firstElementChild;
         if (!firstCard) return;
 
         const cardWidth = firstCard.offsetWidth;
@@ -134,8 +96,7 @@ const TestimonailPage = () => {
         if (!cardWidth) return;
 
         const index = Math.round(
-            sliderRef.current.scrollLeft /
-                (cardWidth + gap)
+            sliderRef.current.scrollLeft / (cardWidth + gap)
         );
 
         setActiveIndex(
@@ -146,15 +107,11 @@ const TestimonailPage = () => {
         );
     };
 
-    // ==========================================
     // SCROLL TO CARD
-    // ==========================================
     const scrollToCard = (index) => {
         if (!sliderRef.current) return;
 
-        const card =
-            sliderRef.current.children[index];
-
+        const card = sliderRef.current.children[index];
         if (!card) return;
 
         sliderRef.current.scrollTo({
@@ -165,9 +122,7 @@ const TestimonailPage = () => {
         setActiveIndex(index);
     };
 
-    // ==========================================
     // IMAGE ERROR HANDLER
-    // ==========================================
     const handleImageError = (event) => {
         event.currentTarget.style.display = "none";
 
@@ -182,18 +137,16 @@ const TestimonailPage = () => {
         }
     };
 
-    // ==========================================
     // LOADING
-    // ==========================================
     if (loading) {
         return (
             <section
                 id="testimonials"
-                className="w-full overflow-hidden bg-[#0d0d0d] py-16 text-white"
+                className="w-full overflow-hidden bg-[#0d0d0d] py-10 text-white sm:py-12 lg:py-16"
             >
                 <div className="mx-auto w-full max-w-[110rem] px-6 sm:px-10 lg:px-16 xl:px-[7%]">
                     <div className="flex min-h-[250px] items-center justify-center">
-                        <p className="font-['Barlow'] text-sm text-white/50">
+                        <p className="text-[13px] text-white/50 sm:text-[14px]">
                             Loading testimonials...
                         </p>
                     </div>
@@ -202,18 +155,16 @@ const TestimonailPage = () => {
         );
     }
 
-    // ==========================================
     // ERROR
-    // ==========================================
     if (error) {
         return (
             <section
                 id="testimonials"
-                className="w-full overflow-hidden bg-[#0d0d0d] py-16 text-white"
+                className="w-full overflow-hidden bg-[#0d0d0d] py-10 text-white sm:py-12 lg:py-16"
             >
                 <div className="mx-auto w-full max-w-[110rem] px-6 sm:px-10 lg:px-16 xl:px-[7%]">
                     <div className="flex min-h-[250px] items-center justify-center">
-                        <p className="font-['Barlow'] text-sm text-red-400">
+                        <p className="text-[13px] text-red-400 sm:text-[14px]">
                             {error}
                         </p>
                     </div>
@@ -222,26 +173,24 @@ const TestimonailPage = () => {
         );
     }
 
-    // ==========================================
     // NO TESTIMONIALS
-    // ==========================================
     if (testimonials.length === 0) {
         return (
             <section
                 id="testimonials"
-                className="w-full overflow-hidden bg-[#0d0d0d] py-16 text-white"
+                className="w-full overflow-hidden bg-[#0d0d0d] py-10 text-white sm:py-12 lg:py-16"
             >
                 <div className="mx-auto w-full max-w-[110rem] px-6 sm:px-10 lg:px-16 xl:px-[7%]">
                     <div className="mb-7">
                         <div className="mb-2 flex items-center gap-2">
                             <span className="h-[1px] w-7 bg-[#e85d3a]" />
 
-                            <span className="font-['Barlow'] text-[12px] font-bold uppercase tracking-[0.22em] text-[#e85d3a]">
+                            <span className="text-[11px] font-bold uppercase tracking-[0.15em] text-[#e85d3a] sm:text-[12px]">
                                 CLIENT STORIES
                             </span>
                         </div>
 
-                        <h2 className="font-['Bebas_Neue'] text-[34px] leading-none tracking-[0.02em] sm:text-[42px] md:text-[48px] lg:text-[52px]">
+                        <h2 className="text-[14px] font-bold leading-tight tracking-wide text-white sm:text-[15px] md:text-[16px]">
                             WHAT OUR{" "}
                             <span className="text-[#e85d3a]">
                                 MEMBERS SAY
@@ -249,7 +198,7 @@ const TestimonailPage = () => {
                         </h2>
                     </div>
 
-                    <p className="font-['Barlow'] text-sm text-white/40">
+                    <p className="text-[13px] text-white/40 sm:text-[14px]">
                         No testimonials available yet.
                     </p>
                 </div>
@@ -264,251 +213,194 @@ const TestimonailPage = () => {
         >
             <div className="mx-auto w-full max-w-[110rem] px-6 sm:px-10 lg:px-16 xl:px-[7%]">
 
-                {/* ==========================================
-                    HEADER
-                ========================================== */}
-                <div className="mb-7 flex flex-col gap-6 sm:mb-9 lg:flex-row lg:items-end lg:justify-between">
-
+                {/* HEADER */}
+                <div className="mb-7 flex flex-col gap-5 sm:mb-9 lg:flex-row lg:items-end lg:justify-between">
                     <div>
                         <div className="mb-2 flex items-center gap-2">
                             <span className="h-[1px] w-7 bg-[#e85d3a]" />
 
-                            <span className="font-['Barlow'] text-[12px] font-bold uppercase tracking-[0.22em] text-[#e85d3a]">
+                            <span className="text-[11px] font-bold uppercase tracking-[0.15em] text-[#e85d3a] sm:text-[12px]">
                                 CLIENT STORIES
                             </span>
                         </div>
 
-                        <h2 className="font-['Bebas_Neue'] text-[34px] leading-none tracking-[0.02em] text-white sm:text-[42px] md:text-[48px] lg:text-[52px]">
+                        <h2 className="text-[14px] font-bold leading-tight tracking-wide text-white sm:text-[15px] md:text-[16px] lg:text-[24px]">
                             WHAT OUR{" "}
                             <span className="text-[#e85d3a]">
                                 MEMBERS SAY
                             </span>
                         </h2>
 
-                        <p className="mt-3 max-w-[400px] font-['Barlow'] text-[10px] leading-[1.7] text-white/45 sm:text-[15px]">
-                            Real stories from real members who are
-                            working every day to become stronger,
-                            healthier and better.
+                        <p className="mt-3 max-w-[500px] text-[12px] leading-6 text-white/45 sm:text-[13px] md:text-[14px]">
+                            Real stories from real members who are working
+                            every day to become stronger, healthier and better.
                         </p>
                     </div>
 
                     {/* ARROWS */}
                     <div className="flex items-center gap-2">
                         <button
-                            onClick={() =>
-                                scrollSlider("prev")
-                            }
-                            className="group flex h-9 w-9 items-center justify-center border border-white/10 bg-[#151515] text-white/60 transition-all duration-300 hover:border-[#e85d3a] hover:bg-[#e85d3a] hover:text-white"
+                            onClick={() => scrollSlider("prev")}
+                            className="group flex h-9 w-9 items-center justify-center rounded-md border border-white/10 bg-[#151515] text-white/60 transition-all duration-300 hover:border-[#e85d3a] hover:bg-[#e85d3a] hover:text-white"
                             aria-label="Previous testimonials"
                         >
-                            <ArrowLeft
-                                size={15}
-                                strokeWidth={1.5}
-                            />
+                            <ArrowLeft size={15} strokeWidth={1.5} />
                         </button>
 
                         <button
-                            onClick={() =>
-                                scrollSlider("next")
-                            }
-                            className="group flex h-9 w-9 items-center justify-center border border-white/10 bg-[#151515] text-white/60 transition-all duration-300 hover:border-[#e85d3a] hover:bg-[#e85d3a] hover:text-white"
+                            onClick={() => scrollSlider("next")}
+                            className="group flex h-9 w-9 items-center justify-center rounded-md border border-white/10 bg-[#151515] text-white/60 transition-all duration-300 hover:border-[#e85d3a] hover:bg-[#e85d3a] hover:text-white"
                             aria-label="Next testimonials"
                         >
-                            <ArrowRight
-                                size={15}
-                                strokeWidth={1.5}
-                            />
+                            <ArrowRight size={15} strokeWidth={1.5} />
                         </button>
                     </div>
                 </div>
 
-                {/* ==========================================
-                    TESTIMONIAL SLIDER
-                ========================================== */}
+                {/* TESTIMONIAL SLIDER */}
                 <div
                     ref={sliderRef}
                     onScroll={handleScroll}
                     className="flex snap-x snap-mandatory gap-4 overflow-x-auto scroll-smooth pb-2 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
                 >
-                    {testimonials.map(
-                        (testimonial, index) => {
-                            const imageUrl =
-                                getImageUrl(testimonial);
+                    {testimonials.map((testimonial, index) => {
+                        const imageUrl = getImageUrl(testimonial);
 
-                            return (
-                                <article
-                                    key={testimonial._id}
-                                    className="group relative min-w-[88%] snap-start overflow-hidden rounded-lg border border-white/10 bg-[#151515] p-4 transition-all duration-500 hover:border-[#e85d3a]/50 sm:min-w-[47%] sm:p-5 lg:min-w-[31.5%] xl:min-w-[31.8%]"
-                                >
-                                    {/* TOP LINE */}
-                                    <span className="absolute left-0 top-0 h-[2px] w-full origin-left scale-x-60 bg-[#e85d3a] transition-transform duration-500 group-hover:scale-x-100" />
+                        return (
+                            <article
+                                key={testimonial._id}
+                                className="group relative min-w-[88%] snap-start overflow-hidden rounded-lg border border-white/10 bg-[#151515] p-4 transition-all duration-500 hover:border-[#e85d3a]/50 sm:min-w-[47%] sm:p-5 lg:min-w-[31.5%] xl:min-w-[31.8%]"
+                            >
+                                {/* TOP LINE */}
+                                <span className="absolute left-0 top-0 h-[2px] w-full origin-left scale-x-60 bg-[#e85d3a] transition-transform duration-500 group-hover:scale-x-100" />
 
-                                    {/* NUMBER */}
-                                    <span className="absolute right-4 top-3 font-['Bebas_Neue'] text-[36px] leading-none text-white/[0.035] transition-colors duration-300 group-hover:text-[#e85d3a]/10">
-                                        {String(index + 1).padStart(
-                                            2,
-                                            "0"
-                                        )}
-                                    </span>
+                                {/* NUMBER */}
+                                <span className="absolute right-4 top-3 text-[28px] font-bold leading-none text-white/[0.035] transition-colors duration-300 group-hover:text-[#e85d3a]/10 sm:text-[32px]">
+                                    {String(index + 1).padStart(2, "0")}
+                                </span>
 
-                                    {/* TOP */}
-                                    <div className="flex items-start justify-between">
+                                {/* TOP */}
+                                <div className="flex items-start justify-between">
+                                    {/* QUOTE */}
+                                    <div className="flex h-9 w-9 items-center justify-center rounded-md bg-[#e85d3a]/10 text-[#e85d3a] transition-all duration-300 group-hover:bg-[#e85d3a] group-hover:text-white">
+                                        <Quote size={17} strokeWidth={1.4} />
+                                    </div>
 
-                                        {/* QUOTE */}
-                                        <div className="flex h-9 w-9 items-center justify-center bg-[#e85d3a]/10 text-[#e85d3a] transition-all duration-300 group-hover:bg-[#e85d3a] group-hover:text-white">
-                                            <Quote
-                                                size={17}
-                                                strokeWidth={1.4}
-                                            />
-                                        </div>
-
-                                        {/* RATING */}
-                                        <div className="flex gap-1 pt-1">
-                                            {Array.from({
-                                                length: Math.min(
-                                                    Math.max(
-                                                        Number(
-                                                            testimonial.rating
-                                                        ) || 0,
-                                                        0
-                                                    ),
-                                                    5
+                                    {/* RATING */}
+                                    <div className="flex gap-1 pt-1">
+                                        {Array.from({
+                                            length: Math.min(
+                                                Math.max(
+                                                    Number(
+                                                        testimonial.rating
+                                                    ) || 0,
+                                                    0
                                                 ),
-                                            }).map(
-                                                (
-                                                    _,
-                                                    starIndex
-                                                ) => (
-                                                    <Star
-                                                        key={
-                                                            starIndex
-                                                        }
-                                                        size={11}
-                                                        fill="currentColor"
-                                                        strokeWidth={
-                                                            1.5
-                                                        }
-                                                        className="text-[#e85d3a]"
-                                                    />
-                                                )
-                                            )}
-                                        </div>
+                                                5
+                                            ),
+                                        }).map((_, starIndex) => (
+                                            <Star
+                                                key={starIndex}
+                                                size={11}
+                                                fill="currentColor"
+                                                strokeWidth={1.5}
+                                                className="text-[#e85d3a]"
+                                            />
+                                        ))}
                                     </div>
+                                </div>
 
-                                    {/* REVIEW */}
-                                    <p className="mt-2.5 font-['Barlow'] text-[16px] leading-[1.65] text-white/60 sm:mt-5">
-                                        "{testimonial.review}"
-                                    </p>
+                                {/* REVIEW */}
+                                <p className="mt-4 text-[13px] leading-6 text-white/60 sm:mt-5 sm:text-[14px] md:text-[15px]">
+                                    "{testimonial.review}"
+                                </p>
 
-                                    {/* DIVIDER */}
-                                    <div className="my-4 h-[1px] w-full bg-white/10 sm:my-5" />
+                                {/* DIVIDER */}
+                                <div className="my-4 h-[1px] w-full bg-white/10 sm:my-5" />
 
-                                    {/* MEMBER */}
-                                    <div className="flex items-center justify-between">
+                                {/* MEMBER */}
+                                <div className="flex items-center justify-between">
+                                    <div className="flex items-center gap-3">
 
-                                        <div className="flex items-center gap-3">
-
-                                            {/* AVATAR */}
-                                            <div className="relative h-9 w-9 shrink-0 overflow-hidden rounded-full">
-
-                                                {imageUrl ? (
-                                                    <img
-                                                        src={imageUrl}
-                                                        alt={
-                                                            testimonial.name ||
-                                                            "Member"
-                                                        }
-                                                        className="block h-full w-full rounded-full object-cover"
-                                                        onError={
-                                                            handleImageError
-                                                        }
-                                                    />
-                                                ) : null}
-
-                                                {/* INITIALS FALLBACK */}
-                                                <div
-                                                    className={`testimonial-image-fallback absolute inset-0 items-center justify-center rounded-full bg-[#e85d3a] font-['Barlow'] text-[12px] font-bold text-white ${
-                                                        imageUrl
-                                                            ? "hidden"
-                                                            : "flex"
-                                                    }`}
-                                                >
-                                                    {getInitials(
-                                                        testimonial
-                                                    )}
-                                                </div>
-                                            </div>
-
-                                            {/* NAME + ROLE */}
-                                            <div>
-                                                <h3 className="font-['Barlow'] text-[14px] font-bold tracking-[0.05em] text-white">
-                                                    {
-                                                        testimonial.name
+                                        {/* AVATAR */}
+                                        <div className="relative h-9 w-9 shrink-0 overflow-hidden rounded-full">
+                                            {imageUrl ? (
+                                                <img
+                                                    src={imageUrl}
+                                                    alt={
+                                                        testimonial.name ||
+                                                        "Member"
                                                     }
-                                                </h3>
-
-                                                <p className="mt-1 font-['Barlow'] text-[10px] uppercase tracking-[0.12em] text-white/35">
-                                                    {
-                                                        testimonial.role
+                                                    className="block h-full w-full rounded-full object-cover"
+                                                    onError={
+                                                        handleImageError
                                                     }
-                                                </p>
+                                                />
+                                            ) : null}
+
+                                            {/* INITIALS FALLBACK */}
+                                            <div
+                                                className={`testimonial-image-fallback absolute inset-0 items-center justify-center rounded-full bg-[#e85d3a] text-[11px] font-bold text-white ${
+                                                    imageUrl
+                                                        ? "hidden"
+                                                        : "flex"
+                                                }`}
+                                            >
+                                                {getInitials(testimonial)}
                                             </div>
                                         </div>
 
-                                        {/* VERIFIED */}
-                                        <span className="font-['Barlow'] text-[7px] font-bold uppercase tracking-[0.12em] text-[#e85d3a] opacity-0 transition-opacity duration-300 group-hover:opacity-100">
-                                            VERIFIED
-                                        </span>
+                                        {/* NAME + ROLE */}
+                                        <div>
+                                            <h3 className="text-[13px] font-bold tracking-wide text-white sm:text-[14px]">
+                                                {testimonial.name}
+                                            </h3>
+
+                                            <p className="mt-1 text-[10px] uppercase tracking-[0.1em] text-white/35">
+                                                {testimonial.role}
+                                            </p>
+                                        </div>
                                     </div>
-                                </article>
-                            );
-                        }
-                    )}
+
+                                    {/* VERIFIED */}
+                                    <span className="text-[8px] font-bold uppercase tracking-[0.1em] text-[#e85d3a] opacity-0 transition-opacity duration-300 group-hover:opacity-100">
+                                        VERIFIED
+                                    </span>
+                                </div>
+                            </article>
+                        );
+                    })}
                 </div>
 
-                {/* ==========================================
-                    BOTTOM NAVIGATION
-                ========================================== */}
-                <div className="mt-2.5 flex flex-col gap-4 border-t border-white/10 pt-5 sm:flex-row sm:items-center sm:justify-between">
+                {/* BOTTOM NAVIGATION */}
+                <div className="mt-3 flex flex-col gap-4 border-t border-white/10 pt-5 sm:flex-row sm:items-center sm:justify-between">
 
                     {/* DOTS */}
                     <div className="flex items-center gap-1.5">
-                        {testimonials.map(
-                            (_, index) => (
-                                <button
-                                    key={index}
-                                    onClick={() =>
-                                        scrollToCard(
-                                            index
-                                        )
-                                    }
-                                    className={`h-[2px] transition-all duration-300 ${
-                                        activeIndex ===
-                                        index
-                                            ? "w-7 bg-[#e85d3a]"
-                                            : "w-3 bg-white/15 hover:bg-white/40"
-                                    }`}
-                                    aria-label={`Go to testimonial ${
-                                        index + 1
-                                    }`}
-                                />
-                            )
-                        )}
+                        {testimonials.map((_, index) => (
+                            <button
+                                key={index}
+                                onClick={() => scrollToCard(index)}
+                                className={`h-[2px] rounded-full transition-all duration-300 ${
+                                    activeIndex === index
+                                        ? "w-7 bg-[#e85d3a]"
+                                        : "w-3 bg-white/15 hover:bg-white/40"
+                                }`}
+                                aria-label={`Go to testimonial ${
+                                    index + 1
+                                }`}
+                            />
+                        ))}
                     </div>
 
                     {/* COUNTER */}
                     <div className="flex items-center gap-2">
-                        <span className="font-['Bebas_Neue'] text-[20px] leading-none text-[#e85d3a]">
-                            {String(
-                                activeIndex + 1
-                            ).padStart(2, "0")}
+                        <span className="text-[17px] font-bold leading-none text-[#e85d3a] sm:text-[19px]">
+                            {String(activeIndex + 1).padStart(2, "0")}
                         </span>
 
-                        <span className="font-['Barlow'] text-[8px] uppercase tracking-[0.12em] text-white/25">
-                            /{" "}
-                            {String(
-                                testimonials.length
-                            ).padStart(2, "0")}
+                        <span className="text-[10px] uppercase tracking-[0.1em] text-white/25">
+                            / {String(testimonials.length).padStart(2, "0")}
                         </span>
                     </div>
                 </div>
@@ -518,3 +410,4 @@ const TestimonailPage = () => {
 };
 
 export default TestimonailPage;
+

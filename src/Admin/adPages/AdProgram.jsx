@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import {
     Plus,
     Search,
@@ -11,6 +11,7 @@ import {
 } from "lucide-react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
+
 import {
     getPrograms,
     deleteProgram,
@@ -21,42 +22,63 @@ const AdProgram = () => {
     const navigate = useNavigate();
     const dispatch = useDispatch();
 
+    // =====================================================
+    // REDUX STATE
     // IMPORTANT:
-    // Tumhare slice me initialState programs hai,
-    // lekin extraReducers me state.program use ho raha hai.
-    const { program, loading, error } = useSelector(
-        (state) => state.program
-    );
+    // programSlice me field "programs" hai, "program" nahi
+    // =====================================================
+    const {
+        programs,
+        loading,
+        error,
+    } = useSelector((state) => state.program);
 
     const [search, setSearch] = useState("");
 
-    // ============================
-    // GET PROGRAMS
-    // ============================
+    // =====================================================
+    // GET ALL PROGRAMS
+    // =====================================================
     useEffect(() => {
         dispatch(getPrograms());
     }, [dispatch]);
 
-    // ============================
+    // =====================================================
     // SAFETY
-    // ============================
-    const programs = Array.isArray(program) ? program : [];
+    // =====================================================
+    const programList = Array.isArray(programs) ? programs : [];
 
-    // ============================
+    // =====================================================
     // SEARCH
-    // ============================
-    const filteredPrograms = programs.filter((item) =>
-        `${item.title || ""} ${item.subtitle || ""} ${
-            item.description || ""
-        } ${item.icon || ""}`
-            .toLowerCase()
-            .includes(search.toLowerCase())
-    );
+    // =====================================================
+    const filteredPrograms = useMemo(() => {
+        const searchValue = search.trim().toLowerCase();
 
-    // ============================
-    // DELETE
-    // ============================
+        if (!searchValue) {
+            return programList;
+        }
+
+        return programList.filter((item) => {
+            const searchableText = `
+                ${item?.title || ""}
+                ${item?.subtitle || ""}
+                ${item?.description || ""}
+                ${item?.icon || ""}
+                ${item?.isActive ? "active" : "inactive"}
+            `.toLowerCase();
+
+            return searchableText.includes(searchValue);
+        });
+    }, [programList, search]);
+
+    // =====================================================
+    // DELETE PROGRAM
+    // =====================================================
     const handleDelete = async (id) => {
+        if (!id) {
+            console.error("Program ID is missing");
+            return;
+        }
+
         const confirmDelete = window.confirm(
             "Are you sure you want to delete this program?"
         );
@@ -66,46 +88,90 @@ const AdProgram = () => {
         try {
             await dispatch(deleteProgram(id)).unwrap();
 
-            // Backend se fresh data
-            dispatch(getPrograms());
+            // Redux already removes the deleted item.
+            // Fresh API data is not required here.
         } catch (error) {
             console.error("Delete program error:", error);
         }
     };
 
-    // ============================
+    // =====================================================
     // REFRESH
-    // ============================
+    // =====================================================
     const handleRefresh = () => {
         dispatch(getPrograms());
     };
 
-    // ============================
+    // =====================================================
     // COUNTS
-    // ============================
-    const totalPrograms = programs.length;
+    // =====================================================
+    const totalPrograms = programList.length;
 
-    const activePrograms = programs.filter(
-        (item) => item.isActive === true
+    const activePrograms = programList.filter(
+        (item) =>
+            item?.isActive === true ||
+            item?.isActive === "true"
     ).length;
 
-    // Backend me members property nahi hai
+    // Program model me members field nahi hai
     const totalMembers = 0;
 
-    // ============================
+    // =====================================================
     // EDIT
-    // ============================
+    // =====================================================
     const handleEdit = (id) => {
+        if (!id) return;
+
         navigate(`/admin/addprogram?edit=${id}`);
+    };
+
+    // =====================================================
+    // IMAGE ERROR
+    // =====================================================
+    const handleImageError = (e) => {
+        e.currentTarget.style.display = "none";
+
+        const parent = e.currentTarget.parentElement;
+
+        if (parent) {
+            const fallback = parent.querySelector(
+                ".program-image-fallback"
+            );
+
+            if (fallback) {
+                fallback.classList.remove("hidden");
+            }
+        }
+    };
+
+    // =====================================================
+    // DATE FORMAT
+    // =====================================================
+    const formatDate = (date) => {
+        if (!date) return "—";
+
+        const parsedDate = new Date(date);
+
+        if (Number.isNaN(parsedDate.getTime())) {
+            return "—";
+        }
+
+        return parsedDate.toLocaleDateString("en-IN", {
+            day: "2-digit",
+            month: "short",
+            year: "numeric",
+        });
     };
 
     return (
         <div className="min-h-full bg-[#F5F7F9] dark:bg-[#12181B] p-5 sm:p-8 lg:p-10 transition-colors duration-300">
-            <div>
-                {/* ============================
+            <div className="max-w-[1600px] mx-auto">
+
+                {/* =====================================================
                     HEADER
-                ============================ */}
+                ===================================================== */}
                 <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-5">
+
                     <div>
                         <h1 className="text-xl sm:text-2xl font-bold text-[#1F272B] dark:text-[#F4F6F7]">
                             Programs
@@ -117,23 +183,28 @@ const AdProgram = () => {
                     </div>
 
                     <div className="flex items-center gap-2">
+
                         {/* Refresh */}
                         <button
+                            type="button"
                             onClick={handleRefresh}
                             disabled={loading}
-                            className="w-10 h-10 flex items-center justify-center rounded-lg bg-white dark:bg-[#1C2529] border border-[#E2E6E8] dark:border-[#303A3F] text-[#606E6E] dark:text-[#AEB7BA] hover:bg-[#F1F3F4] dark:hover:bg-white/5 transition disabled:opacity-50"
+                            className="w-10 h-10 flex items-center justify-center rounded-lg bg-white dark:bg-[#1C2529] border border-[#E2E6E8] dark:border-[#303A3F] text-[#606E6E] dark:text-[#AEB7BA] hover:bg-[#F1F3F4] dark:hover:bg-white/5 transition disabled:opacity-50 disabled:cursor-not-allowed"
                             title="Refresh"
                         >
                             <RefreshCw
                                 size={17}
                                 className={
-                                    loading ? "animate-spin" : ""
+                                    loading
+                                        ? "animate-spin"
+                                        : ""
                                 }
                             />
                         </button>
 
                         {/* Add Program */}
                         <button
+                            type="button"
                             onClick={() =>
                                 navigate("/admin/addprogram")
                             }
@@ -145,14 +216,15 @@ const AdProgram = () => {
                     </div>
                 </div>
 
-                {/* ============================
+                {/* =====================================================
                     ERROR
-                ============================ */}
+                ===================================================== */}
                 {error && (
                     <div className="flex items-center justify-between gap-3 mb-4 px-4 py-3 rounded-lg bg-red-50 dark:bg-red-500/10 border border-red-200 dark:border-red-500/20 text-red-600 dark:text-red-400 text-sm">
                         <span>{error}</span>
 
                         <button
+                            type="button"
                             onClick={() =>
                                 dispatch(clearProgramError())
                             }
@@ -163,13 +235,15 @@ const AdProgram = () => {
                     </div>
                 )}
 
-                {/* ============================
+                {/* =====================================================
                     STATS
-                ============================ */}
+                ===================================================== */}
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-4">
+
                     {/* Total Programs */}
                     <div className="bg-white dark:bg-[#1C2529] rounded-xl border border-[#E2E6E8] dark:border-[#303A3F] p-4 sm:p-5 shadow-sm">
                         <div className="flex items-start justify-between">
+
                             <div>
                                 <p className="text-xs sm:text-sm text-[#778387] dark:text-[#AEB7BA]">
                                     Total Programs
@@ -189,6 +263,7 @@ const AdProgram = () => {
                     {/* Active Programs */}
                     <div className="bg-white dark:bg-[#1C2529] rounded-xl border border-[#E2E6E8] dark:border-[#303A3F] p-4 sm:p-5 shadow-sm">
                         <div className="flex items-start justify-between">
+
                             <div>
                                 <p className="text-xs sm:text-sm text-[#778387] dark:text-[#AEB7BA]">
                                     Active Programs
@@ -208,6 +283,7 @@ const AdProgram = () => {
                     {/* Total Members */}
                     <div className="bg-white dark:bg-[#1C2529] rounded-xl border border-[#E2E6E8] dark:border-[#303A3F] p-4 sm:p-5 shadow-sm">
                         <div className="flex items-start justify-between">
+
                             <div>
                                 <p className="text-xs sm:text-sm text-[#778387] dark:text-[#AEB7BA]">
                                     Total Members
@@ -225,13 +301,18 @@ const AdProgram = () => {
                     </div>
                 </div>
 
-                {/* ============================
-                    TABLE
-                ============================ */}
+                {/* =====================================================
+                    TABLE CONTAINER
+                ===================================================== */}
                 <div className="bg-white dark:bg-[#1C2529] rounded-xl border border-[#E2E6E8] dark:border-[#303A3F] shadow-sm overflow-hidden">
-                    {/* Search */}
+
+                    {/* =================================================
+                        SEARCH
+                    ================================================= */}
                     <div className="p-4 sm:p-5 border-b border-[#E7EAED] dark:border-[#303A3F]">
+
                         <div className="relative max-w-sm">
+
                             <Search
                                 size={17}
                                 className="absolute left-3 top-1/2 -translate-y-1/2 text-[#778387]"
@@ -249,11 +330,12 @@ const AdProgram = () => {
                         </div>
                     </div>
 
-                    {/* ============================
+                    {/* =================================================
                         LOADING
-                    ============================ */}
-                    {loading && programs.length === 0 ? (
+                    ================================================= */}
+                    {loading && programList.length === 0 ? (
                         <div className="py-16 flex flex-col items-center justify-center">
+
                             <RefreshCw
                                 size={28}
                                 className="animate-spin text-[#3420FF] mb-3"
@@ -264,10 +346,12 @@ const AdProgram = () => {
                             </p>
                         </div>
                     ) : filteredPrograms.length === 0 ? (
-                        /* ============================
-                            EMPTY
-                        ============================ */
+
+                        /* =================================================
+                            EMPTY STATE
+                        ================================================= */
                         <div className="py-16 text-center">
+
                             <div className="w-12 h-12 mx-auto rounded-xl bg-[#F3F0FF] dark:bg-[#3420FF]/10 flex items-center justify-center text-[#3420FF] mb-3">
                                 <Dumbbell size={22} />
                             </div>
@@ -286,6 +370,7 @@ const AdProgram = () => {
 
                             {!search && (
                                 <button
+                                    type="button"
                                     onClick={() =>
                                         navigate(
                                             "/admin/addprogram"
@@ -299,13 +384,18 @@ const AdProgram = () => {
                             )}
                         </div>
                     ) : (
-                        /* ============================
+
+                        /* =================================================
                             PROGRAM TABLE
-                        ============================ */
+                        ================================================= */
                         <div className="overflow-x-auto">
-                            <table className="w-full min-w-[1000px]">
+
+                            <table className="w-full min-w-[1050px]">
+
                                 <thead className="bg-[#F8F9FB] dark:bg-[#1C2529]">
+
                                     <tr className="text-left">
+
                                         <th className="px-5 py-3.5 text-xs font-semibold text-[#778387] dark:text-[#AEB7BA]">
                                             Program
                                         </th>
@@ -329,151 +419,230 @@ const AdProgram = () => {
                                         <th className="px-5 py-3.5 text-xs font-semibold text-[#778387] dark:text-[#AEB7BA]">
                                             Actions
                                         </th>
+
                                     </tr>
                                 </thead>
 
                                 <tbody>
-                                    {filteredPrograms.map((item) => (
-                                        <tr
-                                            key={item._id}
-                                            className="border-t border-[#E7EAED] dark:border-[#303A3F] hover:bg-[#F8F9FB] dark:hover:bg-[#222D31] transition"
-                                        >
-                                            {/* ============================
-                                                PROGRAM
-                                            ============================ */}
-                                            <td className="px-5 py-4">
-                                                <div className="flex items-center gap-3">
-                                                    {/* Small Image */}
-                                                    {item.image ? (
-                                                        <img
-                                                            src={item.image}
-                                                            alt={
-                                                                item.title ||
-                                                                "Program"
-                                                            }
-                                                            className="w-10 h-10 rounded-md object-cover flex-shrink-0 border border-[#E2E6E8] dark:border-[#303A3F]"
-                                                            onError={(
-                                                                e
-                                                            ) => {
-                                                                e.currentTarget.style.display =
-                                                                    "none";
-                                                            }}
-                                                        />
-                                                    ) : (
-                                                        <div className="w-10 h-10 rounded-md bg-[#F3F0FF] dark:bg-[#3420FF]/10 flex items-center justify-center text-[#3420FF] flex-shrink-0">
-                                                            <Dumbbell
-                                                                size={17}
-                                                            />
+
+                                    {filteredPrograms.map(
+                                        (item) => (
+                                            <tr
+                                                key={item?._id}
+                                                className="border-t border-[#E7EAED] dark:border-[#303A3F] hover:bg-[#F8F9FB] dark:hover:bg-[#222D31] transition"
+                                            >
+
+                                                {/* =================================================
+                                                    PROGRAM
+                                                ================================================= */}
+                                                <td className="px-5 py-4">
+
+                                                    <div className="flex items-center gap-3">
+
+                                                        {/* Image */}
+                                                        <div className="relative w-10 h-10 flex-shrink-0">
+
+                                                            {item?.image ? (
+                                                                <img
+                                                                    src={
+                                                                        item.image
+                                                                    }
+                                                                    alt={
+                                                                        item.title ||
+                                                                        "Program"
+                                                                    }
+                                                                    className="w-10 h-10 rounded-md object-cover border border-[#E2E6E8] dark:border-[#303A3F]"
+                                                                    onError={
+                                                                        handleImageError
+                                                                    }
+                                                                />
+                                                            ) : null}
+
+                                                            {/* Fallback */}
+                                                            <div
+                                                                className={`program-image-fallback ${
+                                                                    item?.image
+                                                                        ? "hidden"
+                                                                        : ""
+                                                                } w-10 h-10 rounded-md bg-[#F3F0FF] dark:bg-[#3420FF]/10 flex items-center justify-center text-[#3420FF]`}
+                                                            >
+                                                                <Dumbbell
+                                                                    size={
+                                                                        17
+                                                                    }
+                                                                />
+                                                            </div>
                                                         </div>
-                                                    )}
 
-                                                    {/* Name */}
-                                                    <div className="min-w-0">
-                                                        <p className="text-sm font-bold text-[#1F272B] dark:text-[#F4F6F7] truncate">
-                                                            {item.title ||
-                                                                "Untitled Program"}
-                                                        </p>
+                                                        {/* Name */}
+                                                        <div className="min-w-0">
 
-                                                        <p className="text-xs font-medium text-[#3420FF] mt-0.5 truncate">
-                                                            {item.subtitle ||
-                                                                "No subtitle"}
-                                                        </p>
+                                                            <p className="text-sm font-bold text-[#1F272B] dark:text-[#F4F6F7] truncate max-w-[220px]">
+                                                                {item?.title ||
+                                                                    "Untitled Program"}
+                                                            </p>
+
+                                                            <p className="text-xs font-medium text-[#3420FF] mt-0.5 truncate max-w-[220px]">
+                                                                {item?.subtitle ||
+                                                                    "No subtitle"}
+                                                            </p>
+
+                                                        </div>
+
                                                     </div>
-                                                </div>
-                                            </td>
+                                                </td>
 
-                                            {/* Description */}
-                                            <td className="px-5 py-4">
-                                                <p className="text-sm text-[#606E6E] dark:text-[#AEB7BA] max-w-[300px] truncate">
-                                                    {item.description ||
-                                                        "No description"}
-                                                </p>
-                                            </td>
+                                                {/* =================================================
+                                                    DESCRIPTION
+                                                ================================================= */}
+                                                <td className="px-5 py-4">
 
-                                            {/* Icon */}
-                                            <td className="px-5 py-4">
-                                                <span className="text-xs text-[#606E6E] dark:text-[#AEB7BA]">
-                                                    {item.icon || "—"}
-                                                </span>
-                                            </td>
+                                                    <p className="text-sm text-[#606E6E] dark:text-[#AEB7BA] max-w-[300px] truncate">
+                                                        {item?.description ||
+                                                            "No description"}
+                                                    </p>
 
-                                            {/* Status */}
-                                            <td className="px-5 py-4">
-                                                <span
-                                                    className={`inline-flex px-3 py-1 rounded-full text-xs font-medium ${
-                                                        item.isActive
-                                                            ? "bg-[#ECFBF5] text-[#38C79A]"
-                                                            : "bg-[#FFF0F0] text-[#E05252]"
-                                                    }`}
-                                                >
-                                                    {item.isActive
-                                                        ? "Active"
-                                                        : "Inactive"}
-                                                </span>
-                                            </td>
+                                                </td>
 
-                                            {/* Created */}
-                                            <td className="px-5 py-4">
-                                                <span className="text-xs text-[#606E6E] dark:text-[#AEB7BA]">
-                                                    {item.createdAt
-                                                        ? new Date(
-                                                              item.createdAt
-                                                          ).toLocaleDateString(
-                                                              "en-IN",
-                                                              {
-                                                                  day: "2-digit",
-                                                                  month: "short",
-                                                                  year: "numeric",
-                                                              }
-                                                          )
-                                                        : "—"}
-                                                </span>
-                                            </td>
+                                                {/* =================================================
+                                                    ICON
+                                                ================================================= */}
+                                                <td className="px-5 py-4">
 
-                                            {/* ============================
-                                                ACTIONS
-                                            ============================ */}
-                                            <td className="px-5 py-4">
-                                                <div className="flex items-center gap-2">
-                                                    {/* EDIT */}
-                                                    <button
-                                                        onClick={() =>
-                                                            handleEdit(
-                                                                item._id
-                                                            )
-                                                        }
-                                                        className="p-2 rounded-lg bg-[#FFF8E8] text-[#E7B84B] hover:bg-[#FFF1C7] transition"
-                                                        title="Edit Program"
+                                                    <span className="inline-flex px-2.5 py-1 rounded-md bg-[#F5F7F9] dark:bg-[#12181B] border border-[#E2E6E8] dark:border-[#303A3F] text-xs font-medium text-[#606E6E] dark:text-[#AEB7BA]">
+                                                        {item?.icon ||
+                                                            "—"}
+                                                    </span>
+
+                                                </td>
+
+                                                {/* =================================================
+                                                    STATUS
+                                                ================================================= */}
+                                                <td className="px-5 py-4">
+
+                                                    <span
+                                                        className={`inline-flex px-3 py-1 rounded-full text-xs font-medium ${
+                                                            item?.isActive ===
+                                                                true ||
+                                                            item?.isActive ===
+                                                                "true"
+                                                                ? "bg-[#ECFBF5] text-[#38C79A]"
+                                                                : "bg-[#FFF0F0] text-[#E05252]"
+                                                        }`}
                                                     >
-                                                        <Edit
-                                                            size={15}
-                                                        />
-                                                    </button>
+                                                        {item?.isActive ===
+                                                            true ||
+                                                        item?.isActive ===
+                                                            "true"
+                                                            ? "Active"
+                                                            : "Inactive"}
+                                                    </span>
 
-                                                    {/* DELETE */}
-                                                    <button
-                                                        onClick={() =>
-                                                            handleDelete(
-                                                                item._id
-                                                            )
-                                                        }
-                                                        disabled={loading}
-                                                        className="p-2 rounded-lg bg-[#FFF0F0] text-[#E05252] hover:bg-[#FFE0E0] transition disabled:opacity-50"
-                                                        title="Delete Program"
-                                                    >
-                                                        <Trash2
-                                                            size={15}
-                                                        />
-                                                    </button>
-                                                </div>
-                                            </td>
-                                        </tr>
-                                    ))}
+                                                </td>
+
+                                                {/* =================================================
+                                                    CREATED
+                                                ================================================= */}
+                                                <td className="px-5 py-4">
+
+                                                    <span className="text-xs text-[#606E6E] dark:text-[#AEB7BA]">
+                                                        {formatDate(
+                                                            item?.createdAt
+                                                        )}
+                                                    </span>
+
+                                                </td>
+
+                                                {/* =================================================
+                                                    ACTIONS
+                                                ================================================= */}
+                                                <td className="px-5 py-4">
+
+                                                    <div className="flex items-center gap-2">
+
+                                                        {/* EDIT */}
+                                                        <button
+                                                            type="button"
+                                                            onClick={() =>
+                                                                handleEdit(
+                                                                    item?._id
+                                                                )
+                                                            }
+                                                            className="p-2 rounded-lg bg-[#FFF8E8] text-[#E7B84B] hover:bg-[#FFF1C7] transition"
+                                                            title="Edit Program"
+                                                        >
+                                                            <Edit
+                                                                size={
+                                                                    15
+                                                                }
+                                                            />
+                                                        </button>
+
+                                                        {/* DELETE */}
+                                                        <button
+                                                            type="button"
+                                                            onClick={() =>
+                                                                handleDelete(
+                                                                    item?._id
+                                                                )
+                                                            }
+                                                            disabled={
+                                                                loading
+                                                            }
+                                                            className="p-2 rounded-lg bg-[#FFF0F0] text-[#E05252] hover:bg-[#FFE0E0] transition disabled:opacity-50 disabled:cursor-not-allowed"
+                                                            title="Delete Program"
+                                                        >
+                                                            <Trash2
+                                                                size={
+                                                                    15
+                                                                }
+                                                            />
+                                                        </button>
+
+                                                    </div>
+                                                </td>
+
+                                            </tr>
+                                        )
+                                    )}
+
                                 </tbody>
                             </table>
                         </div>
                     )}
                 </div>
+
+                {/* =====================================================
+                    RESULT INFO
+                ===================================================== */}
+                {programList.length > 0 && (
+                    <div className="flex items-center justify-between mt-3 px-1">
+
+                        <p className="text-xs text-[#778387] dark:text-[#AEB7BA]">
+                            Showing{" "}
+                            <span className="font-semibold">
+                                {filteredPrograms.length}
+                            </span>{" "}
+                            of{" "}
+                            <span className="font-semibold">
+                                {programList.length}
+                            </span>{" "}
+                            programs
+                        </p>
+
+                        {search && (
+                            <button
+                                type="button"
+                                onClick={() => setSearch("")}
+                                className="text-xs text-[#3420FF] font-medium hover:underline"
+                            >
+                                Clear search
+                            </button>
+                        )}
+                    </div>
+                )}
+
             </div>
         </div>
     );

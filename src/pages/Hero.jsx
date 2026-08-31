@@ -51,9 +51,6 @@ const Hero = () => {
             id="home"
             className="relative flex w-full min-h-[30vh] overflow-hidden bg-[#F4F0EC] text-[#16251F] md:min-h-[620px] lg:min-h-screen lg:max-h-[550px]"
         >
-            {/* =====================================================
-                DESKTOP / TABLET HERO
-            ====================================================== */}
 
             <div
                 className="absolute inset-0 hidden bg-cover bg-center bg-no-repeat md:block"
@@ -178,17 +175,13 @@ const Hero = () => {
                                 className="
                                     mt-3
                                     max-w-[390px]
-                                    font-['Barlow']
-                                    text-[13px]
+                                   
+                                    text-[14px]
                                     leading-[1.5]
                                     text-white/75
-
-                                    sm:text-[14px]
-
                                     md:mt-4
                                     md:max-w-[400px]
-                                    md:text-[14px]
-
+                                    md:text-[15px]
                                     lg:mt-6
                                     lg:max-w-[430px]
                                     lg:text-[16px]
@@ -310,6 +303,7 @@ const Hero = () => {
                             lg:p-5
 
                             xl:right-14
+                            rounded-md
                         "
                     >
 
@@ -443,6 +437,7 @@ const Hero = () => {
                                 backdrop-blur-md
 
                                 md:grid-cols-6
+                                rounded-md
                             "
                         >
 
@@ -625,7 +620,7 @@ const Hero = () => {
 
                         {/* Description */}
 
-                        <p className="mt-2 max-w-[400px] font-['Barlow'] text-[13px] leading-[1.5] text-white/75 sm:text-[14px]">
+                        <p className="mt-2 max-w-[400px] text-[14px] leading-[1.5] text-white/75 md:text-[16px]">
                             Expert coaching, premium equipment and a
                             supportive community to help you crush your
                             goals and become your best.
@@ -638,7 +633,7 @@ const Hero = () => {
 
                             <a
                                 href="/programs"
-                                className="flex h-[43px] items-center gap-2 bg-[#e85d3a] px-5 font-['Barlow'] text-[10px] font-bold uppercase text-white sm:h-[45px] sm:text-[11px]"
+                                className="flex h-[43px] items-center gap-2 bg-[#e85d3a] px-5 text-[10px] font-bold uppercase text-white sm:h-[45px] sm:text-[11px]"
                                 style={{
                                     clipPath:
                                         "polygon(7% 0, 100% 0, 93% 100%, 0 100%)",
@@ -658,7 +653,7 @@ const Hero = () => {
                         MOBILE STATS
                     ================================================== */}
 
-                    <div className="mt-6 grid grid-cols-3 border border-white/10 bg-black/60 backdrop-blur-md sm:mt-7">
+                    <div className="mt-6 grid grid-cols-3 border rounded-xl border-white/10 bg-black/60 backdrop-blur-md sm:mt-7 ">
 
                         {stats.map((item, index) => {
 
@@ -674,6 +669,8 @@ const Hero = () => {
                                         px-2.5
                                         py-3
                                         sm:px-3
+                                        rounded-md
+                                        
 
                                         ${index < 3
                                             ? "border-b border-white/10"
@@ -695,11 +692,11 @@ const Hero = () => {
 
                                     <div>
 
-                                        <div className="font-['Bebas_Neue'] text-[17px] leading-none text-white">
+                                        <div className=" text-[17px] leading-none text-white">
                                             {item.value}
                                         </div>
 
-                                        <div className="mt-0.5 font-['Barlow'] text-[7px] text-white/55 sm:text-[8px]">
+                                        <div className="mt-0.5 text-[10px] text-white/55 md:text-[12px]">
                                             {item.label}
                                         </div>
 

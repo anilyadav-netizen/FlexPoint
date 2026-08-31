@@ -44,26 +44,34 @@ const About = () => {
     return (
         <section
             id="about"
-            className="w-full overflow-hidden bg-[#0d0d0d] py-2 text-white md:py-4 lg:py-6"
+            className="w-full overflow-hidden bg-[#0d0d0d] py-5 text-white sm:py-7 md:py-9 lg:py-10"
         >
             <div className="mx-auto w-full max-w-[110rem] px-6 sm:px-10 lg:px-16 xl:px-[7%]">
 
-                {/* ================= MAIN CONTENT ================= */}
+                {/* =====================================================
+                    MAIN CONTENT
+                ===================================================== */}
 
-                <div className="grid grid-cols-1 gap-7 lg:grid-cols-[0.9fr_1.35fr_1.15fr] lg:items-center lg:gap-5 xl:gap-7">
+                <div className="grid grid-cols-1 gap-8 lg:grid-cols-[0.9fr_1.35fr_1.15fr] lg:items-center lg:gap-6 xl:gap-8">
 
-                    {/* ================= WHY CHOOSE US ================= */}
+                    {/* =================================================
+                        WHY CHOOSE US
+                    ================================================= */}
 
                     <div className="order-2 lg:order-1">
 
-                        <h2 className="font-['Bebas_Neue'] text-[27px] leading-none tracking-[0.02em] text-white sm:text-[30px] md:text-[34px] lg:text-[30px] xl:text-[34px]">
+                        {/* Heading */}
+
+                        <h2 className="whitespace-nowrap text-[27px] font-bold leading-none tracking-tight text-white sm:text-[30px] md:text-[34px] lg:text-[30px] xl:text-[34px]">
                             WHY CHOOSE{" "}
                             <span className="text-[#e85d3a]">
                                 US?
                             </span>
                         </h2>
 
-                        <div className="mt-5 space-y-4 sm:mt-6 md:mt-7">
+                        {/* Benefits */}
+
+                        <div className="mt-6 space-y-5 sm:mt-7 sm:space-y-6">
 
                             {benefits.map((benefit) => {
                                 const Icon = benefit.icon;
@@ -71,15 +79,15 @@ const About = () => {
                                 return (
                                     <div
                                         key={benefit.title}
-                                        className="group flex items-start gap-3"
+                                        className="group flex items-start gap-2"
                                     >
 
                                         {/* Icon */}
 
-                                        <div className="flex h-8 w-8 shrink-0 items-center justify-center text-[#e85d3a] sm:h-9 sm:w-9">
+                                        <div className="flex h-9 w-9 shrink-0 items-center justify-center text-[#e85d3a] sm:h-10 sm:w-10">
                                             <Icon
-                                                size={23}
-                                                strokeWidth={1.4}
+                                                size={24}
+                                                strokeWidth={1.5}
                                             />
                                         </div>
 
@@ -87,11 +95,11 @@ const About = () => {
 
                                         <div className="pt-0.5">
 
-                                            <h3 className="font-['Barlow'] text-[10px] font-bold uppercase tracking-wide text-white sm:text-[11px]">
+                                            <h3 className="text-[14px] font-bold uppercase tracking-wide text-white md:text-[16px]">
                                                 {benefit.title}
                                             </h3>
 
-                                            <p className="mt-0.5 max-w-[180px] font-['Barlow'] text-[8px] leading-[1.45] text-white/55 sm:text-[9px]">
+                                            <p className="mt-1 max-w-[230px] text-[12px] leading-[1.5] text-white/60 md:text-[14px]">
                                                 {benefit.text}
                                             </p>
 
@@ -104,64 +112,73 @@ const About = () => {
                         </div>
                     </div>
 
-                    {/* ================= CENTER IMAGE ================= */}
+                    {/* =================================================
+                        CENTER IMAGE
+                    ================================================= */}
 
                     <div className="order-1 lg:order-2">
 
-                        <div className="group relative overflow-hidden border border-white/10 bg-[#151515]">
+                        <div className="group relative overflow-hidden border border-white/10 bg-[#151515] rounded-md">
 
                             <img
                                 src={AboutImage}
                                 alt="Fitness Center Training"
-                                className="h-[240px] w-full object-cover transition-transform duration-700 group-hover:scale-[1.03] sm:h-[300px] md:h-[350px] lg:h-[255px] xl:h-[285px]"
+                                className="h-[250px] w-full object-cover transition-transform duration-700 group-hover:scale-[1.03] sm:h-[310px] md:h-[350px] lg:h-[270px] xl:h-[300px]"
                             />
 
-                            {/* Image overlay */}
+                            {/* Image Overlay */}
 
                             <div className="absolute inset-0 bg-gradient-to-t from-black/35 via-transparent to-transparent" />
 
-                            {/* Orange bottom line */}
+                            {/* Orange Bottom Line */}
 
                             <span className="absolute bottom-0 left-0 h-[2px] w-full bg-[#e85d3a]" />
 
                         </div>
-
                     </div>
 
-                    {/* ================= ABOUT CONTENT ================= */}
+                    {/* =================================================
+                        ABOUT CONTENT
+                    ================================================= */}
 
                     <div className="order-3">
 
-                        <h2 className="font-['Bebas_Neue'] text-[27px] leading-none tracking-[0.02em] text-white sm:text-[30px] md:text-[34px] lg:text-[30px] xl:text-[34px]">
+                        {/* Heading */}
+
+                        <h2 className="text-[27px] font-bold leading-none tracking-tight text-white sm:text-[30px] md:text-[34px] lg:text-[30px] xl:text-[34px]">
                             ABOUT OUR{" "}
                             <span className="text-[#e85d3a]">
                                 FITNESS CENTER
                             </span>
                         </h2>
 
-                        <p className="mt-3 max-w-[440px] font-['Barlow'] text-[10px] leading-[1.6] text-white/65 sm:text-[11px] sm:leading-[1.65]">
+                        {/* Description */}
+
+                        <p className="mt-4 max-w-[480px] text-[14px] leading-[1.6] text-white/65 md:text-[15px]">
                             We're more than a gym. We're a community that
                             believes in helping you transform your body,
                             improve your health and uplift your life.
                         </p>
 
-                        {/* Features */}
+                        {/* =================================================
+                            FEATURES
+                        ================================================= */}
 
-                        <div className="mt-4 space-y-2">
+                        <div className="mt-5 space-y-3">
 
                             {features.map((feature) => (
                                 <div
                                     key={feature}
-                                    className="flex items-center gap-2"
+                                    className="flex items-center gap-2.5"
                                 >
 
                                     <Check
-                                        size={12}
+                                        size={14}
                                         strokeWidth={2.5}
                                         className="shrink-0 text-[#e85d3a]"
                                     />
 
-                                    <span className="font-['Barlow'] text-[9px] text-white/75 sm:text-[10px]">
+                                    <span className="text-[14px] text-white/75 md:text-[15px]">
                                         {feature}
                                     </span>
 
@@ -170,13 +187,15 @@ const About = () => {
 
                         </div>
 
-                        {/* CTA */}
+                        {/* =================================================
+                            CTA
+                        ================================================= */}
 
-                        <div className="mt-4 sm:mt-5">
+                        <div className="mt-5 sm:mt-6">
 
                             <a
                                 href="/about"
-                                className="group inline-flex h-[38px] items-center gap-2 bg-[#e85d3a] px-5 font-['Barlow'] text-[9px] font-bold uppercase tracking-[0.08em] text-white transition-all duration-300 hover:bg-[#f06a49]"
+                                className="group inline-flex h-[40px] items-center gap-2 bg-[#e85d3a] px-6 text-[10px] font-bold uppercase tracking-[0.08em] text-white transition-all duration-300 hover:bg-[#f06a49] sm:h-[42px] sm:px-7 sm:text-[11px]"
                                 style={{
                                     clipPath:
                                         "polygon(7% 0, 100% 0, 93% 100%, 0 100%)",
@@ -185,7 +204,7 @@ const About = () => {
                                 Learn More
 
                                 <ArrowRight
-                                    size={13}
+                                    size={14}
                                     strokeWidth={1.8}
                                     className="transition-transform duration-300 group-hover:translate-x-1"
                                 />
@@ -194,9 +213,7 @@ const About = () => {
                         </div>
 
                     </div>
-
                 </div>
-
             </div>
         </section>
     );

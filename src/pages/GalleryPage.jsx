@@ -1,35 +1,27 @@
+
 import React, { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
-import {
-    FaArrowRight,
-    FaExpand,
-    FaXmark,
-} from "react-icons/fa6";
+import { FaArrowRight, FaExpand, FaXmark } from "react-icons/fa6";
 import { useDispatch, useSelector } from "react-redux";
 import { getGallery } from "../redux/Slicer/gallerySlice";
 
 const GalleryPage = () => {
     const dispatch = useDispatch();
 
-    const { gallery, loading } = useSelector(
-        (state) => state.gallery
-    );
+    const { gallery, loading } = useSelector((state) => state.gallery);
 
     const [selectedImage, setSelectedImage] = useState(null);
+    const [activeCategory, setActiveCategory] = useState("ALL");
 
     useEffect(() => {
         dispatch(getGallery());
     }, [dispatch]);
-
-    // ================= GALLERY DATA =================
 
     const galleryList = Array.isArray(gallery) ? gallery : [];
 
     const categories = useMemo(() => {
         return ["ALL"];
     }, []);
-
-    const [activeCategory, setActiveCategory] = useState("ALL");
 
     const filteredGallery = useMemo(() => {
         if (activeCategory === "ALL") {
@@ -42,213 +34,98 @@ const GalleryPage = () => {
     return (
         <main className="mt-0 w-full overflow-hidden bg-[#0d0d0d] text-white">
 
-            {/* =====================================================
-                HERO
-            ===================================================== */}
+            {/* =========================
+                GALLERY SECTION
+            ========================== */}
+            <section>
+                <div className="mx-auto w-full max-w-[110rem] px-5 py-6 sm:px-8 md:py-8 lg:px-12 xl:px-[7%]">
 
-            <section className="border-b border-white/10 bg-[#111111]">
-
-                <div className="mx-auto w-full max-w-[110rem] px-5 py-8 sm:px-8 md:py-12 lg:px-12 xl:px-[7%]">
-
-                    <div className="grid items-end gap-5 lg:grid-cols-[1fr_0.7fr] lg:gap-16">
+                    {/* HEADER */}
+                    <div className="flex flex-col gap-3 md:flex-row md:items-end md:justify-between">
 
                         {/* LEFT */}
-
                         <div>
+                            <div className="mb-2 flex items-center gap-2">
+                                <span className="h-[2px] w-6 bg-[#e85d3a]" />
 
-                            <div className="mb-3 flex items-center gap-3">
-
-                                <span className="h-[2px] w-8 bg-[#e85d3a]" />
-
-                                <span className="font-['Barlow'] text-[12px] font-semibold uppercase tracking-[0.18em] text-[#e85d3a] sm:text-[13px]">
-                                    Fitness Center Gallery
+                                <span className="text-[12px] font-semibold uppercase tracking-[0.15em] text-[#e85d3a] md:text-[13px]">
+                                    Our Fitness Space
                                 </span>
-
                             </div>
 
-                            <h1 className="max-w-[850px] font-['Bebas_Neue'] text-[38px] leading-[0.82] tracking-wide sm:text-[48px] md:text-[60px]">
-
+                            <h1 className="text-[20px] font-bold leading-tight md:text-[28px]">
                                 TRAIN.
-
                                 <span className="text-[#e85d3a]">
                                     {" "}MOVE.
-                                </span>
-
-                                {" "}REPEAT.
-
+                                </span>{" "}
+                                REPEAT.
                             </h1>
-
                         </div>
 
                         {/* RIGHT */}
-
-                        <div className="max-w-[500px] lg:justify-self-end">
-
-                            <p className="font-['Barlow'] text-[13px] leading-6 text-white/40 sm:text-[14px] sm:leading-7">
-
-                                Real people. Real training. Real progress.
-                                Explore moments from our fitness community
-                                and take a look inside our training environment.
-
-                            </p>
-
-                            <div className="mt-4 flex flex-wrap gap-2">
-
-                                <div className="border border-white/10 bg-[#151515] px-4 py-2.5">
-
-                                    <span className="font-['Barlow'] text-[10px] font-semibold uppercase tracking-[0.08em] text-white/60 sm:text-[11px]">
-                                        {galleryList.length} Photos
-                                    </span>
-
-                                </div>
-
-                                <div className="border border-white/10 bg-[#151515] px-4 py-2.5">
-
-                                    <span className="font-['Barlow'] text-[10px] font-semibold uppercase tracking-[0.08em] text-white/60 sm:text-[11px]">
-                                        Real Training
-                                    </span>
-
-                                </div>
-
-                            </div>
-
-                        </div>
-
-                    </div>
-
-                </div>
-
-            </section>
-
-            {/* =====================================================
-                CATEGORY BAR
-            ===================================================== */}
-
-            <section className="border-b border-white/10 bg-[#111111]">
-
-                <div className="mx-auto flex w-full max-w-[110rem] items-center gap-2 overflow-x-auto px-5 py-3 sm:px-8 lg:px-12 xl:px-[7%]">
-
-                    <span className="mr-2 shrink-0 font-['Barlow'] text-[10px] font-bold uppercase tracking-[0.12em] text-white/35">
-                        Explore:
-                    </span>
-
-                    {categories.map((category) => (
-
-                        <button
-                            key={category}
-                            type="button"
-                            onClick={() => setActiveCategory(category)}
-                            className={`shrink-0 border px-4 py-2 font-['Barlow'] text-[10px] font-semibold uppercase tracking-[0.08em] transition-all duration-300 ${
-                                activeCategory === category
-                                    ? "border-[#e85d3a] bg-[#e85d3a] text-white"
-                                    : "border-white/10 bg-[#151515] text-white/55 hover:border-[#e85d3a]/60 hover:text-white"
-                            }`}
-                        >
-                            {category}
-                        </button>
-
-                    ))}
-
-                </div>
-
-            </section>
-
-            {/* =====================================================
-                GALLERY SECTION
-            ===================================================== */}
-
-            <section>
-
-                <div className="mx-auto w-full max-w-[110rem] px-5 py-7 sm:px-8 md:py-10 lg:px-12 xl:px-[7%]">
-
-                    {/* HEADER */}
-
-                    <div className="mb-6 flex flex-col gap-3 md:flex-row md:items-end md:justify-between">
-
-                        <div>
-
-                            <div className="mb-2 flex items-center gap-2">
-
-                                <span className="h-[2px] w-7 bg-[#e85d3a]" />
-
-                                <span className="font-['Barlow'] text-[11px] font-semibold uppercase tracking-[0.15em] text-[#e85d3a]">
-                                    Inside The Gym
-                                </span>
-
-                            </div>
-
-                            <h2 className="font-['Bebas_Neue'] text-[28px] leading-[0.85] tracking-wide sm:text-[36px] md:text-[44px]">
-
-                                OUR
-
-                                <span className="text-[#e85d3a]">
-                                    {" "}MOMENTS
-                                </span>
-
-                            </h2>
-
-                        </div>
-
-                        <p className="max-w-[430px] font-['Barlow'] text-[12px] leading-5 text-white/40 sm:text-[13px] sm:leading-6">
-
-                            A closer look at our workouts, facilities,
-                            training sessions and fitness community.
-
+                        <p className="max-w-[450px] text-[12px] leading-5 text-white/40 md:text-[14px]">
+                            Step inside our training environment and experience
+                            the energy, dedication and moments that define our
+                            fitness community.
                         </p>
-
                     </div>
 
-                    {/* =================================================
-                        LOADING
-                    ================================================= */}
-
+                    {/* LOADING */}
                     {loading ? (
-
-                        <div className="flex min-h-[450px] items-center justify-center">
-
+                        <div className="flex min-h-[350px] items-center justify-center">
                             <div className="text-center">
+                                <div className="mx-auto h-7 w-7 animate-spin rounded-full border-2 border-white/10 border-t-[#e85d3a]" />
 
-                                <div className="mx-auto h-8 w-8 animate-spin rounded-full border-2 border-white/10 border-t-[#e85d3a]" />
-
-                                <p className="mt-4 font-['Barlow'] text-[11px] font-semibold uppercase tracking-[0.15em] text-white/35">
+                                <p className="mt-3 text-[9px] font-semibold uppercase tracking-[0.12em] text-white/35">
                                     Loading Gallery...
                                 </p>
-
                             </div>
-
                         </div>
-
                     ) : filteredGallery.length > 0 ? (
 
-                        /* =================================================
-                           MASONRY GRID
-                        ================================================= */
 
-                        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3 lg:gap-4">
-
+                        <div
+                            className="
+                                mt-5
+                                columns-1
+                                gap-3
+                                sm:columns-2
+                                lg:columns-3
+                                lg:gap-4
+                            "
+                        >
                             {filteredGallery.map((item, index) => (
-
                                 <article
                                     key={item._id}
-                                    className={`group relative overflow-hidden border border-white/10 bg-[#151515] ${
-                                        index % 5 === 0
-                                            ? "sm:row-span-2"
-                                            : ""
-                                    }`}
+                                    className="
+                                        group
+                                        relative
+                                        mb-3
+                                        break-inside-avoid
+                                        overflow-hidden
+                                        rounded-md
+                                        border
+                                        border-white/10
+                                        bg-[#151515]
+                                        lg:mb-4
+                                    "
                                 >
 
+                                    {/* =========================
+                                        FIXED IMAGE AREA
+                                    ========================== */}
                                     <div
-                                        className={`relative overflow-hidden ${
-                                            index % 5 === 0
-                                                ? "h-[430px] sm:h-full sm:min-h-[450px]"
-                                                : "h-[270px] sm:h-[290px]"
-                                        }`}
+                                        className="
+                                            relative
+                                            h-[240px]
+                                            w-full
+                                            overflow-hidden
+                                            sm:h-[280px]
+                                            lg:h-[300px]
+                                        "
                                     >
 
-                                        {/* IMAGE */}
-
                                         {item.image ? (
-
                                             <img
                                                 src={item.image}
                                                 alt={
@@ -256,251 +133,327 @@ const GalleryPage = () => {
                                                     "Fitness Gallery"
                                                 }
                                                 loading="lazy"
-                                                className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-110"
+                                                className="
+                                                    block
+                                                    h-full
+                                                    w-full
+                                                    object-cover
+                                                    object-center
+                                                    transition-transform
+                                                    duration-700
+                                                    ease-out
+                                                    group-hover:scale-105
+                                                "
                                             />
-
                                         ) : (
-
-                                            <div className="flex h-full items-center justify-center bg-[#151515]">
-
-                                                <span className="font-['Barlow'] text-[11px] uppercase tracking-[0.12em] text-white/20">
+                                            <div className="flex h-full w-full items-center justify-center bg-[#151515]">
+                                                <span className="text-[9px] uppercase tracking-[0.12em] text-white/20">
                                                     No Image
                                                 </span>
-
                                             </div>
-
                                         )}
 
-                                        {/* OVERLAY */}
-
-                                        <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/10 to-transparent opacity-80 transition-opacity duration-300 group-hover:opacity-100" />
-
-                                        {/* ORANGE TOP LINE */}
-
-                                        <div className="absolute left-0 top-0 h-[3px] w-0 bg-[#e85d3a] transition-all duration-500 group-hover:w-full" />
+                                        {/* DARK OVERLAY */}
+                                        <div
+                                            className="
+                                                pointer-events-none
+                                                absolute
+                                                inset-0
+                                                bg-gradient-to-t
+                                                from-black/85
+                                                via-black/10
+                                                to-transparent
+                                            "
+                                        />
 
                                         {/* NUMBER */}
-
-                                        <div className="absolute left-4 top-4">
-
-                                            <span className="font-['Bebas_Neue'] text-[24px] text-white/30">
+                                        <div className="absolute left-3 top-3">
+                                            <span className="text-[18px] font-bold text-white/30">
                                                 {String(index + 1).padStart(
                                                     2,
                                                     "0"
                                                 )}
                                             </span>
-
                                         </div>
 
                                         {/* EXPAND BUTTON */}
-
                                         <button
                                             type="button"
                                             onClick={() =>
                                                 setSelectedImage(item)
                                             }
-                                            className="absolute right-4 top-4 flex h-9 w-9 items-center justify-center border border-white/20 bg-black/30 text-white/60 opacity-0 backdrop-blur-sm transition-all duration-300 hover:border-[#e85d3a] hover:bg-[#e85d3a] hover:text-white group-hover:opacity-100"
+                                            className="
+                                                absolute
+                                                right-3
+                                                top-3
+                                                flex
+                                                h-8
+                                                w-8
+                                                items-center
+                                                justify-center
+                                                rounded-md
+                                                border
+                                                border-white/20
+                                                bg-black/30
+                                                text-white/60
+                                                opacity-0
+                                                backdrop-blur-sm
+                                                transition-all
+                                                duration-300
+                                                hover:border-[#e85d3a]
+                                                hover:bg-[#e85d3a]
+                                                hover:text-white
+                                                group-hover:opacity-100
+                                            "
                                             aria-label="Expand image"
                                         >
-
-                                            <FaExpand size={11} />
-
+                                            <FaExpand size={10} />
                                         </button>
 
                                         {/* DESCRIPTION */}
+                                        <div className="absolute bottom-0 left-0 w-full p-4">
 
-                                        <div className="absolute bottom-0 left-0 w-full p-5">
-
-                                            <p className="font-['Barlow'] text-[10px] font-semibold uppercase tracking-[0.15em] text-[#e85d3a]">
+                                            <p className="text-[8px] font-semibold uppercase tracking-[0.12em] text-[#e85d3a]">
                                                 Fitness Centers
                                             </p>
 
-                                            <h3 className="mt-2 max-w-[400px] font-['Bebas_Neue'] text-[23px] leading-none tracking-wide text-white sm:text-[25px]">
-
+                                            <h3 className="mt-1.5 max-w-[400px] text-[14px] font-semibold leading-tight text-white sm:text-[15px] md:text-[16px]">
                                                 {item.description ||
                                                     "Fitness Center"}
-
                                             </h3>
 
                                         </div>
-
                                     </div>
-
-                                    {/* BOTTOM ACCENT */}
-
-                                    <div className="h-[2px] w-0 bg-[#e85d3a] transition-all duration-300 group-hover:w-full" />
-
                                 </article>
-
                             ))}
-
                         </div>
 
                     ) : (
 
-                        /* =================================================
-                           EMPTY STATE
-                        ================================================= */
+                        /* EMPTY STATE */
+                        <div className="rounded-md border border-white/10 bg-[#151515] py-16 text-center">
 
-                        <div className="border border-white/10 bg-[#151515] py-24 text-center">
-
-                            <p className="font-['Bebas_Neue'] text-[28px] text-white/40 sm:text-[34px]">
+                            <p className="text-[14px] font-bold text-white/40 sm:text-[15px] md:text-[16px]">
                                 NO GALLERY PHOTOS YET.
                             </p>
 
-                            <p className="mt-2 font-['Barlow'] text-[12px] text-white/30 sm:text-[13px]">
+                            <p className="mt-2 text-[10px] text-white/30 sm:text-[11px]">
                                 Gallery photos will appear here once added
                                 from the admin panel.
                             </p>
 
                         </div>
-
                     )}
 
                 </div>
-
             </section>
 
-            {/* =====================================================
-                CTA
-            ===================================================== */}
-
+            {/* =========================
+                CTA SECTION
+            ========================== */}
             <section className="border-t border-white/10">
 
-                <div className="mx-auto w-full max-w-[110rem] px-5 py-7 sm:px-8 md:py-10 lg:px-12 xl:px-[7%]">
+                <div className="mx-auto w-full max-w-[110rem] px-5 py-6 sm:px-8 md:py-8 lg:px-12 xl:px-[7%]">
 
-                    <div className="relative overflow-hidden border border-white/10 bg-[#151515] px-6 py-8 sm:px-10 md:py-10 lg:px-14">
-
-                        {/* Glow */}
-
+                    <div
+                        className="
+                            relative
+                            overflow-hidden
+                            rounded-md
+                            border
+                            border-white/10
+                            bg-[#151515]
+                            px-5
+                            py-7
+                            sm:px-8
+                            md:py-8
+                            lg:px-12
+                        "
+                    >
                         <div className="absolute -right-20 -top-24 h-60 w-60 rounded-full bg-[#e85d3a]/10 blur-3xl" />
 
-                        <div className="relative z-10 flex flex-col gap-6 md:flex-row md:items-center md:justify-between">
+                        <div
+                            className="
+                                relative
+                                z-10
+                                flex
+                                flex-col
+                                gap-5
+                                md:flex-row
+                                md:items-center
+                                md:justify-between
+                            "
+                        >
 
+                            {/* LEFT */}
                             <div className="max-w-[680px]">
 
-                                <p className="mb-2 font-['Barlow'] text-[10px] font-bold uppercase tracking-[0.14em] text-[#e85d3a]">
+                                <p className="mb-2 text-[9px] font-bold uppercase tracking-[0.12em] text-[#e85d3a]">
                                     Ready To Start?
                                 </p>
 
-                                <h2 className="font-['Bebas_Neue'] text-[29px] leading-[0.85] tracking-wide sm:text-[38px] md:text-[48px]">
-
+                                <h2 className="text-[14px] font-bold leading-tight sm:text-[15px] md:text-[16px]">
                                     YOUR FITNESS.
-
                                     <span className="text-[#e85d3a]">
                                         {" "}YOUR JOURNEY.
                                     </span>
-
                                 </h2>
 
-                                <p className="mt-3 max-w-[560px] font-['Barlow'] text-[12px] leading-5 text-white/40 sm:text-[13px] sm:leading-6">
-
+                                <p className="mt-2 max-w-[560px] text-[10px] leading-5 text-white/40 sm:text-[11px]">
                                     Ready to become stronger and more
                                     consistent? Find the right training
                                     program and start your journey.
-
                                 </p>
 
                             </div>
 
+                            {/* BUTTON */}
                             <Link
                                 to="/programs"
-                                className="group inline-flex w-fit shrink-0 items-center gap-3 bg-[#e85d3a] px-7 py-3.5 font-['Barlow'] text-[11px] font-bold uppercase tracking-[0.08em] text-white transition-all duration-300 hover:bg-[#f16a49]"
-                                style={{
-                                    clipPath:
-                                        "polygon(7% 0, 100% 0, 93% 100%, 0 100%)",
-                                }}
+                                className="
+                                    group
+                                    inline-flex
+                                    w-fit
+                                    shrink-0
+                                    items-center
+                                    gap-2
+                                    rounded-md
+                                    bg-[#e85d3a]
+                                    px-5
+                                    py-2.5
+                                    text-[9px]
+                                    font-bold
+                                    uppercase
+                                    tracking-[0.08em]
+                                    text-white
+                                    transition-all
+                                    duration-300
+                                    hover:bg-[#f16a49]
+                                "
                             >
-
                                 Explore Programs
 
                                 <FaArrowRight
-                                    size={9}
+                                    size={8}
                                     className="transition-transform duration-300 group-hover:translate-x-1"
                                 />
-
                             </Link>
 
                         </div>
-
                     </div>
-
                 </div>
-
             </section>
 
-            {/* =====================================================
-                IMAGE LIGHTBOX
-            ===================================================== */}
-
+            {/* =========================
+                LIGHTBOX
+            ========================== */}
             {selectedImage && (
-
                 <div
-                    className="fixed inset-0 z-[999] flex items-center justify-center bg-black/90 p-5 backdrop-blur-sm"
+                    className="
+                        fixed
+                        inset-0
+                        z-[999]
+                        flex
+                        items-center
+                        justify-center
+                        bg-black/90
+                        p-4
+                        backdrop-blur-sm
+                    "
                     onClick={() => setSelectedImage(null)}
                 >
 
                     {/* CLOSE BUTTON */}
-
                     <button
                         type="button"
                         onClick={() => setSelectedImage(null)}
-                        className="absolute right-5 top-5 flex h-10 w-10 items-center justify-center border border-white/20 bg-white/5 text-white/70 transition-all duration-300 hover:border-[#e85d3a] hover:bg-[#e85d3a] hover:text-white"
+                        className="
+                            absolute
+                            right-4
+                            top-4
+                            flex
+                            h-9
+                            w-9
+                            items-center
+                            justify-center
+                            rounded-md
+                            border
+                            border-white/20
+                            bg-white/5
+                            text-white/70
+                            transition-all
+                            duration-300
+                            hover:border-[#e85d3a]
+                            hover:bg-[#e85d3a]
+                            hover:text-white
+                        "
+                        aria-label="Close image"
                     >
-
-                        <FaXmark size={14} />
-
+                        <FaXmark size={13} />
                     </button>
 
                     {/* IMAGE CONTAINER */}
-
                     <div
-                        className="relative max-h-[90vh] max-w-[1100px]"
+                        className="
+                            relative
+                            max-h-[90vh]
+                            max-w-[1100px]
+                            overflow-hidden
+                            rounded-md
+                        "
                         onClick={(e) => e.stopPropagation()}
                     >
 
                         {selectedImage.image ? (
-
                             <img
                                 src={selectedImage.image}
                                 alt={
                                     selectedImage.description ||
                                     "Fitness Gallery"
                                 }
-                                className="max-h-[85vh] max-w-full object-contain"
+                                className="
+                                    block
+                                    max-h-[85vh]
+                                    max-w-full
+                                    rounded-md
+                                    object-contain
+                                "
                             />
-
                         ) : (
-
-                            <div className="flex h-[400px] w-[600px] items-center justify-center bg-[#151515]">
-                                <span className="font-['Barlow'] text-white/30">
+                            <div className="flex h-[400px] w-[600px] items-center justify-center rounded-md bg-[#151515]">
+                                <span className="text-[11px] text-white/30">
                                     No Image
                                 </span>
                             </div>
-
                         )}
+
                         {selectedImage.description && (
-
-                            <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/90 to-transparent px-5 pb-5 pt-12">
-
-                                <p className="font-['Barlow'] text-[9px] font-bold uppercase tracking-[0.12em] text-[#e85d3a]">
+                            <div
+                                className="
+                                    absolute
+                                    bottom-0
+                                    left-0
+                                    right-0
+                                    bg-gradient-to-t
+                                    from-black/90
+                                    to-transparent
+                                    px-4
+                                    pb-4
+                                    pt-10
+                                "
+                            >
+                                <p className="text-[8px] font-bold uppercase tracking-[0.12em] text-[#e85d3a]">
                                     Fitness Centers
                                 </p>
 
-                                <h2 className="mt-1 font-['Bebas_Neue'] text-[25px] tracking-wide text-white">
+                                <h2 className="mt-1 text-[14px] font-bold text-white">
                                     {selectedImage.description}
                                 </h2>
-
                             </div>
-
                         )}
-
                     </div>
-
                 </div>
-
             )}
-
         </main>
     );
 };

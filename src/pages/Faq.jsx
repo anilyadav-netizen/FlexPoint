@@ -36,42 +36,47 @@ const Faq = () => {
     };
 
     return (
-        <section className="relative w-full overflow-hidden bg-[#0d0d0d] py-3 text-white md:py-5 lg:py-8">
+        <section className="relative w-full overflow-hidden bg-[#0d0d0d] py-5 text-white sm:py-7 md:py-8 lg:py-10">
             <div className="pointer-events-none absolute -right-32 top-20 h-72 w-72 rounded-full bg-[#e85d3a]/5 blur-3xl" />
             <div className="pointer-events-none absolute -left-32 bottom-20 h-72 w-72 rounded-full bg-[#e85d3a]/5 blur-3xl" />
 
-            <div className="pointer-events-none absolute top-0 left-0 h-px w-full bg-gradient-to-r from-transparent via-[#e85d3a]/40 to-transparent" />
+            <div className="pointer-events-none absolute left-0 top-0 h-px w-full bg-gradient-to-r from-transparent via-[#e85d3a]/40 to-transparent" />
 
-            <div className="mx-auto w-full max-w-[110rem] px-6 sm:px-10 lg:px-16 xl:px-[7%]">
-                <div className="grid grid-cols-1 gap-8 md:grid-cols-[0.8fr_1.2fr] lg:gap-16">
+            <div className="mx-auto w-full max-w-[110rem] px-5 sm:px-8 md:px-10 lg:px-16 xl:px-[7%]">
+                <div className="grid grid-cols-1 gap-7 md:grid-cols-[0.8fr_1.2fr] md:gap-10 lg:gap-14">
 
                     {/* LEFT CONTENT */}
                     <div>
                         <div className="mb-3 flex items-center gap-2">
                             <span className="h-[2px] w-6 bg-[#e85d3a]" />
-                            <span className="font-['Barlow'] text-[8px] uppercase tracking-[0.18em] text-white/30">
+
+                            <span className="text-[12px] font-semibold uppercase tracking-[0.16em] text-white/40 sm:text-[13px]">
                                 Need To Know
                             </span>
                         </div>
 
-                        <h2 className="font-['Bebas_Neue'] text-[24px] leading-[0.9] tracking-wide text-white md:text-[40px] lg:text-[48px]">
+                        <h2 className="text-[14px] font-bold leading-[1.05] tracking-wide text-white sm:text-[15px] md:text-[16px] lg:text-[18px]">
                             FREQUENTLY
                             <br />
-                            ASKED <span className="text-[#e85d3a]">QUESTIONS</span>
+                            ASKED{" "}
+                            <span className="text-[#e85d3a]">
+                                QUESTIONS
+                            </span>
                         </h2>
 
-                        <p className="mt-5 max-w-[400px] font-['Barlow'] text-[10px] leading-[1.7] text-white/45 sm:text-[11px]">
-                            Everything you need to know about our memberships, training
-                            programs and fitness experience. Can't find your answer?
-                            Contact our team and we'll be happy to help.
+                        <p className="mt-4 max-w-[420px] text-[12px] leading-[1.7] text-white/50 sm:text-[13px] md:text-[14px]">
+                            Everything you need to know about our memberships,
+                            training programs and fitness experience. Can't find
+                            your answer? Contact our team and we'll be happy to help.
                         </p>
 
-                        <div className="mt-8 flex items-center gap-3 border-l-2 border-[#e85d3a] pl-4">
+                        <div className="mt-6 flex items-center gap-3 rounded-md border-l-2 border-[#e85d3a] bg-[#111111] py-3 pl-4">
                             <div>
-                                <p className="font-['Bebas_Neue'] text-[22px] leading-none text-[#e85d3a]">
+                                <p className="text-[18px] font-bold leading-none text-[#e85d3a] sm:text-[20px]">
                                     24/7
                                 </p>
-                                <p className="mt-1 font-['Barlow'] text-[8px] uppercase tracking-[0.12em] text-white/30">
+
+                                <p className="mt-1 text-[10px] uppercase tracking-[0.12em] text-white/35">
                                     Support Available
                                 </p>
                             </div>
@@ -79,60 +84,74 @@ const Faq = () => {
                     </div>
 
                     {/* FAQ LIST */}
-                    <div className="border-t border-white/10">
+                    <div className="space-y-2">
                         {faqs.map((faq, index) => {
                             const isOpen = openIndex === index;
 
                             return (
                                 <div
                                     key={index}
-                                    className="border-b border-white/10"
+                                    className={`overflow-hidden rounded-md border transition-all duration-300 ${
+                                        isOpen
+                                            ? "border-[#e85d3a]/40 bg-[#151515]"
+                                            : "border-white/10 bg-[#111111] hover:border-white/20"
+                                    }`}
                                 >
                                     <button
                                         onClick={() => toggleFaq(index)}
-                                        className="group flex w-full items-center justify-between gap-5 py-5 text-left transition-all duration-300 md:py-6"
+                                        className="group flex w-full items-center justify-between gap-4 px-4 py-4 text-left transition-all duration-300 sm:px-5 sm:py-5"
                                     >
-                                        <div className="flex items-start gap-4">
+                                        <div className="flex min-w-0 items-start gap-3 sm:gap-4">
                                             <span
-                                                className={`pt-0.5 font-['Bebas_Neue'] text-[13px] transition-colors duration-300 ${isOpen ? "text-[#e85d3a]" : "text-white/20"
-                                                    }`}
+                                                className={`pt-0.5 text-[11px] font-semibold transition-colors duration-300 sm:text-[12px] ${
+                                                    isOpen
+                                                        ? "text-[#e85d3a]"
+                                                        : "text-white/25"
+                                                }`}
                                             >
-                                                0{index + 1}
+                                                {String(index + 1).padStart(2, "0")}
                                             </span>
 
                                             <span
-                                                className={`font-['Bebas_Neue'] text-[18px] leading-tight tracking-wide transition-colors duration-300 sm:text-[20px] ${isOpen
+                                                className={`text-[13px] font-semibold leading-[1.4] tracking-wide transition-colors duration-300 sm:text-[14px] md:text-[15px] ${
+                                                    isOpen
                                                         ? "text-[#e85d3a]"
                                                         : "text-white group-hover:text-[#e85d3a]"
-                                                    }`}
+                                                }`}
                                             >
                                                 {faq.question}
                                             </span>
                                         </div>
 
                                         <span
-                                            className={`flex h-8 w-8 shrink-0 items-center justify-center border transition-all duration-300 ${isOpen
+                                            className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-md border transition-all duration-300 ${
+                                                isOpen
                                                     ? "border-[#e85d3a] bg-[#e85d3a] text-white"
                                                     : "border-white/15 text-white/40 group-hover:border-[#e85d3a] group-hover:text-[#e85d3a]"
-                                                }`}
+                                            }`}
                                         >
-                                            {isOpen ? <Minus size={15} /> : <Plus size={15} />}
+                                            {isOpen ? (
+                                                <Minus size={15} />
+                                            ) : (
+                                                <Plus size={15} />
+                                            )}
                                         </span>
                                     </button>
 
                                     <div
-                                        className={`grid transition-all duration-500 ease-in-out ${isOpen
+                                        className={`grid transition-all duration-500 ease-in-out ${
+                                            isOpen
                                                 ? "grid-rows-[1fr] opacity-100"
                                                 : "grid-rows-[0fr] opacity-0"
-                                            }`}
+                                        }`}
                                     >
                                         <div className="overflow-hidden">
-                                            <div className="pb-6 pl-9 pr-10">
-                                                <p className="max-w-[650px] font-['Barlow'] text-[10px] leading-[1.7] text-white/45 sm:text-[11px]">
+                                            <div className="pb-5 pl-11 pr-5 sm:pl-14 sm:pr-10">
+                                                <p className="max-w-[650px] text-[12px] leading-[1.7] text-white/50 sm:text-[13px] md:text-[14px]">
                                                     {faq.answer}
                                                 </p>
 
-                                                <div className="mt-4 h-[1px] w-8 bg-[#e85d3a]" />
+                                                <div className="mt-4 h-[2px] w-8 bg-[#e85d3a]" />
                                             </div>
                                         </div>
                                     </div>
@@ -143,15 +162,16 @@ const Faq = () => {
                 </div>
 
                 {/* BOTTOM STRIP */}
-                <div className="mt-5 flex flex-col items-start justify-between gap-4 border-t border-white/10 pt-6 sm:flex-row sm:items-center">
+                <div className="mt-6 flex flex-col items-start justify-between gap-3 border-t border-white/10 pt-5 sm:flex-row sm:items-center">
                     <div className="flex items-center gap-2">
                         <span className="h-[2px] w-6 bg-[#e85d3a]" />
-                        <span className="font-['Barlow'] text-[8px] uppercase tracking-[0.15em] text-white/25">
+
+                        <span className="text-[11px] uppercase tracking-[0.14em] text-white/30 sm:text-[12px]">
                             Your Questions. Our Answers.
                         </span>
                     </div>
 
-                    <span className="font-['Barlow'] text-[9px] text-white/30">
+                    <span className="text-[12px] text-white/35 sm:text-[13px]">
                         Ready to start your fitness journey?
                     </span>
                 </div>
