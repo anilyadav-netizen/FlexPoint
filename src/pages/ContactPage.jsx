@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import {
     FaInstagram,
@@ -88,23 +87,23 @@ const ContactPage = () => {
             {/* =========================
                 HERO
             ========================== */}
-            <section className="border-white/10">
-                <div className="mx-auto w-full max-w-[110rem] px-5 py-5 sm:px-8 md:py-7 lg:px-12 xl:px-[7%]">
+            <section>
+                <div className="mx-auto w-full max-w-[110rem] px-5 py-6 sm:px-8 md:py-8 lg:px-12 xl:px-[7%]">
 
-                    <div className="grid gap-4 lg:grid-cols-[1.1fr_0.9fr] lg:items-end lg:gap-14">
+                    <div className="flex flex-col gap-3 md:flex-row md:items-end md:justify-between">
 
                         {/* LEFT */}
                         <div>
                             <div className="mb-2 flex items-center gap-2">
                                 <span className="h-[2px] w-6 bg-[#e85d3a]" />
 
-                                <span className="text-[10px] font-semibold uppercase tracking-[0.15em] text-[#e85d3a] md:text-[11px]">
+                                <span className="text-[12px] font-semibold uppercase tracking-[0.15em] text-[#e85d3a] md:text-[13px]">
                                     Get In Touch
                                 </span>
                             </div>
 
-                            <h1 className="text-[14px] font-bold leading-tight tracking-wide md:text-[16px]">
-                                LET'S GET
+                            <h1 className="text-[20px] font-bold leading-tight md:text-[28px]">
+                                LET&apos;S GET
                                 <span className="text-[#e85d3a]">
                                     {" "}MOVING.
                                 </span>
@@ -117,12 +116,12 @@ const ContactPage = () => {
                         </div>
 
                         {/* RIGHT */}
-                        <div className="max-w-[430px] lg:justify-self-end">
-                            <p className="text-[10px] leading-5 text-white/45 sm:text-[11px] md:text-[12px]">
+                        <div className="max-w-[450px]">
+                            <p className="text-[12px] leading-5 text-white/40 md:text-[14px]">
                                 Have a question about our programs,
                                 membership or training sessions? Reach out
-                                to our team and we'll help you find the right
-                                way to get started.
+                                to our team and we&apos;ll help you find the
+                                right way to get started.
                             </p>
 
                             <div className="mt-3 flex flex-wrap gap-2">
@@ -149,85 +148,95 @@ const ContactPage = () => {
             {/* =========================
                 CONTACT INFO
             ========================== */}
+            <section>
+                <div className="mx-auto w-full max-w-[110rem] px-5 sm:px-8 lg:px-12 xl:px-[7%]">
 
-            <div className="mx-auto w-full max-w-[110rem] px-5 sm:px-8 md:px-10 lg:px-12 xl:px-[7%]">
-                <div className="grid grid-cols-1 overflow-hidden rounded-md border border-white/10 bg-[#111111] sm:grid-cols-3">
+                    <div className="grid grid-cols-1 overflow-hidden rounded-md border border-white/10 bg-[#111111] sm:grid-cols-3">
 
-                    {/* PHONE */}
-                    <a
-                        href="tel:+919876543210"
-                        className="group border-b border-white/10 px-5 py-4 transition-colors duration-300 hover:bg-[#151515] sm:border-b-0 sm:border-r"
-                    >
-                        <div className="flex items-center gap-3">
-                            <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-md border border-white/10 text-[#e85d3a] transition-colors duration-300 group-hover:border-[#e85d3a]">
-                                <FaPhoneAlt size={13} />
+                        {/* PHONE */}
+                        <a
+                            href="tel:+919876543210"
+                            className="group border-b border-white/10 px-5 py-4 transition-colors duration-300 hover:bg-[#151515] sm:border-b-0 sm:border-r"
+                        >
+                            <div className="flex items-center gap-3">
+
+                                <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-md border border-white/10 text-[#e85d3a] transition-colors duration-300 group-hover:border-[#e85d3a]">
+                                    <FaPhoneAlt size={13} />
+                                </div>
+
+                                <div className="min-w-0">
+                                    <p className="text-[9px] font-semibold uppercase tracking-[0.12em] text-white/35">
+                                        Call Us
+                                    </p>
+
+                                    <p className="mt-1 truncate text-[11px] font-medium text-white/80 md:text-[12px]">
+                                        +91 98765 43210
+                                    </p>
+                                </div>
+
                             </div>
+                        </a>
 
-                            <div className="min-w-0">
-                                <p className="text-[9px] font-semibold uppercase tracking-[0.12em] text-white/35">
-                                    Call Us
-                                </p>
+                        {/* EMAIL */}
+                        <a
+                            href="mailto:hello@fitcenter.com"
+                            className="group border-b border-white/10 px-5 py-4 transition-colors duration-300 hover:bg-[#151515] sm:border-b-0 sm:border-r"
+                        >
+                            <div className="flex items-center gap-3">
 
-                                <p className="mt-1 truncate text-[11px] font-medium text-white/80 md:text-[12px]">
-                                    +91 98765 43210
-                                </p>
+                                <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-md border border-white/10 text-[#e85d3a] transition-colors duration-300 group-hover:border-[#e85d3a]">
+                                    <IoMdMail size={14} />
+                                </div>
+
+                                <div className="min-w-0">
+                                    <p className="text-[9px] font-semibold uppercase tracking-[0.12em] text-white/35">
+                                        Email Us
+                                    </p>
+
+                                    <p className="mt-1 truncate text-[11px] font-medium text-white/80 md:text-[12px]">
+                                        hello@fitcenter.com
+                                    </p>
+                                </div>
+
+                            </div>
+                        </a>
+
+                        {/* LOCATION */}
+                        <div className="group px-5 py-4 transition-colors duration-300 hover:bg-[#151515]">
+                            <div className="flex items-center gap-3">
+
+                                <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-md border border-white/10 text-[#e85d3a] transition-colors duration-300 group-hover:border-[#e85d3a]">
+                                    <FiMapPin size={14} />
+                                </div>
+
+                                <div className="min-w-0">
+                                    <p className="text-[9px] font-semibold uppercase tracking-[0.12em] text-white/35">
+                                        Visit Us
+                                    </p>
+
+                                    <p className="mt-1 truncate text-[11px] font-medium text-white/80 md:text-[12px]">
+                                        New Delhi, India
+                                    </p>
+                                </div>
+
                             </div>
                         </div>
-                    </a>
 
-                    {/* EMAIL */}
-                    <a
-                        href="mailto:hello@fitcenter.com"
-                        className="group border-b border-white/10 px-5 py-4 transition-colors duration-300 hover:bg-[#151515] sm:border-b-0 sm:border-r"
-                    >
-                        <div className="flex items-center gap-3">
-                            <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-md border border-white/10 text-[#e85d3a] transition-colors duration-300 group-hover:border-[#e85d3a]">
-                                <IoMdMail size={14} />
-                            </div>
-
-                            <div className="min-w-0">
-                                <p className="text-[9px] font-semibold uppercase tracking-[0.12em] text-white/35">
-                                    Email Us
-                                </p>
-
-                                <p className="mt-1 truncate text-[11px] font-medium text-white/80 md:text-[12px]">
-                                    hello@fitcenter.com
-                                </p>
-                            </div>
-                        </div>
-                    </a>
-
-                    {/* LOCATION */}
-                    <div className="group px-5 py-4 transition-colors duration-300 hover:bg-[#151515]">
-                        <div className="flex items-center gap-3">
-                            <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-md border border-white/10 text-[#e85d3a] transition-colors duration-300 group-hover:border-[#e85d3a]">
-                                <FiMapPin size={14} />
-                            </div>
-
-                            <div className="min-w-0">
-                                <p className="text-[9px] font-semibold uppercase tracking-[0.12em] text-white/35">
-                                    Visit Us
-                                </p>
-
-                                <p className="mt-1 truncate text-[11px] font-medium text-white/80 md:text-[12px]">
-                                    New Delhi, India
-                                </p>
-                            </div>
-                        </div>
                     </div>
-
                 </div>
-            </div>
+            </section>
 
             {/* =========================
                 CONTACT FORM
             ========================== */}
             <section>
-                <div className="mx-auto w-full max-w-[110rem] px-5 py-6 sm:px-8 sm:py-7 lg:px-12 lg:py-9 xl:px-[7%]">
+                <div className="mx-auto w-full max-w-[110rem] px-5 py-6 sm:px-8 sm:py-8 lg:px-12 lg:py-9 xl:px-[7%]">
 
                     <div className="grid gap-6 lg:grid-cols-[1.15fr_0.85fr] lg:gap-12">
 
-                        {/* LEFT */}
+                        {/* =========================
+                            FORM
+                        ========================== */}
                         <div>
 
                             <div className="mb-5">
@@ -235,26 +244,25 @@ const ContactPage = () => {
                                 <div className="mb-2 flex items-center gap-2">
                                     <span className="h-[2px] w-6 bg-[#e85d3a]" />
 
-                                    <span className="text-[9px] font-semibold uppercase tracking-[0.15em] text-[#e85d3a] sm:text-[10px]">
+                                    <span className="text-[12px] font-semibold uppercase tracking-[0.15em] text-[#e85d3a] md:text-[13px]">
                                         Send A Message
                                     </span>
                                 </div>
 
-                                <h2 className="text-[14px] font-bold leading-tight tracking-wide sm:text-[15px] md:text-[16px]">
+                                <h2 className="text-[20px] font-bold leading-tight md:text-[28px]">
                                     HAVE A QUESTION?
                                     <span className="block text-[#e85d3a]">
-                                        WE'RE HERE TO HELP.
+                                        WE&apos;RE HERE TO HELP.
                                     </span>
                                 </h2>
 
-                                <p className="mt-2 max-w-[560px] text-[10px] leading-5 text-white/40 sm:text-[11px] md:text-[12px]">
+                                <p className="mt-2 max-w-[560px] text-[12px] leading-5 text-white/40 md:text-[14px]">
                                     Fill out the form below and our team will
                                     get back to you as soon as possible.
                                 </p>
 
                             </div>
 
-                            {/* FORM */}
                             <form
                                 onSubmit={handleSubmit}
                                 className="grid grid-cols-1 gap-3 sm:grid-cols-2"
@@ -341,11 +349,10 @@ const ContactPage = () => {
 
                                 {/* BUTTON */}
                                 <div className="sm:col-span-2">
-
                                     <button
                                         type="submit"
                                         disabled={loading}
-                                        className="group inline-flex h-10 items-center gap-2 rounded-md bg-[#e85d3a] px-6 text-[9px] font-bold uppercase tracking-[0.1em] text-white transition-all duration-300 hover:bg-[#f16a49] disabled:cursor-not-allowed disabled:opacity-60 md:text-[10px]"
+                                        className="group inline-flex h-10 items-center gap-2 rounded-md bg-[#e85d3a] px-5 text-[9px] font-bold uppercase tracking-[0.08em] text-white transition-all duration-300 hover:bg-[#f16a49] disabled:cursor-not-allowed disabled:opacity-60 md:text-[10px]"
                                     >
                                         {loading
                                             ? "Sending..."
@@ -358,7 +365,6 @@ const ContactPage = () => {
                                             />
                                         )}
                                     </button>
-
                                 </div>
 
                             </form>
@@ -376,22 +382,23 @@ const ContactPage = () => {
                         ========================== */}
                         <div className="lg:pt-1">
 
-                            <div className="rounded-md border border-white/10 bg-[#111111] overflow-hidden">
+                            <div className="overflow-hidden rounded-md border border-white/10 bg-[#111111]">
 
+                                {/* HEADER */}
                                 <div className="border-b border-white/10 p-5 sm:p-6">
 
                                     <div className="mb-3 flex h-9 w-9 items-center justify-center rounded-md border border-[#e85d3a]/40 text-[#e85d3a]">
                                         <BiDumbbell size={17} />
                                     </div>
 
-                                    <h3 className="text-[14px] font-bold leading-tight tracking-wide md:text-[16px]">
+                                    <h3 className="text-[18px] font-bold leading-tight md:text-[20px]">
                                         VISIT OUR
                                         <span className="text-[#e85d3a]">
                                             {" "}FITNESS CENTER
                                         </span>
                                     </h3>
 
-                                    <p className="mt-2 text-[10px] leading-5 text-white/40 sm:text-[11px] md:text-[12px]">
+                                    <p className="mt-2 text-[12px] leading-5 text-white/40 md:text-[14px]">
                                         Come in, meet the team and take a look
                                         around our training space before you
                                         decide where to start.
@@ -438,7 +445,10 @@ const ContactPage = () => {
                                         <div className="mt-2 space-y-1.5 text-[10px] text-white/55 md:text-[11px]">
 
                                             <div className="flex justify-between gap-3">
-                                                <span>Monday - Friday</span>
+                                                <span>
+                                                    Monday - Friday
+                                                </span>
+
                                                 <span className="text-right text-white/75">
                                                     6:00 AM - 10:00 PM
                                                 </span>
@@ -446,6 +456,7 @@ const ContactPage = () => {
 
                                             <div className="flex justify-between gap-3">
                                                 <span>Saturday</span>
+
                                                 <span className="text-right text-white/75">
                                                     7:00 AM - 9:00 PM
                                                 </span>
@@ -453,12 +464,14 @@ const ContactPage = () => {
 
                                             <div className="flex justify-between gap-3">
                                                 <span>Sunday</span>
+
                                                 <span className="text-right text-[#e85d3a]">
                                                     8:00 AM - 2:00 PM
                                                 </span>
                                             </div>
 
                                         </div>
+
                                     </div>
                                 </div>
 
@@ -503,7 +516,7 @@ const ContactPage = () => {
             ========================== */}
             <section className="border-y border-white/10 bg-[#111111]">
 
-                <div className="mx-auto w-full max-w-[110rem] px-5 py-6 sm:px-8 sm:py-7 lg:px-12 xl:px-[7%]">
+                <div className="mx-auto w-full max-w-[110rem] px-5 py-6 sm:px-8 sm:py-8 lg:px-12 xl:px-[7%]">
 
                     <div className="grid gap-3 sm:grid-cols-3">
 
@@ -529,15 +542,15 @@ const ContactPage = () => {
                                 className="rounded-md border border-white/10 bg-[#151515] p-4 transition-all duration-300 hover:-translate-y-1 hover:border-[#e85d3a]/50"
                             >
 
-                                <span className="text-[14px] font-bold text-[#e85d3a] md:text-[16px]">
+                                <span className="text-[18px] font-bold text-[#e85d3a] md:text-[20px]">
                                     {item.number}
                                 </span>
 
-                                <h3 className="mt-2 text-[13px] font-bold leading-tight tracking-wide md:text-[15px]">
+                                <h3 className="mt-2 text-[14px] font-bold leading-tight tracking-wide md:text-[16px]">
                                     {item.title}
                                 </h3>
 
-                                <p className="mt-2 text-[10px] leading-5 text-white/40 md:text-[11px]">
+                                <p className="mt-2 text-[11px] leading-5 text-white/40 md:text-[12px]">
                                     {item.text}
                                 </p>
 
@@ -552,7 +565,7 @@ const ContactPage = () => {
                 MAP
             ========================== */}
             <section>
-                <div className="mx-auto w-full max-w-[110rem] px-5 py-6 sm:px-8 sm:py-7 lg:px-12 lg:py-9 xl:px-[7%]">
+                <div className="mx-auto w-full max-w-[110rem] px-5 py-6 sm:px-8 sm:py-8 lg:px-12 lg:py-9 xl:px-[7%]">
 
                     <div className="mb-4 flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
 
@@ -560,12 +573,12 @@ const ContactPage = () => {
                             <div className="mb-2 flex items-center gap-2">
                                 <span className="h-[2px] w-6 bg-[#e85d3a]" />
 
-                                <span className="text-[9px] font-semibold uppercase tracking-[0.15em] text-[#e85d3a] sm:text-[10px]">
+                                <span className="text-[12px] font-semibold uppercase tracking-[0.15em] text-[#e85d3a] md:text-[13px]">
                                     Find Us
                                 </span>
                             </div>
 
-                            <h2 className="text-[14px] font-bold leading-tight tracking-wide sm:text-[15px] md:text-[16px]">
+                            <h2 className="text-[20px] font-bold leading-tight md:text-[28px]">
                                 OUR
                                 <span className="text-[#e85d3a]">
                                     {" "}LOCATION
@@ -573,9 +586,10 @@ const ContactPage = () => {
                             </h2>
                         </div>
 
-                        <p className="max-w-[420px] text-[10px] leading-5 text-white/40 sm:text-[11px] md:text-[12px]">
-                            We're easy to find. Visit us at our fitness center
-                            in New Delhi and let's get your training started.
+                        <p className="max-w-[450px] text-[12px] leading-5 text-white/40 md:text-[14px]">
+                            We&apos;re easy to find. Visit us at our fitness
+                            center in New Delhi and let&apos;s get your
+                            training started.
                         </p>
 
                     </div>
@@ -610,8 +624,10 @@ const ContactPage = () => {
                                 </div>
 
                             </div>
+
                         </div>
                     </div>
+
                 </div>
             </section>
 
@@ -620,35 +636,36 @@ const ContactPage = () => {
             ========================== */}
             <section className="border-t border-white/10">
 
-                <div className="mx-auto w-full max-w-[110rem] px-5 py-6 sm:px-8 sm:py-7 lg:px-12 lg:py-9 xl:px-[7%]">
+                <div className="mx-auto w-full max-w-[110rem] px-5 py-6 sm:px-8 sm:py-8 lg:px-12 lg:py-9 xl:px-[7%]">
 
                     <div className="relative overflow-hidden rounded-md border border-white/10 bg-[#151515] px-5 py-7 sm:px-8 md:flex md:items-center md:justify-between md:gap-8 md:py-8 lg:px-12">
 
-                        <div className="absolute -right-16 -top-20 h-56 w-56 rounded-full bg-[#e85d3a]/10 blur-3xl" />
+                        <div className="absolute -right-20 -top-24 h-60 w-60 rounded-full bg-[#e85d3a]/10 blur-3xl" />
 
                         <div className="relative z-10">
 
-                            <p className="text-[9px] font-bold uppercase tracking-[0.14em] text-[#e85d3a] sm:text-[10px]">
+                            <p className="text-[10px] font-bold uppercase tracking-[0.12em] text-[#e85d3a] md:text-[11px]">
                                 Your Next Step
                             </p>
 
-                            <h2 className="mt-2 text-[14px] font-bold leading-tight tracking-wide sm:text-[15px] md:text-[16px]">
+                            <h2 className="mt-2 text-[18px] font-bold leading-tight md:text-[20px]">
                                 READY TO
                                 <span className="text-[#e85d3a]">
                                     {" "}START?
                                 </span>
                             </h2>
 
-                            <p className="mt-2 max-w-[500px] text-[10px] leading-5 text-white/40 sm:text-[11px] md:text-[12px]">
-                                Don't wait for the perfect time. Take the first
-                                step toward becoming stronger, healthier and fitter.
+                            <p className="mt-2 max-w-[560px] text-[11px] leading-5 text-white/40 md:text-[12px]">
+                                Don&apos;t wait for the perfect time. Take the
+                                first step toward becoming stronger, healthier
+                                and fitter.
                             </p>
 
                         </div>
 
                         <a
                             href="tel:+919876543210"
-                            className="group relative z-10 mt-5 inline-flex w-fit shrink-0 items-center gap-2 rounded-md bg-[#e85d3a] px-6 py-3 text-[9px] font-bold uppercase tracking-[0.08em] text-white transition-all duration-300 hover:bg-[#f16a49] md:mt-0 md:text-[10px]"
+                            className="group relative z-10 mt-5 inline-flex w-fit shrink-0 items-center gap-2 rounded-md bg-[#e85d3a] px-5 py-2.5 text-[9px] font-bold uppercase tracking-[0.08em] text-white transition-all duration-300 hover:bg-[#f16a49] md:mt-0 md:text-[10px]"
                         >
                             Call Now
 
@@ -667,4 +684,3 @@ const ContactPage = () => {
 };
 
 export default ContactPage;
-

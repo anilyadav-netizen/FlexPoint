@@ -1,386 +1,588 @@
-import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
+import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import API from "../../Api/Api";
 
-// ============================
+// ======================================
 // GET ALL TRAINERS
-// ============================
+// GET /api/trainers
+// GET /api/trainers?active=true
+// ======================================
 export const getTrainers = createAsyncThunk(
-    "trainer/getTrainers",
-    async (active, { rejectWithValue }) => {
-        try {
-            const url =
-                active !== undefined
-                    ? `/trainers?active=${active}`
-                    : "/trainers";
+  "trainer/getTrainers",
+  async (active, { rejectWithValue }) => {
+    try {
+      let url = "/trainers";
 
-            const { data } = await API.get(url);
-            return data;
-        } catch (error) {
-            return rejectWithValue(
-                error.response?.data?.message ||
-                "No Trainer Available"
-            );
-        }
+      if (active !== undefined && active !== null) {
+        url += `?active=${Boolean(active)}`;
+      }
+
+      const response = await API.get(url);
+
+      return response.data;
+    } catch (error) {
+      return rejectWithValue(
+        error.response?.data?.message ||
+          "Failed to fetch trainers"
+      );
     }
+  }
 );
 
-// ============================
+// ======================================
 // GET SINGLE TRAINER
-// ============================
+// GET /api/trainers/:id
+// ======================================
 export const getTrainerById = createAsyncThunk(
-    "trainer/getTrainerById",
-    async (id, { rejectWithValue }) => {
-        try {
-            const { data } = await API.get(`/trainers/${id}`);
-            return data;
-        } catch (error) {
-            return rejectWithValue(
-                error.response?.data?.message ||
-                "Failed to fetch trainer"
-            );
-        }
+  "trainer/getTrainerById",
+  async (id, { rejectWithValue }) => {
+    try {
+      if (!id) {
+        return rejectWithValue("Trainer ID is required");
+      }
+
+      const response = await API.get(`/trainers/${id}`);
+
+      return response.data;
+    } catch (error) {
+      return rejectWithValue(
+        error.response?.data?.message ||
+          "Failed to fetch trainer"
+      );
     }
+  }
 );
 
-// ============================
+// ======================================
 // CREATE TRAINER
-// ============================
+// POST /api/trainers
+// ======================================
 export const createTrainer = createAsyncThunk(
-    "trainer/createTrainer",
-    async (trainerData, { rejectWithValue }) => {
-        try {
-            const formData = new FormData();
+  "trainer/createTrainer",
+  async (trainerData, { rejectWithValue }) => {
+    try {
+      const formData = new FormData();
 
-            formData.append("number", trainerData.number || "");
-            formData.append("name", trainerData.name || "");
-            formData.append("role", trainerData.role || "");
-            formData.append(
-                "specialty",
-                trainerData.specialty || ""
-            );
-            formData.append(
-                "experience",
-                trainerData.experience || ""
-            );
-            formData.append("icon", trainerData.icon || "Users");
-            formData.append(
-                "isActive",
-                String(trainerData.isActive ?? true)
-            );
+      // Required fields
+      formData.append(
+        "number",
+        trainerData.number ?? ""
+      );
 
-            if (trainerData.image instanceof File) {
-                formData.append("image", trainerData.image);
-            }
+      formData.append(
+        "name",
+        trainerData.name ?? ""
+      );
 
-            const { data } = await API.post(
-                "/trainers",
-                formData
-            );
+      formData.append(
+        "role",
+        trainerData.role ?? ""
+      );
 
-            return data;
-        } catch (error) {
-            return rejectWithValue(
-                error.response?.data?.message ||
-                "Failed to create trainer"
-            );
-        }
+      formData.append(
+        "specialty",
+        trainerData.specialty ?? ""
+      );
+
+      formData.append(
+        "experience",
+        trainerData.experience ?? ""
+      );
+
+      // Optional fields
+      formData.append(
+        "icon",
+        trainerData.icon || "Users"
+      );
+
+      formData.append(
+        "isActive",
+        String(trainerData.isActive ?? true)
+      );
+
+      // Image
+      if (
+        typeof File !== "undefined" &&
+        trainerData.image instanceof File
+      ) {
+        formData.append(
+          "image",
+          trainerData.image
+        );
+      }
+
+      const response = await API.post(
+        "/trainers",
+        formData
+      );
+
+      return response.data;
+    } catch (error) {
+      return rejectWithValue(
+        error.response?.data?.message ||
+          "Failed to create trainer"
+      );
     }
+  }
 );
 
-// ============================
+// ======================================
 // UPDATE TRAINER
-// ============================
+// PUT /api/trainers/:id
+// ======================================
 export const updateTrainer = createAsyncThunk(
-    "trainer/updateTrainer",
-    async ({ id, trainerData }, { rejectWithValue }) => {
-        try {
-            const formData = new FormData();
+  "trainer/updateTrainer",
+  async (
+    { id, trainerData },
+    { rejectWithValue }
+  ) => {
+    try {
+      if (!id) {
+        return rejectWithValue("Trainer ID is required");
+      }
 
-            if (trainerData.number !== undefined) {
-                formData.append(
-                    "number",
-                    trainerData.number
-                );
-            }
+      const formData = new FormData();
 
-            if (trainerData.name !== undefined) {
-                formData.append("name", trainerData.name);
-            }
+      // Number
+      if (
+        trainerData.number !== undefined &&
+        trainerData.number !== null
+      ) {
+        formData.append(
+          "number",
+          trainerData.number
+        );
+      }
 
-            if (trainerData.role !== undefined) {
-                formData.append("role", trainerData.role);
-            }
+      // Name
+      if (
+        trainerData.name !== undefined &&
+        trainerData.name !== null
+      ) {
+        formData.append(
+          "name",
+          trainerData.name
+        );
+      }
 
-            if (trainerData.specialty !== undefined) {
-                formData.append(
-                    "specialty",
-                    trainerData.specialty
-                );
-            }
+      // Role
+      if (
+        trainerData.role !== undefined &&
+        trainerData.role !== null
+      ) {
+        formData.append(
+          "role",
+          trainerData.role
+        );
+      }
 
-            if (trainerData.experience !== undefined) {
-                formData.append(
-                    "experience",
-                    trainerData.experience
-                );
-            }
+      // Specialty
+      if (
+        trainerData.specialty !== undefined &&
+        trainerData.specialty !== null
+      ) {
+        formData.append(
+          "specialty",
+          trainerData.specialty
+        );
+      }
 
-            if (trainerData.icon !== undefined) {
-                formData.append("icon", trainerData.icon);
-            }
+      // Experience
+      if (
+        trainerData.experience !== undefined &&
+        trainerData.experience !== null
+      ) {
+        formData.append(
+          "experience",
+          trainerData.experience
+        );
+      }
 
-            if (trainerData.isActive !== undefined) {
-                formData.append(
-                    "isActive",
-                    String(trainerData.isActive)
-                );
-            }
+      // Icon
+      if (
+        trainerData.icon !== undefined &&
+        trainerData.icon !== null
+      ) {
+        formData.append(
+          "icon",
+          trainerData.icon
+        );
+      }
 
-            // Only send image when a new file is selected
-            if (trainerData.image instanceof File) {
-                formData.append(
-                    "image",
-                    trainerData.image
-                );
-            }
+      // Active status
+      if (
+        trainerData.isActive !== undefined &&
+        trainerData.isActive !== null
+      ) {
+        formData.append(
+          "isActive",
+          String(trainerData.isActive)
+        );
+      }
 
-            const { data } = await API.put(
-                `/trainers/${id}`,
-                formData
-            );
+      // New image only
+      if (
+        typeof File !== "undefined" &&
+        trainerData.image instanceof File
+      ) {
+        formData.append(
+          "image",
+          trainerData.image
+        );
+      }
 
-            return data;
-        } catch (error) {
-            return rejectWithValue(
-                error.response?.data?.message ||
-                "Failed to update trainer"
-            );
-        }
+      const response = await API.put(
+        `/trainers/${id}`,
+        formData
+      );
+
+      return response.data;
+    } catch (error) {
+      return rejectWithValue(
+        error.response?.data?.message ||
+          "Failed to update trainer"
+      );
     }
+  }
 );
 
-// ============================
+// ======================================
 // DELETE TRAINER
-// ============================
+// DELETE /api/trainers/:id
+// ======================================
 export const deleteTrainer = createAsyncThunk(
-    "trainer/deleteTrainer",
-    async (id, { rejectWithValue }) => {
-        try {
-            const { data } = await API.delete(
-                `/trainers/${id}`
-            );
+  "trainer/deleteTrainer",
+  async (id, { rejectWithValue }) => {
+    try {
+      if (!id) {
+        return rejectWithValue(
+          "Trainer ID is required"
+        );
+      }
 
-            return {
-                ...data,
-                id,
-            };
-        } catch (error) {
-            return rejectWithValue(
-                error.response?.data?.message ||
-                "Failed to delete trainer"
-            );
-        }
+      const response = await API.delete(
+        `/trainers/${id}`
+      );
+
+      return {
+        ...response.data,
+        id,
+      };
+    } catch (error) {
+      return rejectWithValue(
+        error.response?.data?.message ||
+          "Failed to delete trainer"
+      );
     }
+  }
 );
 
-// ============================
+// ======================================
 // INITIAL STATE
-// ============================
+// ======================================
 const initialState = {
-    trainers: [],
-    selectedTrainer: null,
-    loading: false,
-    error: null,
-    success: false,
-    message: "",
+  trainers: [],
+  selectedTrainer: null,
+
+  loading: false,
+  error: null,
+
+  success: false,
+  message: "",
 };
 
-// ============================
+// ======================================
 // SLICE
-// ============================
+// ======================================
 const trainerSlice = createSlice({
-    name: "trainer",
-    initialState,
+  name: "trainer",
 
-    reducers: {
-        clearTrainerError: (state) => {
-            state.error = null;
-        },
+  initialState,
 
-        clearTrainerSuccess: (state) => {
-            state.success = false;
-            state.message = "";
-        },
+  reducers: {
+    // ======================================
+    // CLEAR ERROR
+    // ======================================
+    clearTrainerError: (state) => {
+      state.error = null;
+    },
 
-        clearSelectedTrainer: (state) => {
+    // ======================================
+    // CLEAR SUCCESS
+    // ======================================
+    clearTrainerSuccess: (state) => {
+      state.success = false;
+      state.message = "";
+    },
+
+    // ======================================
+    // CLEAR SELECTED TRAINER
+    // ======================================
+    clearSelectedTrainer: (state) => {
+      state.selectedTrainer = null;
+    },
+
+    // ======================================
+    // RESET TRAINER STATE
+    // ======================================
+    resetTrainerState: (state) => {
+      state.loading = false;
+      state.error = null;
+      state.success = false;
+      state.message = "";
+      state.selectedTrainer = null;
+    },
+  },
+
+  extraReducers: (builder) => {
+    builder
+
+      // ======================================
+      // GET ALL TRAINERS
+      // ======================================
+      .addCase(
+        getTrainers.pending,
+        (state) => {
+          state.loading = true;
+          state.error = null;
+        }
+      )
+
+      .addCase(
+        getTrainers.fulfilled,
+        (state, action) => {
+          state.loading = false;
+          state.error = null;
+
+          state.trainers =
+            action.payload?.data || [];
+        }
+      )
+
+      .addCase(
+        getTrainers.rejected,
+        (state, action) => {
+          state.loading = false;
+
+          state.error =
+            action.payload ||
+            "Failed to fetch trainers";
+        }
+      )
+
+      // ======================================
+      // GET SINGLE TRAINER
+      // ======================================
+      .addCase(
+        getTrainerById.pending,
+        (state) => {
+          state.loading = true;
+          state.error = null;
+        }
+      )
+
+      .addCase(
+        getTrainerById.fulfilled,
+        (state, action) => {
+          state.loading = false;
+          state.error = null;
+
+          state.selectedTrainer =
+            action.payload?.data || null;
+        }
+      )
+
+      .addCase(
+        getTrainerById.rejected,
+        (state, action) => {
+          state.loading = false;
+
+          state.error =
+            action.payload ||
+            "Failed to fetch trainer";
+        }
+      )
+
+      // ======================================
+      // CREATE TRAINER
+      // ======================================
+      .addCase(
+        createTrainer.pending,
+        (state) => {
+          state.loading = true;
+          state.error = null;
+          state.success = false;
+          state.message = "";
+        }
+      )
+
+      .addCase(
+        createTrainer.fulfilled,
+        (state, action) => {
+          state.loading = false;
+          state.error = null;
+          state.success = true;
+
+          state.message =
+            action.payload?.message ||
+            "Trainer created successfully";
+
+          const newTrainer =
+            action.payload?.data;
+
+          if (newTrainer) {
+            state.trainers.unshift(
+              newTrainer
+            );
+          }
+        }
+      )
+
+      .addCase(
+        createTrainer.rejected,
+        (state, action) => {
+          state.loading = false;
+          state.success = false;
+
+          state.error =
+            action.payload ||
+            "Failed to create trainer";
+        }
+      )
+
+      // ======================================
+      // UPDATE TRAINER
+      // ======================================
+      .addCase(
+        updateTrainer.pending,
+        (state) => {
+          state.loading = true;
+          state.error = null;
+          state.success = false;
+          state.message = "";
+        }
+      )
+
+      .addCase(
+        updateTrainer.fulfilled,
+        (state, action) => {
+          state.loading = false;
+          state.error = null;
+          state.success = true;
+
+          state.message =
+            action.payload?.message ||
+            "Trainer updated successfully";
+
+          const updatedTrainer =
+            action.payload?.data;
+
+          if (!updatedTrainer) {
+            return;
+          }
+
+          // Update trainer inside list
+          const index =
+            state.trainers.findIndex(
+              (trainer) =>
+                trainer._id ===
+                updatedTrainer._id
+            );
+
+          if (index !== -1) {
+            state.trainers[index] =
+              updatedTrainer;
+          }
+
+          // Update selected trainer
+          if (
+            state.selectedTrainer?._id ===
+            updatedTrainer._id
+          ) {
+            state.selectedTrainer =
+              updatedTrainer;
+          }
+        }
+      )
+
+      .addCase(
+        updateTrainer.rejected,
+        (state, action) => {
+          state.loading = false;
+          state.success = false;
+
+          state.error =
+            action.payload ||
+            "Failed to update trainer";
+        }
+      )
+
+      // ======================================
+      // DELETE TRAINER
+      // ======================================
+      .addCase(
+        deleteTrainer.pending,
+        (state) => {
+          state.loading = true;
+          state.error = null;
+          state.success = false;
+          state.message = "";
+        }
+      )
+
+      .addCase(
+        deleteTrainer.fulfilled,
+        (state, action) => {
+          state.loading = false;
+          state.error = null;
+          state.success = true;
+
+          state.message =
+            action.payload?.message ||
+            "Trainer deleted successfully";
+
+          const deletedId =
+            action.payload?.id;
+
+          state.trainers =
+            state.trainers.filter(
+              (trainer) =>
+                trainer._id !== deletedId
+            );
+
+          if (
+            state.selectedTrainer?._id ===
+            deletedId
+          ) {
             state.selectedTrainer = null;
-        },
-    },
+          }
+        }
+      )
 
-    extraReducers: (builder) => {
-        builder
+      .addCase(
+        deleteTrainer.rejected,
+        (state, action) => {
+          state.loading = false;
+          state.success = false;
 
-            // ============================
-            // GET ALL TRAINERS
-            // ============================
-            .addCase(getTrainers.pending, (state) => {
-                state.loading = true;
-                state.error = null;
-            })
-
-            .addCase(getTrainers.fulfilled, (state, action) => {
-                state.loading = false;
-                state.trainers = action.payload.data || [];
-                state.error = null;
-            })
-
-            .addCase(getTrainers.rejected, (state, action) => {
-                state.loading = false;
-                state.error = action.payload;
-            })
-
-            // ============================
-            // GET SINGLE TRAINER
-            // ============================
-            .addCase(getTrainerById.pending, (state) => {
-                state.loading = true;
-                state.error = null;
-            })
-
-            .addCase(getTrainerById.fulfilled, (state, action) => {
-                state.loading = false;
-                state.selectedTrainer =
-                    action.payload.data;
-                state.error = null;
-            })
-
-            .addCase(getTrainerById.rejected, (state, action) => {
-                state.loading = false;
-                state.error = action.payload;
-            })
-
-            // ============================
-            // CREATE TRAINER
-            // ============================
-            .addCase(createTrainer.pending, (state) => {
-                state.loading = true;
-                state.error = null;
-                state.success = false;
-            })
-
-            .addCase(createTrainer.fulfilled, (state, action) => {
-                state.loading = false;
-                state.success = true;
-                state.message = action.payload.message;
-                state.error = null;
-
-                if (action.payload.data) {
-                    state.trainers.unshift(
-                        action.payload.data
-                    );
-                }
-            })
-
-            .addCase(createTrainer.rejected, (state, action) => {
-                state.loading = false;
-                state.success = false;
-                state.error = action.payload;
-            })
-
-            // ============================
-            // UPDATE TRAINER
-            // ============================
-            .addCase(updateTrainer.pending, (state) => {
-                state.loading = true;
-                state.error = null;
-                state.success = false;
-            })
-
-            .addCase(updateTrainer.fulfilled, (state, action) => {
-                state.loading = false;
-                state.success = true;
-                state.message = action.payload.message;
-                state.error = null;
-
-                const updatedTrainer =
-                    action.payload.data;
-
-                if (updatedTrainer) {
-                    const index = state.trainers.findIndex(
-                        (trainer) =>
-                            trainer._id ===
-                            updatedTrainer._id
-                    );
-
-                    if (index !== -1) {
-                        state.trainers[index] =
-                            updatedTrainer;
-                    }
-
-                    if (
-                        state.selectedTrainer &&
-                        state.selectedTrainer._id ===
-                        updatedTrainer._id
-                    ) {
-                        state.selectedTrainer =
-                            updatedTrainer;
-                    }
-                }
-            })
-
-            .addCase(updateTrainer.rejected, (state, action) => {
-                state.loading = false;
-                state.success = false;
-                state.error = action.payload;
-            })
-
-            // ============================
-            // DELETE TRAINER
-            // ============================
-            .addCase(deleteTrainer.pending, (state) => {
-                state.loading = true;
-                state.error = null;
-                state.success = false;
-            })
-
-            .addCase(deleteTrainer.fulfilled, (state, action) => {
-                state.loading = false;
-                state.success = true;
-                state.message = action.payload.message;
-                state.error = null;
-
-                state.trainers = state.trainers.filter(
-                    (trainer) =>
-                        trainer._id !== action.payload.id
-                );
-
-                if (
-                    state.selectedTrainer &&
-                    state.selectedTrainer._id ===
-                    action.payload.id
-                ) {
-                    state.selectedTrainer = null;
-                }
-            })
-
-            .addCase(deleteTrainer.rejected, (state, action) => {
-                state.loading = false;
-                state.success = false;
-                state.error = action.payload;
-            });
-    },
+          state.error =
+            action.payload ||
+            "Failed to delete trainer";
+        }
+      );
+  },
 });
 
-// ============================
+// ======================================
 // ACTIONS
-// ============================
+// ======================================
 export const {
-    clearTrainerError,
-    clearTrainerSuccess,
-    clearSelectedTrainer,
+  clearTrainerError,
+  clearTrainerSuccess,
+  clearSelectedTrainer,
+  resetTrainerState,
 } = trainerSlice.actions;
 
-// ============================
+// ======================================
 // REDUCER
-// ============================
+// ======================================
 export default trainerSlice.reducer;

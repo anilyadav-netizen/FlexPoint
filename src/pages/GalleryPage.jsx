@@ -227,7 +227,6 @@ const GalleryPage = () => {
                                 </article>
                             ))}
                         </div>
-
                     ) : (
 
                         /* EMPTY STATE */

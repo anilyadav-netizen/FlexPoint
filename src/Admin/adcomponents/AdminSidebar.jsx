@@ -26,11 +26,11 @@ const AdminSidebar = ({ sidebarOpen, onClose }) => {
         { title: "Blogs", icon: FileText, path: "/admin/adblogs" },
     ];
 
-    const managementMenu = [
-        { title: "Payments", icon: CreditCard, path: "/admin/payments" },
-        { title: "Attendance", icon: ClipboardCheck, path: "/admin/attandance" },
-        { title: "Progress", icon: TrendingUp, path: "/admin/progress" },
-    ];
+    // const managementMenu = [
+    //     { title: "Payments", icon: CreditCard, path: "/admin/payments" },
+    //     { title: "Attendance", icon: ClipboardCheck, path: "/admin/attandance" },
+    //     { title: "Progress", icon: TrendingUp, path: "/admin/progress" },
+    // ];
 
     const linkClass = ({ isActive }) =>
         `flex items-center gap-3 px-3 py-2.5 rounded-lg text-[14px] transition-all duration-200 ${
@@ -85,7 +85,7 @@ const AdminSidebar = ({ sidebarOpen, onClose }) => {
                     </div>
                 )}
 
-                <p className="px-3 mt-6 mb-2 text-[11px] font-semibold text-[#778387] uppercase tracking-wider">Management</p>
+                {/* <p className="px-3 mt-6 mb-2 text-[11px] font-semibold text-[#778387] uppercase tracking-wider">Management</p>
 
                 <button onClick={() => setOpenManagement(!openManagement)} className="w-full flex items-center justify-between px-3 py-2.5 rounded-lg text-[14px] text-[#606E6E] dark:text-[#AEB7BA] hover:bg-[#F8F9FB] dark:hover:bg-white/5 hover:text-[#1F272B] dark:hover:text-[#F4F6F7] transition">
                     <div className="flex items-center gap-3">
@@ -93,8 +93,8 @@ const AdminSidebar = ({ sidebarOpen, onClose }) => {
                         <span>Management</span>
                     </div>
                     <ChevronDown size={16} className={`transition-transform duration-200 ${openManagement ? "" : "-rotate-90"}`} />
-                </button>
-
+                </button> */}
+{/* 
                 {openManagement && (
                     <div className="mt-1 ml-3 pl-3 border-l border-[#E2E6E8] dark:border-[#303A3F] space-y-1">
                         {managementMenu.map(({ title, icon: Icon, path }) => (
@@ -104,7 +104,7 @@ const AdminSidebar = ({ sidebarOpen, onClose }) => {
                             </NavLink>
                         ))}
                     </div>
-                )}
+                )} */}
             </div>
 
             <div className="shrink-0 p-3 border-t border-[#E7EAED] dark:border-[#303A3F]">

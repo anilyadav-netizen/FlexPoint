@@ -29,7 +29,7 @@ const TrainerPage = () => {
     };
 
     const activeTrainers = useMemo(() => trainers.filter((trainer) => trainer.isActive !== false), [trainers]);
-    const trainersPerPage = 10;
+    const trainersPerPage = 12;
     const totalPages = Math.ceil(activeTrainers.length / trainersPerPage);
     const currentTrainers = activeTrainers.slice(activePage * trainersPerPage, activePage * trainersPerPage + trainersPerPage);
 

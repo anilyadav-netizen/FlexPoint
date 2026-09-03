@@ -4,9 +4,9 @@ import "./App.css";
 import Footer from "./components/Footer";
 import Navbar from "./components/Navbar";
 import ScrollToTop from "./components/ScrollToTop";
+
 import { useEffect } from "react";
 import { useDispatch } from "react-redux";
-import { getCurrentUser } from "./redux/Slicer/authSlice";
 
 import Home from "./pages/Home";
 import Privacy from "./pages/Privacy";
@@ -43,6 +43,7 @@ import MyProfile from "./Admin/adPages/MyProfile";
 
 import PrivateRoute from "./routes/PrivateRoute";
 import AdminRoute from "./routes/AdminRoute";
+import { clearAuth, getCurrentUser } from "./redux/Slicer/authSlice";
 
 const WebsiteLayout = () => {
   return (
@@ -70,142 +71,91 @@ const WebsiteLayout = () => {
 };
 
 function App() {
-
   const dispatch = useDispatch();
+
   useEffect(() => {
-    dispatch(getCurrentUser());
+    const token = localStorage.getItem("token");
+
+    console.log("TOKEN:", token);
+
+    if (token) {
+      console.log("Calling getCurrentUser...");
+      dispatch(getCurrentUser());
+    } else {
+      console.log("No token found");
+      dispatch(clearAuth());
+    }
   }, [dispatch]);
+
 
   return (
     <>
       <ScrollToTop />
 
       <Routes>
-
         {/* ========================================
                     PUBLIC WEBSITE ROUTES
-                ======================================== */}
-        <Route path="/*" element={<WebsiteLayout />} />
+        ======================================== */}
 
+        <Route path="/*" element={<WebsiteLayout />} />
 
         {/* ========================================
                     AUTHENTICATION ROUTES
                     No Navbar / Footer
-                ======================================== */}
+        ======================================== */}
+
         <Route path="/login" element={<LoginPage />} />
         <Route path="/signup" element={<SignupPage />} />
 
-
         {/* ========================================
                     PROTECTED ADMIN ROUTES
-                ======================================== */}
+        ======================================== */}
 
-        {/* Step 1: User must be logged in */}
         <Route element={<PrivateRoute />}>
-
-          {/* Step 2: User must be admin */}
           <Route element={<AdminRoute />}>
-
             <Route path="/admin" element={<AdminLayout />}>
 
               <Route index element={<Dashboard />} />
 
-              <Route
-                path="dashboard"
-                element={<Dashboard />}
-              />
+              <Route path="dashboard" element={<Dashboard />} />
 
-              <Route
-                path="members"
-                element={<Members />}
-              />
+              <Route path="members" element={<Members />} />
 
-              <Route
-                path="adtrainers"
-                element={<AdTrainer />}
-              />
+              <Route path="adtrainers" element={<AdTrainer />} />
 
-              <Route
-                path="adprogram"
-                element={<AdProgram />}
-              />
+              <Route path="adprogram" element={<AdProgram />} />
 
-              <Route
-                path="adPremium"
-                element={<AdPremium />}
-              />
+              <Route path="adPremium" element={<AdPremium />} />
 
-              <Route
-                path="adContact"
-                element={<AdContact />}
-              />
+              <Route path="adContact" element={<AdContact />} />
 
-              <Route
-                path="addtrainer"
-                element={<AddTrainers />}
-              />
+              <Route path="addtrainer" element={<AddTrainers />} />
 
-              <Route
-                path="addmembers"
-                element={<AddMember />}
-              />
+              <Route path="addmembers" element={<AddMember />} />
 
-              <Route
-                path="payments"
-                element={<Payment />}
-              />
+              <Route path="payments" element={<Payment />} />
 
-              <Route
-                path="attandance"
-                element={<Attandance />}
-              />
+              <Route path="attandance" element={<Attandance />} />
 
-              <Route
-                path="progress"
-                element={<Progress />}
-              />
+              <Route path="progress" element={<Progress />} />
 
-              <Route
-                path="profile"
-                element={<MyProfile />}
-              />
+              <Route path="profile" element={<MyProfile />} />
 
-              <Route
-                path="addprogram"
-                element={<AddProgram />}
-              />
+              <Route path="addprogram" element={<AddProgram />} />
 
-              <Route
-                path="testimonials"
-                element={<Testimonials />}
-              />
+              <Route path="testimonials" element={<Testimonials />} />
 
-              <Route
-                path="addreview"
-                element={<AddReview />}
-              />
+              <Route path="addreview" element={<AddReview />} />
 
-              <Route
-                path="adgallery"
-                element={<AdGallery />}
-              />
+              <Route path="adgallery" element={<AdGallery />} />
 
-              <Route
-                path="adblogs"
-                element={<AdBlog />}
-              />
+              <Route path="adblogs" element={<AdBlog />} />
 
-              <Route
-                path="addblogs"
-                element={<AddBlogPage />}
-              />
+              <Route path="addblogs" element={<AddBlogPage />} />
 
             </Route>
-
           </Route>
-
         </Route>
-
       </Routes>
     </>
   );

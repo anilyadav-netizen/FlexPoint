@@ -2,7 +2,7 @@ const axios = require("axios");
 const Trainer = require("../models/Trainer");
 
 // ======================================
-// Upload Image to ImgBB
+// UPLOAD IMAGE TO IMGBB
 // ======================================
 const uploadToImgBB = async (file) => {
   if (!file) {
@@ -30,7 +30,7 @@ const uploadToImgBB = async (file) => {
     }
   );
 
-  if (!response.data.success) {
+  if (!response.data?.success) {
     throw new Error("ImgBB image upload failed");
   }
 
@@ -50,7 +50,7 @@ const createTrainer = async (req, res) => {
       experience,
       icon,
       isActive,
-    } = req.body;
+    } = req.body || {};
 
     if (
       !number ||
@@ -73,7 +73,9 @@ const createTrainer = async (req, res) => {
       });
     }
 
-    const existingTrainer = await Trainer.findOne({ number });
+    const existingTrainer = await Trainer.findOne({
+      number: String(number).trim(),
+    });
 
     if (existingTrainer) {
       return res.status(409).json({
@@ -85,16 +87,16 @@ const createTrainer = async (req, res) => {
     const imageUrl = await uploadToImgBB(req.file);
 
     const trainer = await Trainer.create({
-      number,
-      name,
-      role,
-      specialty,
-      experience,
+      number: String(number).trim(),
+      name: String(name).trim(),
+      role: String(role).trim(),
+      specialty: String(specialty).trim(),
+      experience: String(experience).trim(),
       image: imageUrl,
       icon: icon || "Users",
       isActive:
         isActive !== undefined
-          ? isActive === "true" || isActive === true
+          ? isActive === true || isActive === "true"
           : true,
     });
 
@@ -200,12 +202,17 @@ const updateTrainer = async (req, res) => {
       experience,
       icon,
       isActive,
-    } = req.body;
+    } = req.body || {};
 
-    // Check duplicate number
-    if (number !== undefined && number !== trainer.number) {
+    // ======================================
+    // CHECK DUPLICATE NUMBER
+    // ======================================
+    if (
+      number !== undefined &&
+      String(number).trim() !== String(trainer.number)
+    ) {
       const existingTrainer = await Trainer.findOne({
-        number,
+        number: String(number).trim(),
         _id: { $ne: id },
       });
 
@@ -216,23 +223,26 @@ const updateTrainer = async (req, res) => {
         });
       }
 
-      trainer.number = number;
+      trainer.number = String(number).trim();
     }
 
+    // ======================================
+    // UPDATE BASIC FIELDS
+    // ======================================
     if (name !== undefined) {
-      trainer.name = name;
+      trainer.name = String(name).trim();
     }
 
     if (role !== undefined) {
-      trainer.role = role;
+      trainer.role = String(role).trim();
     }
 
     if (specialty !== undefined) {
-      trainer.specialty = specialty;
+      trainer.specialty = String(specialty).trim();
     }
 
     if (experience !== undefined) {
-      trainer.experience = experience;
+      trainer.experience = String(experience).trim();
     }
 
     if (icon !== undefined) {
@@ -241,10 +251,12 @@ const updateTrainer = async (req, res) => {
 
     if (isActive !== undefined) {
       trainer.isActive =
-        isActive === "true" || isActive === true;
+        isActive === true || isActive === "true";
     }
 
-    // New image
+    // ======================================
+    // UPDATE IMAGE ONLY IF NEW IMAGE EXISTS
+    // ======================================
     if (req.file) {
       const imageUrl = await uploadToImgBB(req.file);
       trainer.image = imageUrl;
@@ -273,9 +285,7 @@ const updateTrainer = async (req, res) => {
 // ======================================
 const deleteTrainer = async (req, res) => {
   try {
-    const trainer = await Trainer.findByIdAndDelete(
-      req.params.id
-    );
+    const trainer = await Trainer.findByIdAndDelete(req.params.id);
 
     if (!trainer) {
       return res.status(404).json({
@@ -287,6 +297,7 @@ const deleteTrainer = async (req, res) => {
     return res.status(200).json({
       success: true,
       message: "Trainer deleted successfully",
+      data: trainer,
     });
   } catch (error) {
     console.error("Delete Trainer Error:", error);

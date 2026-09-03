@@ -56,24 +56,30 @@ const register = async (req, res) => {
       });
     }
 
-    // ✅ Hash password manually in controller
+    // Hash password
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(password, salt);
 
     const user = await User.create({
       name,
       email: email.toLowerCase(),
-      password: hashedPassword, // 👈 store hashed password
+      password: hashedPassword,
       role: "user",
     });
 
+    // Generate JWT
     const token = generateToken(user);
 
+    // Save token in HTTP-only cookie
     res.cookie("token", token, cookieOptions);
 
     return res.status(201).json({
       success: true,
       message: "Registration successful",
+
+      // ✅ YAHAN ADD KARNA HAI
+      token,
+
       user: {
         id: user._id,
         name: user.name,
@@ -124,7 +130,6 @@ const login = async (req, res) => {
       });
     }
 
-    // Compare plain password with hashed password
     const isMatch = await bcrypt.compare(password, user.password);
 
     if (!isMatch) {
@@ -136,11 +141,14 @@ const login = async (req, res) => {
 
     const token = generateToken(user);
 
+    // Cookie bhi rahegi
     res.cookie("token", token, cookieOptions);
 
+    // Token response me bhi bhej rahe hain
     return res.status(200).json({
       success: true,
       message: "Login successful",
+      token,
       user: {
         id: user._id,
         name: user.name,

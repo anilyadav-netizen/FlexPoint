@@ -1,77 +1,75 @@
 const express = require("express");
-
-const {
-  upload,
-  createTestimonial,
-  getAllTestimonials,
-  getActiveTestimonials,
-  getTestimonialById,
-  updateTestimonial,
-  deleteTestimonial,
-} = require("../controllers/testimonialController");
+const multer = require("multer");
 
 const router = express.Router();
 
-// ======================================================
-// CREATE TESTIMONIAL
-// POST /api/testimonials
-// ======================================================
+const {
+  createTrainer,
+  getTrainers,
+  getTrainerById,
+  updateTrainer,
+  deleteTrainer,
+} = require("../controllers/trainerController");
 
+// ======================================
+// MULTER CONFIG
+// ======================================
+const storage = multer.memoryStorage();
+
+const upload = multer({
+  storage,
+  limits: {
+    fileSize: 5 * 1024 * 1024,
+  },
+  fileFilter: (req, file, cb) => {
+    if (
+      file.mimetype &&
+      file.mimetype.startsWith("image/")
+    ) {
+      cb(null, true);
+    } else {
+      cb(new Error("Only image files are allowed"), false);
+    }
+  },
+});
+
+// ======================================
+// CREATE TRAINER
+// POST /api/trainers
+// ======================================
 router.post(
   "/",
   upload.single("image"),
-  createTestimonial
+  createTrainer
 );
 
-// ======================================================
-// GET ALL TESTIMONIALS
-// GET /api/testimonials
-// ======================================================
+// ======================================
+// GET ALL TRAINERS
+// GET /api/trainers
+// GET /api/trainers?active=true
+// ======================================
+router.get("/", getTrainers);
 
-router.get(
-  "/",
-  getAllTestimonials
-);
+// ======================================
+// GET SINGLE TRAINER
+// GET /api/trainers/:id
+// ======================================
+router.get("/:id", getTrainerById);
 
-// ======================================================
-// GET ACTIVE TESTIMONIALS
-// GET /api/testimonials/active
-// ======================================================
-
-router.get(
-  "/active",
-  getActiveTestimonials
-);
-
-// ======================================================
-// GET SINGLE TESTIMONIAL
-// GET /api/testimonials/:id
-// ======================================================
-
-router.get(
-  "/:id",
-  getTestimonialById
-);
-
-// ======================================================
-// UPDATE TESTIMONIAL
-// PUT /api/testimonials/:id
-// ======================================================
-
+// ======================================
+// UPDATE TRAINER
+// PUT /api/trainers/:id
+// ======================================
 router.put(
   "/:id",
   upload.single("image"),
-  updateTestimonial
+  updateTrainer
 );
 
-// ======================================================
-// DELETE TESTIMONIAL
-// DELETE /api/testimonials/:id
-// ======================================================
-
-router.delete(
-  "/:id",
-  deleteTestimonial
-);
+// ======================================
+// DELETE TRAINER
+// DELETE /api/trainers/:id
+// ======================================
+router.delete("/:id", deleteTrainer);
 
 module.exports = router;
