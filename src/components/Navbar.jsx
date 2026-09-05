@@ -167,8 +167,8 @@ const Navbar = () => {
 
                                         <span
                                             className={`absolute bottom-[20px] left-1/2 h-[2px] -translate-x-1/2 bg-[#e85d3a] transition-all duration-300 ${isActive
-                                                    ? "w-7"
-                                                    : "w-0 group-hover:w-7"
+                                                ? "w-7"
+                                                : "w-0 group-hover:w-7"
                                                 }`}
                                         />
                                     </>
@@ -475,8 +475,8 @@ const Navbar = () => {
                                                         <span className="flex items-center gap-3">
                                                             <span
                                                                 className={`h-1.5 w-1.5 transition-all duration-300 ${isActive
-                                                                        ? "scale-100 bg-[#e85d3a] opacity-100"
-                                                                        : "scale-0 bg-[#e85d3a] opacity-0"
+                                                                    ? "scale-100 bg-[#e85d3a] opacity-100"
+                                                                    : "scale-0 bg-[#e85d3a] opacity-0"
                                                                     }`}
                                                             />
 
@@ -487,8 +487,8 @@ const Navbar = () => {
 
                                                         <span
                                                             className={`flex h-7 w-7 items-center justify-center border transition-all duration-300 ${isActive
-                                                                    ? "border-[#e85d3a] bg-[#e85d3a] text-white"
-                                                                    : "border-white/10 bg-[#171717] text-white/35 group-hover:border-[#e85d3a] group-hover:bg-[#e85d3a] group-hover:text-white"
+                                                                ? "border-[#e85d3a] bg-[#e85d3a] text-white"
+                                                                : "border-white/10 bg-[#171717] text-white/35 group-hover:border-[#e85d3a] group-hover:bg-[#e85d3a] group-hover:text-white"
                                                                 }`}
                                                         >
                                                             <ArrowUpRight
